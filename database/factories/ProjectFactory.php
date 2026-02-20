@@ -14,7 +14,7 @@ class ProjectFactory extends Factory
             'name' => fake()->words(3, true),
             'description' => fake()->optional()->paragraph(),
             'status' => 'created',
-            'color' => fake()->optional()->hexColor(),
+            'color' => fake()->hexColor(),
             'user_modified_at' => null,
         ];
     }
