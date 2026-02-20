@@ -13,7 +13,7 @@
 | **Tipo** | Plataforma web freemium |
 | **Modelos** | 10 entidades principales |
 | **Roles** | 3 (admin, premium_user, free_user) |
-| **Tests** | 50+ tests Pest |
+| **Tests** | 143 tests Pest (todos pasando ✅) |
 | **Rutas** | 50+ rutas protegidas |
 
 ---
@@ -256,8 +256,11 @@ $user->hasRole('admin')
 | `RoleDoesNotExist` | `php artisan migrate` + `php artisan db:seed` |
 | `Class not found` | `composer dump-autoload` |
 | `N+1 queries` | Usar `with()` en queries |
-| `Unauthorized` | Verificar `authorize()` en FormRequest |
-| `Route not found` | Verificar `web.php` y `php artisan routes:list` |
+| `Unauthorized` / `authorize() undefined` | Controller base necesita `use AuthorizesRequests` |
+| `Route not found` | Verificar `web.php` y `php artisan route:list` |
+| `ViteException` en tests | Ya corregido: `app.blade.php` solo incluye `app.tsx` |
+| `Inertia page does not exist` | Crear archivo `.tsx` en `resources/js/pages/` |
+| `hasEnabledTwoFactorAuthentication()` | User model necesita `use TwoFactorAuthenticatable` |
 
 ---
 
@@ -400,7 +403,26 @@ Claude tendrá todo el contexto listo.
 
 ---
 
-**Última actualización:** Febrero 2026  
-**Versión:** 1.0 Flowly
+---
+
+## ⚠️ ENUMS VERIFICADOS (NO INVENTAR VALORES)
+
+| Modelo | Campo | Valores válidos |
+|--------|-------|-----------------|
+| Task | status | `pending` \| `completed` — SIN 'in_progress' |
+| Task | priority | `low` \| `medium` \| `high` |
+| Project | status | `active` \| `created` \| `completed` — SIN 'archived' |
+| Idea | status | `active` \| `resolved` — SIN 'archived' |
+| Idea | source | `manual` \| `voice` \| `ai_suggestion` |
+| Subscription | plan | `free` \| `premium_monthly` \| `premium_yearly` |
+| Subscription | status | `active` \| `expired` \| `cancelled` |
+| Payment | status | `pending` \| `completed` \| `failed` |
+| Resource | type | `link` \| `document` \| `video` \| `image` \| `other` |
+| VoiceRecording | status | `pending` \| `processing` \| `completed` \| `failed` |
+
+---
+
+**Última actualización:** Febrero 2026
+**Versión:** 1.1 Flowly (143 tests pasando)
 
 Imprime esto o mantenlo en una pestaña. Te ahorrará tiempo. 📌

@@ -159,12 +159,14 @@ Spatie Permission Tables (automáticas)
 
 ### Límite de Tareas para Free User
 ```php
+// Task solo tiene status: 'pending' | 'completed' — NO hay 'in_progress'
 if ($user->isFreeUser()) {
-    $activeTasks = $user->tasks()->whereIn('status', ['pending', 'in_progress'])->count();
+    $activeTasks = $user->tasks()->where('status', 'pending')->count();
     if ($activeTasks >= 5) {
         throw new ValidationException("Máximo 5 tareas activas para usuarios free");
     }
 }
+// El método helper del modelo: $user->canAddTask()
 ```
 
 ### Ownership Check
@@ -281,9 +283,12 @@ Free User:
 ```
 ✅ Pest para testing
 ✅ Tests en tests/Feature/
-✅ 50+ tests de cobertura
+✅ 143 tests pasando (551 assertions)
 ✅ Tests de Feature, no unitarios
 ✅ Usar RefreshDatabase para resetear BD entre tests
+✅ withoutVite() en beforeEach (Pest.php)
+✅ RoleSeeder sembrado en cada test
+✅ Helpers globales: createAdmin(), createPremiumUser(), createFreeUser()
 ```
 
 ### Git
@@ -303,14 +308,15 @@ Free User:
 hasOne Subscription
 hasMany Projects, Tasks, Ideas, Boxes, Resources, Payments, AiConversations, VoiceRecordings
 hasRoles (Spatie) → admin, premium_user, free_user
+use TwoFactorAuthenticatable (Fortify) ← requerido para 2FA
 
 Métodos:
   isFreeUser()
   isPremiumUser()
   isAdmin()
-  canAddTask()
+  canAddTask()          ← true si no es free O tiene < 5 tareas pending
   getDashboardData()
-  getActiveTasksCount()
+  getActiveTasksCount() ← cuenta tasks WHERE status='pending'
   getCompletedThisMonthCount()
 ```
 
@@ -341,8 +347,11 @@ Métodos:
 belongsTo User
 hasMany Tasks (cascade delete)
 
+// Status: 'active' | 'created' | 'completed' — SIN 'archived'
+// Color: hex string, siempre requerido (NOT NULL, default '#3B82F6')
+
 Scopes:
-  active(), archived(), forUser(User)
+  active(), completed(), forUser(User)
 
 Métodos:
   getTasksSummary() → array
@@ -354,13 +363,15 @@ Métodos:
 belongsTo User, Project (nullable)
 Soft deletes
 
+// Status: 'pending' | 'completed' — SIN 'in_progress'
+// Priority: 'low' | 'medium' | 'high'
+
 Scopes:
-  active(), pending(), inProgress(), completed(), forUser(),
-  byPriority(), overdue(), dueToday(), dueSoon()
+  pending(), completed(), forUser(), byPriority(), overdue(), dueToday(), dueSoon()
 
 Métodos:
-  markAsCompleted()
-  markAsInProgress()
+  markAsCompleted()   ← cambia status a 'completed', guarda completed_at
+  markAsPending()     ← vuelve a 'pending' (NO markAsInProgress — no existe)
   getStatusLabel(), getPriorityLabel()
   isOverdue(), isDueToday()
 ```
@@ -370,14 +381,17 @@ Métodos:
 belongsTo User
 Soft deletes
 
+// Status: 'active' | 'resolved' — SIN 'archived'
+// Source: 'manual' | 'voice' | 'ai_suggestion'
+
 Scopes:
-  active(), archived(), forUser(), byPriority(),
-  fromVoice(), fromAiSuggestion()
+  active(), forUser(), byPriority(), fromVoice(), fromAiSuggestion()
 
 Métodos:
+  markAsResolved()  ← (NO archive())
+  markAsActive()    ← (NO activate())
   getPriorityLabel()
   getSourceLabel()
-  archive(), activate()
 ```
 
 ### Box
@@ -457,39 +471,49 @@ No guardar tokens en BD
 
 ---
 
-## 🧪 TESTING (50+ TESTS)
+## 🧪 TESTING (143 TESTS — TODOS PASANDO ✅)
 
 ```
-TaskControllerTest
+TaskControllerTest (16 tests)
   - List, create, update, delete
-  - Límite 5 tareas para free
-  - Ownership check
-  - Mark as completed
+  - Límite 5 tareas para free (status='pending')
+  - Ownership check via TaskPolicy
+  - markAsCompleted / reopen (markAsPending)
 
-IdeaControllerTest
+IdeaControllerTest (12 tests)
   - CRUD completo
+  - markAsResolved / markAsActive
   - Disponible para free y premium
 
-ProjectControllerTest
-  - CRUD (solo premium)
+ProjectControllerTest (15 tests)
+  - CRUD (solo premium_user + admin)
   - Forbidden para free_user
+  - Ownership via ProjectPolicy
 
-CheckoutControllerTest
+BoxControllerTest (11 tests)
+  - CRUD (solo premium_user + admin)
+  - Ownership via BoxPolicy
+
+ResourceControllerTest (10 tests)
+  - create/store nested bajo /boxes/{box}/resources
+  - update/delete standalone
+  - Ownership via ResourcePolicy
+
+CheckoutControllerTest (7 tests)
   - Validar tarjeta simulada
   - 80% éxito, 20% fallo
-  - Actualizar suscripción
+  - Actualizar suscripción al completar pago
 
-SubscriptionControllerTest
-  - Ver suscripción actual
+SubscriptionControllerTest (4 tests)
+  - Ver suscripción actual y planes disponibles
 
-AdminDashboardControllerTest
-  - Estadísticas globales
-  - Acceso solo admin
+AdminControllerTest (17 tests)
+  - Dashboard con stats, recentPayments, recentUsers
+  - Users index/show/destroy
+  - Payments y Subscriptions index con summary
+  - Acceso solo admin, 403 para free/premium
 
-AdminUserControllerTest
-  - CRUD de usuarios
-  - Cambiar roles
-  - Proteger self-delete
+Auth + Settings (51 tests) — Auth, 2FA, Email, Profile, Password
 ```
 
 ---
@@ -629,10 +653,13 @@ AiChat    → Solo premium_user
 User::isFreeUser()
 User::isPremiumUser()
 User::isAdmin()
-User::canAddTask()
+User::canAddTask()              ← cuenta pending tasks, no in_progress
 Subscription::upgradeToPremium(plan)
-Payment::process() → simula éxito/fallo
+Payment::process()              → simula 80% éxito / 20% fallo
 Task::markAsCompleted()
+Task::markAsPending()           ← reabrir tarea (NO markAsInProgress)
+Idea::markAsResolved()          ← (NO archive())
+Idea::markAsActive()            ← (NO activate())
 ```
 
 ---

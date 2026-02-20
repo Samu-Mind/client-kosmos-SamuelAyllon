@@ -52,28 +52,28 @@
 
 ## ✨ Features
 
-### Core (Todos los Usuarios)
-- ✅ Autenticación segura (registro, login, 2FA)
-- ✅ Gestor de ideas sin límite
-- ✅ Gestor de tareas (5 para free, ilimitadas para premium)
-- ✅ Dashboard personal con estadísticas
-- ✅ Filtros y búsqueda
-- ✅ Soft deletes (recuperar datos eliminados)
+### Core (Todos los Usuarios) — Backend ✅ / Frontend ⚠️
+- ✅ Autenticación segura (registro, login, 2FA) — Fortify
+- ✅ Gestor de ideas sin límite (backend + tests)
+- ✅ Gestor de tareas con límite free (backend + tests)
+- ✅ Soft deletes en tareas e ideas
+- ✅ Checkout y suscripción simulada (backend + tests)
+- ⚠️ Dashboard personal (existe, sin datos reales todavía)
+- ⚠️ UI de tareas e ideas (páginas placeholder, sin UI real)
 
-### Premium Features
-- ✅ Proyectos con jerarquía de tareas
-- ✅ Cajas de conocimiento (categorías de recursos)
-- ✅ Almacenamiento de referencias y URLs
-- ✅ Transcripción de voz (OpenAI Whisper)
-- ✅ Asistente IA avanzado con sugerencias
-- ✅ Análisis de productividad personalizado
+### Premium Features — Backend ✅ / Frontend ⚠️
+- ✅ Proyectos con jerarquía de tareas (backend + tests)
+- ✅ Cajas de conocimiento y recursos (backend + tests)
+- ⚠️ UI de proyectos, cajas, recursos (páginas placeholder)
+- 🔲 Transcripción de voz (OpenAI Whisper) — pendiente
+- 🔲 Asistente IA — pendiente
 
-### Admin Features
-- ✅ Dashboard con estadísticas globales
-- ✅ Gestión de usuarios y roles
-- ✅ Historial completo de pagos
-- ✅ Control de suscripciones
-- ✅ Ingresos y análisis de negocio
+### Admin Features — Backend ✅ / Frontend ⚠️
+- ✅ Dashboard con estadísticas globales (backend + tests)
+- ✅ Gestión de usuarios (index + show + destroy)
+- ✅ Historial de pagos con resumen
+- ✅ Control de suscripciones con stats por plan
+- ⚠️ UI admin (páginas placeholder, sin UI real)
 
 ---
 
@@ -220,39 +220,57 @@ flowly/
 │   │   │   ├── TaskController.php
 │   │   │   ├── IdeaController.php
 │   │   │   ├── ProjectController.php
-│   │   │   ├── VoiceController.php
-│   │   │   ├── AiAssistantController.php
+│   │   │   ├── BoxController.php
+│   │   │   ├── ResourceController.php
+│   │   │   ├── SubscriptionController.php
+│   │   │   ├── CheckoutController.php
+│   │   │   ├── DashboardController.php
 │   │   │   └── Admin/
-│   │   └── Requests/
-│   │       ├── StoreTaskRequest.php
-│   │       ├── StoreIdeaRequest.php
-│   │       └── ...
-│   └── Models/
-│       ├── User.php
-│       ├── Task.php
-│       ├── Idea.php
-│       ├── Project.php
-│       ├── Subscription.php
-│       ├── Payment.php
-│       └── ...
+│   │   │       ├── AdminDashboardController.php
+│   │   │       ├── AdminUserController.php
+│   │   │       ├── AdminPaymentController.php
+│   │   │       └── AdminSubscriptionController.php
+│   │   ├── Requests/
+│   │   │   ├── StoreTaskRequest.php / UpdateTaskRequest.php
+│   │   │   ├── StoreIdeaRequest.php / UpdateIdeaRequest.php
+│   │   │   └── ...
+│   │   └── (Middleware via Spatie roles)
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Task.php          ← SoftDeletes
+│   │   ├── Idea.php          ← SoftDeletes
+│   │   ├── Project.php
+│   │   ├── Box.php
+│   │   ├── Resource.php
+│   │   ├── Subscription.php
+│   │   ├── Payment.php
+│   │   ├── AiConversation.php
+│   │   └── VoiceRecording.php
+│   └── Policies/
+│       ├── TaskPolicy.php
+│       ├── IdeaPolicy.php
+│       ├── ProjectPolicy.php
+│       ├── BoxPolicy.php
+│       └── ResourcePolicy.php
 ├── database/
-│   ├── migrations/
+│   ├── migrations/           ← 13 tablas
 │   ├── factories/
 │   └── seeders/
+│       ├── RoleSeeder.php    ← 3 roles Spatie
+│       └── UserSeeder.php    ← admin, premium, free
 ├── resources/
 │   ├── js/
-│   │   ├── Pages/
-│   │   ├── Components/
-│   │   └── Layouts/
+│   │   ├── pages/            ← minúsculas (Inertia)
+│   │   ├── components/
+│   │   │   └── ui/           ← shadcn/ui
+│   │   └── layouts/
 │   └── views/
 │       └── app.blade.php
 ├── routes/
 │   └── web.php
 ├── tests/
-│   └── Feature/
-├── config/
-├── storage/
-├── public/
+│   └── Feature/              ← 143 tests Pest
+├── .claude/                  ← Documentación del proyecto
 ├── .env.example
 ├── README.md
 └── composer.json
@@ -408,24 +426,28 @@ POST /checkout            Procesar pago simulado
 
 ### Rutas Premium (premium_user + admin)
 ```
-GET  /projects            Listar proyectos
-POST /projects            Crear proyecto
-GET  /boxes               Listar cajas
-POST /boxes               Crear caja
-GET  /resources           Listar recursos
-POST /voice/transcribe    Transcribir audio (Whisper)
-GET  /ai-chats            Historial de chat IA
-POST /ai-chats            Enviar mensaje a IA
+GET    /projects            Listar proyectos
+POST   /projects            Crear proyecto
+PUT    /projects/{project}  Actualizar proyecto
+DELETE /projects/{project}  Eliminar proyecto
+GET    /boxes               Listar cajas
+POST   /boxes               Crear caja
+PUT    /boxes/{box}         Actualizar caja
+DELETE /boxes/{box}         Eliminar caja
+GET    /boxes/{box}/resources/create  Crear recurso en caja
+POST   /boxes/{box}/resources         Guardar recurso
+PUT    /resources/{resource}          Actualizar recurso
+DELETE /resources/{resource}          Eliminar recurso
 ```
 
 ### Rutas Admin (admin only)
 ```
-GET  /admin/dashboard     Dashboard admin
-GET  /admin/users         Listar usuarios
-PUT  /admin/users/{id}    Cambiar rol de usuario
-DELETE /admin/users/{id}  Eliminar usuario
-GET  /admin/payments      Listar pagos
-GET  /admin/subscriptions Listar suscripciones
+GET    /admin/dashboard              Dashboard admin
+GET    /admin/users                  Listar usuarios
+GET    /admin/users/{user}           Ver detalle de usuario
+DELETE /admin/users/{user}           Eliminar usuario
+GET    /admin/payments               Listar pagos con resumen
+GET    /admin/subscriptions          Listar suscripciones con stats
 ```
 
 ---
@@ -452,12 +474,12 @@ php artisan test --coverage
 
 ### Tests Incluidos
 ```
-✅ 50+ tests de Feature
+✅ 143 tests de Feature / 551 assertions — todos pasando
 ✅ Cobertura de CRUD completo
-✅ Tests de autorización
-✅ Tests de validación
-✅ Tests de límites (free vs premium)
-✅ Tests de flujos críticos
+✅ Tests de autorización (roles + ownership)
+✅ Tests de validación (válido e inválido)
+✅ Tests de límites (free: 5 tareas pendientes)
+✅ Tests de flujos críticos (checkout, admin)
 ```
 
 ### Ver Cobertura
@@ -566,12 +588,12 @@ NO llamar directamente desde frontend
 
 ## 📖 Documentación Adicional
 
-Para información más detallada, ver:
+Para información más detallada, ver la carpeta `.claude/`:
 
-- 📄 **[1_CONTROLHUB_DescripcionTecnica.md](docs/1_CONTROLHUB_DescripcionTecnica.md)** - Descripción técnica completa
-- 🛠️ **[11_README_GuiaInstalacion.md](docs/11_README_GuiaInstalacion.md)** - Guía detallada de instalación
-- 🧪 **[8_CONTROLHUB_Tests_Pest.php](docs/8_CONTROLHUB_Tests_Pest.php)** - Tests completos
-- 🎓 **[9_CONTROLHUB_PromptMaestro.md](docs/9_CONTROLHUB_PromptMaestro.md)** - Metodología de mentoría
+- 📄 **[.claude/PROJECT_STATE.md](.claude/PROJECT_STATE.md)** - Estado actual del proyecto (qué está hecho y qué falta)
+- 🔍 **[.claude/QUICK_REFERENCE.md](.claude/QUICK_REFERENCE.md)** - Referencia rápida: roles, rutas, enums, errores comunes
+- 📋 **[.claude/CHECKLIST_DESARROLLO.md](.claude/CHECKLIST_DESARROLLO.md)** - Checklist de desarrollo y deployment
+- 🗺️ **[.claude/INDEX_TOTAL_ARCHIVOS.md](.claude/INDEX_TOTAL_ARCHIVOS.md)** - Mapa completo de archivos del proyecto
 
 ---
 
@@ -660,10 +682,10 @@ Desarrollado como proyecto intermodular para aprender:
 ## 🚀 Próximos Pasos
 
 1. **Instala el proyecto** (ver [Instalación Rápida](#instalación-rápida))
-2. **Lee la documentación técnica** (1_CONTROLHUB_DescripcionTecnica.md)
-3. **Ejecuta los tests** (`php artisan test`)
+2. **Revisa el estado actual** (`.claude/PROJECT_STATE.md`)
+3. **Ejecuta los tests** (`php artisan test`) — deben pasar 143/143
 4. **Comienza a desarrollar** (`npm run dev` + `php artisan serve`)
-5. **Haz commits frecuentes** (`git commit -am 'feat: ...'`)
+5. **Haz commits frecuentes** (`git commit -m 'feat: ...'`)
 6. **Deploya cuando esté listo**
 
 ---
