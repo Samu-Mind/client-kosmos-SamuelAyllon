@@ -9,7 +9,7 @@
 |------|--------|
 | Migraciones | ✅ Todas creadas (13 tablas) |
 | Modelos Eloquent | ✅ Todos creados (10 modelos) |
-| Seeders | ⚠️ Solo DatabaseSeeder básico (crea test@example.com) — FALTAN roles/usuarios |
+| Seeders | ✅ RoleSeeder + UserSeeder + DatabaseSeeder — 3 usuarios, 3 roles, 3 suscripciones |
 | Rutas | ⚠️ Solo home, dashboard, settings — FALTAN todas las features |
 | Controladores | ⚠️ Solo Settings — FALTAN todos los de features |
 | Form Requests | ⚠️ Solo Settings — FALTAN todos los de features |
@@ -42,11 +42,11 @@
 ### ✅ Modelos creados
 Todos en `app/Models/`: User, Subscription, Payment, Project, Task, Idea, Box, Resource, AiConversation, VoiceRecording
 
-### ❌ Seeders pendientes
-Crear en `database/seeders/`:
-- `RoleSeeder` — crear roles: admin, premium_user, free_user
-- `UserSeeder` — crear 3 usuarios de prueba con sus roles y suscripciones
-- Actualizar `DatabaseSeeder` para llamar a ambos
+### ✅ Seeders creados
+En `database/seeders/`:
+- `RoleSeeder` — crea roles: admin, premium_user, free_user (con firstOrCreate)
+- `UserSeeder` — crea 3 usuarios con roles y Subscription asignada
+- `DatabaseSeeder` — llama a [RoleSeeder, UserSeeder] en orden
 
 ### ❌ Controladores pendientes
 Crear en `app/Http/Controllers/`:

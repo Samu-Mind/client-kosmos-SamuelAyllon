@@ -7,7 +7,7 @@ UI: **shadcn/ui** (components en `resources/js/components/ui/`)
 Auth: Laravel Fortify | Roles: Spatie Permission 6
 
 ## Estado actual del proyecto
-> Ver `claude/PROJECT_STATE.md` para detalle de qué está hecho y qué falta.
+> Ver `.claude/PROJECT_STATE.md` para detalle de qué está hecho y qué falta.
 
 Lo que está creado: **migraciones + modelos** (10 entidades).
 Lo que falta: controladores de features, rutas, Form Requests, seeders de roles, páginas React.
