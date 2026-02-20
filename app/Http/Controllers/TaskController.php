@@ -1,0 +1,125 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
+use App\Models\Project;
+use App\Models\Task;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class TaskController extends Controller
+{
+    public function index(): Response
+    {
+        $user = Auth::user();
+
+        $tasks = $user->tasks()
+            ->with('project')
+            ->orderByRaw("CASE status WHEN 'pending' THEN 0 ELSE 1 END")
+            ->byPriority()
+            ->get();
+
+        return Inertia::render('tasks/index', [
+            'tasks' => $tasks,
+            'canAddTask' => $user->canAddTask(),
+            'isFreeUser' => $user->isFreeUser(),
+        ]);
+    }
+
+    public function create(): Response
+    {
+        $user = Auth::user();
+
+        $projects = $user->isPremiumUser() || $user->isAdmin()
+            ? $user->projects()->active()->get(['id', 'name'])
+            : collect();
+
+        return Inertia::render('tasks/create', [
+            'projects' => $projects,
+        ]);
+    }
+
+    public function store(StoreTaskRequest $request): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if (! $user->canAddTask()) {
+            return redirect()->back()->withErrors([
+                'limit' => 'Has alcanzado el límite de 5 tareas activas. Completa alguna tarea o actualiza a Premium.',
+            ]);
+        }
+
+        $user->tasks()->create([
+            ...$request->validated(),
+            'status' => 'pending',
+            'user_modified_at' => now(),
+        ]);
+
+        return redirect()->route('tasks.index')->with('success', 'Tarea creada correctamente.');
+    }
+
+    public function edit(Task $task): Response
+    {
+        $this->authorize('update', $task);
+
+        $user = Auth::user();
+
+        $projects = $user->isPremiumUser() || $user->isAdmin()
+            ? $user->projects()->active()->get(['id', 'name'])
+            : collect();
+
+        return Inertia::render('tasks/edit', [
+            'task' => $task->load('project'),
+            'projects' => $projects,
+        ]);
+    }
+
+    public function update(UpdateTaskRequest $request, Task $task): RedirectResponse
+    {
+        $this->authorize('update', $task);
+
+        $task->update([
+            ...$request->validated(),
+            'user_modified_at' => now(),
+        ]);
+
+        return redirect()->route('tasks.index')->with('success', 'Tarea actualizada correctamente.');
+    }
+
+    public function destroy(Task $task): RedirectResponse
+    {
+        $this->authorize('delete', $task);
+
+        $task->delete();
+
+        return redirect()->route('tasks.index')->with('success', 'Tarea eliminada correctamente.');
+    }
+
+    public function complete(Task $task): RedirectResponse
+    {
+        $this->authorize('update', $task);
+
+        $task->markAsCompleted();
+
+        return redirect()->back()->with('success', 'Tarea marcada como completada.');
+    }
+
+    public function reopen(Task $task): RedirectResponse
+    {
+        $this->authorize('update', $task);
+
+        if (! Auth::user()->canAddTask()) {
+            return redirect()->back()->withErrors([
+                'limit' => 'Has alcanzado el límite de 5 tareas activas. Actualiza a Premium para reabrir esta tarea.',
+            ]);
+        }
+
+        $task->markAsPending();
+
+        return redirect()->back()->with('success', 'Tarea reabierta.');
+    }
+}

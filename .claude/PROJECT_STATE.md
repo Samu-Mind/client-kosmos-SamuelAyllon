@@ -10,9 +10,11 @@
 | Migraciones | ✅ Todas creadas (13 tablas) |
 | Modelos Eloquent | ✅ Todos creados (10 modelos) |
 | Seeders | ✅ RoleSeeder + UserSeeder + DatabaseSeeder — 3 usuarios, 3 roles, 3 suscripciones |
-| Rutas | ⚠️ Solo home, dashboard, settings — FALTAN todas las features |
-| Controladores | ⚠️ Solo Settings — FALTAN todos los de features |
-| Form Requests | ⚠️ Solo Settings — FALTAN todos los de features |
+| Rutas | ✅ Todas creadas (tasks, ideas, projects, boxes, resources, subscription, checkout, admin) |
+| Controladores features | ✅ TaskController, IdeaController, ProjectController, BoxController, ResourceController, SubscriptionController, CheckoutController |
+| Controladores admin | ✅ AdminDashboardController, AdminUserController, AdminPaymentController, AdminSubscriptionController |
+| Form Requests | ✅ StoreTask/Update, StoreIdea/Update, StoreProject/Update, StoreBox/Update, StoreResource/Update, CheckoutRequest |
+| Policies | ✅ TaskPolicy, IdeaPolicy, ProjectPolicy, BoxPolicy, ResourcePolicy |
 | Tests | ❌ No hay tests de features todavía |
 | Frontend — Auth | ✅ Páginas login, register, 2FA, forgot-password (Fortify) |
 | Frontend — Settings | ✅ Páginas profile, password, appearance, two-factor |
@@ -48,26 +50,24 @@ En `database/seeders/`:
 - `UserSeeder` — crea 3 usuarios con roles y Subscription asignada
 - `DatabaseSeeder` — llama a [RoleSeeder, UserSeeder] en orden
 
-### ❌ Controladores pendientes
-Crear en `app/Http/Controllers/`:
-- `TaskController` (CRUD)
-- `IdeaController` (CRUD)
-- `ProjectController` (CRUD, premium)
-- `BoxController` (CRUD, premium)
-- `ResourceController` (CRUD, premium)
-- `VoiceController` (transcribe, premium)
-- `AiAssistantController` (chat, premium)
-- `SubscriptionController` (ver suscripción)
-- `CheckoutController` (pago simulado)
+### ✅ Controladores creados
+En `app/Http/Controllers/`:
+- `TaskController` — CRUD + complete + reopen (authorize via TaskPolicy)
+- `IdeaController` — CRUD + resolve + reactivate (authorize via IdeaPolicy)
+- `ProjectController` — CRUD completo (authorize via ProjectPolicy)
+- `BoxController` — CRUD completo (authorize via BoxPolicy)
+- `ResourceController` — create/store (nested bajo box) + edit/update/destroy (authorize via ResourcePolicy)
+- `SubscriptionController` — index (muestra planes y suscripción activa)
+- `CheckoutController` — index + store (pago simulado via Payment::process())
 
-Crear en `app/Http/Controllers/Admin/`:
-- `AdminDashboardController`
-- `AdminUserController`
-- `AdminPaymentController`
-- `AdminSubscriptionController`
+En `app/Http/Controllers/Admin/`:
+- `AdminDashboardController` — stats globales + recent payments/users
+- `AdminUserController` — index + show + destroy
+- `AdminPaymentController` — index con resumen
+- `AdminSubscriptionController` — index con resumen por plan
 
-### ❌ Form Requests pendientes
-Crear en `app/Http/Requests/`:
+### ✅ Form Requests creados
+En `app/Http/Requests/`:
 - `StoreTaskRequest` / `UpdateTaskRequest`
 - `StoreIdeaRequest` / `UpdateIdeaRequest`
 - `StoreProjectRequest` / `UpdateProjectRequest`
@@ -75,33 +75,32 @@ Crear en `app/Http/Requests/`:
 - `StoreResourceRequest` / `UpdateResourceRequest`
 - `CheckoutRequest`
 
-### ❌ Rutas pendientes (añadir a `routes/web.php`)
+### ✅ Policies creadas
+En `app/Policies/`:
+- `TaskPolicy` — update + delete (owner check)
+- `IdeaPolicy` — update + delete (owner check)
+- `ProjectPolicy` — view + update + delete (owner check)
+- `BoxPolicy` — view + update + delete (owner check)
+- `ResourcePolicy` — update + delete (owner check)
+
+### ✅ Rutas creadas (`routes/web.php`)
 ```php
 // Autenticadas (todos)
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('tasks', TaskController::class);
-    Route::resource('ideas', IdeaController::class);
-    Route::get('subscription', [SubscriptionController::class, 'index']);
-    Route::get('checkout', [CheckoutController::class, 'index']);
-    Route::post('checkout', [CheckoutController::class, 'store']);
-});
+tasks.*          → TaskController (CRUD + complete + reopen)
+ideas.*          → IdeaController (CRUD + resolve + reactivate)
+subscription.*   → SubscriptionController (index)
+checkout.*       → CheckoutController (index + store)
 
-// Premium (premium_user + admin)
-Route::middleware(['auth', 'verified', 'role:premium_user|admin'])->group(function () {
-    Route::resource('projects', ProjectController::class);
-    Route::resource('boxes', BoxController::class);
-    Route::resource('resources', ResourceController::class);
-    Route::post('voice/transcribe', [VoiceController::class, 'transcribe']);
-    Route::resource('ai-chats', AiAssistantController::class)->only(['index', 'store']);
-});
+// Premium (premium_user|admin)
+projects.*       → ProjectController (CRUD)
+boxes.*          → BoxController (CRUD)
+resources.*      → ResourceController (create/store nested en box; edit/update/destroy standalone)
 
-// Admin
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('dashboard', [AdminDashboardController::class, 'index']);
-    Route::resource('users', AdminUserController::class);
-    Route::get('payments', [AdminPaymentController::class, 'index']);
-    Route::get('subscriptions', [AdminSubscriptionController::class, 'index']);
-});
+// Admin (/admin/*)
+admin.dashboard  → AdminDashboardController@index
+admin.users.*    → AdminUserController (index, show, destroy)
+admin.payments.* → AdminPaymentController@index
+admin.subscriptions.* → AdminSubscriptionController@index
 ```
 
 ---
@@ -135,16 +134,17 @@ toggle, toggle-group, tooltip
 - `pages/settings/` — profile, password, appearance, two-factor
 
 ### ❌ Páginas pendientes de crear
-- `pages/tasks/index.tsx` + `create.tsx` / `edit.tsx`
-- `pages/ideas/index.tsx` + `create.tsx` / `edit.tsx`
-- `pages/projects/index.tsx` + `show.tsx` + `create.tsx` / `edit.tsx`
-- `pages/boxes/index.tsx` + `show.tsx`
-- `pages/resources/create.tsx` / `edit.tsx`
+- `pages/tasks/index.tsx` + `create.tsx` + `edit.tsx`
+- `pages/ideas/index.tsx` + `create.tsx` + `edit.tsx`
+- `pages/projects/index.tsx` + `show.tsx` + `create.tsx` + `edit.tsx`
+- `pages/boxes/index.tsx` + `show.tsx` + `create.tsx` + `edit.tsx`
+- `pages/resources/create.tsx` + `edit.tsx`
 - `pages/subscription/index.tsx`
 - `pages/checkout/index.tsx`
 - `pages/admin/dashboard.tsx`
-- `pages/admin/users/index.tsx`
+- `pages/admin/users/index.tsx` + `show.tsx`
 - `pages/admin/payments/index.tsx`
+- `pages/admin/subscriptions/index.tsx`
 
 ---
 
@@ -163,7 +163,12 @@ Crear en `tests/Feature/`:
 ---
 
 ## Próximo paso sugerido
-1. Crear `RoleSeeder` + `UserSeeder` y actualizar `DatabaseSeeder`
-2. Crear rutas + `TaskController` + `StoreTaskRequest`
-3. Crear página `pages/tasks/index.tsx`
-4. Escribir `TaskControllerTest`
+1. Crear páginas React del frontend (empezar por `tasks/index.tsx` + `ideas/index.tsx`)
+2. Actualizar `dashboard.tsx` con datos reales via `getDashboardData()`
+3. Escribir tests Pest para los controladores
+
+## Notas de implementación
+- `ResourceController` usa rutas anidadas bajo `/boxes/{box}/resources` para create/store
+- `CheckoutController` llama a `Payment::process()` que simula 80% éxito / 20% fallo
+- Policies registradas automáticamente por Laravel (naming convention Model → Policy)
+- `tasks.index` ordena: primero pendientes, luego completadas; dentro de cada grupo por prioridad DESC
