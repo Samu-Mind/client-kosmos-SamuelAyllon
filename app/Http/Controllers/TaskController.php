@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controller;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Project;
@@ -13,6 +15,8 @@ use Inertia\Response;
 
 class TaskController extends Controller
 {
+    use AuthorizesRequests;
+    
     public function index(): Response
     {
         $user = Auth::user();
