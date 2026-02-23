@@ -1,8 +1,7 @@
 export type * from './auth';
 export type * from './navigation';
 export type * from './ui';
-export type * from './task';
-export type * from './props';
-export type * from './subscription';
-export type * from './idea';
-export type * from './dashboardprops';
+export type * from './models';
+export type * from './shared';
+export type * from './pages';
+export type * from './admin';

@@ -1,37 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-interface Stats {
-    total_users: number;
-    free_users: number;
-    premium_users: number;
-    total_revenue: number;
-    payments_this_month: number;
-    active_subscriptions: number;
-}
-
-interface RecentPayment {
-    id: number;
-    amount: number;
-    status: 'pending' | 'completed' | 'failed';
-    created_at: string;
-    user: { id: number; name: string; email: string };
-}
-
-interface RecentUser {
-    id: number;
-    name: string;
-    email: string;
-    created_at: string;
-}
-
-interface Props {
-    stats: Stats;
-    recentPayments: RecentPayment[];
-    recentUsers: RecentUser[];
-}
+import type { BreadcrumbItem, AdminDashboardProps } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Admin', href: '/admin/dashboard' },
@@ -48,7 +18,7 @@ const paymentStatusLabels: Record<string, string> = {
     completed: 'Completado', pending: 'Pendiente', failed: 'Fallido',
 };
 
-export default function AdminDashboard({ stats, recentPayments, recentUsers }: Props) {
+export default function AdminDashboard({ stats, recentPayments, recentUsers }: AdminDashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin — Dashboard" />

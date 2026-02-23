@@ -1,10 +1,9 @@
 import { Link, router } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Props } from '../../types/props';
-import { Task } from '../../types/task';
+import type { TasksProps, Task } from '@/types';
 
-export default function TasksIndex({ tasks, canAddTask, isFreeUser }: Props) {
+export default function TasksIndex({ tasks, canAddTask, isFreeUser }: TasksProps) {
     return (
         <AppLayout>
             <Head title="Tareas" />

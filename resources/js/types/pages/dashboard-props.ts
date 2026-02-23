@@ -1,6 +1,6 @@
-import {Task} from './task';
-import {Idea} from './idea';
-import {Subscription} from './subscription';
+import { Task } from '../models/task';
+import { Idea } from '../models/idea';
+import { Subscription } from '../models/subscription';
 
 export interface DashboardProps {
     pendingTasks: Task[];
