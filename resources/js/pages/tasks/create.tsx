@@ -4,45 +4,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Idea } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Ideas', href: '/ideas' },
-    { title: 'Editar idea', href: '#' },
+    { title: 'Tareas', href: '/tasks' },
+    { title: 'Nueva tarea', href: '#' },
 ];
 
 interface Props {
-    idea: Idea;
+    projects: { id: number; name: string }[];
 }
 
-export default function IdeaEdit({ idea }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
-        name: idea.name,
-        description: idea.description ?? '',
-        priority: idea.priority,
+export default function TaskCreate({ projects }: Props) {
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        description: '',
+        priority: 'medium' as 'low' | 'medium' | 'high',
+        due_date: '',
+        project_id: '',
     });
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        put(`/ideas/${idea.id}`);
+        post('/tasks');
     }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Editar idea" />
+            <Head title="Nueva tarea" />
 
             <div className="flex flex-col gap-6 p-6">
 
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Editar idea</h1>
-                    <Link href="/ideas">
+                    <h1 className="text-2xl font-bold">Nueva tarea</h1>
+                    <Link href="/tasks">
                         <Button variant="outline">← Volver</Button>
                     </Link>
                 </div>
 
                 <Card className="max-w-xl">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Datos de la idea</CardTitle>
+                        <CardTitle className="text-base">Datos de la tarea</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -54,7 +56,8 @@ export default function IdeaEdit({ idea }: Props) {
                                     id="name"
                                     value={data.name}
                                     onChange={e => setData('name', e.target.value)}
-                                    placeholder="Nombre de la idea"
+                                    placeholder="Nombre de la tarea"
+                                    autoFocus
                                 />
                                 {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
                             </div>
@@ -89,11 +92,42 @@ export default function IdeaEdit({ idea }: Props) {
                                 {errors.priority && <p className="text-xs text-red-600">{errors.priority}</p>}
                             </div>
 
+                            {/* Fecha de vencimiento */}
+                            <div className="flex flex-col gap-1.5">
+                                <Label htmlFor="due_date">Fecha de vencimiento</Label>
+                                <Input
+                                    id="due_date"
+                                    type="date"
+                                    value={data.due_date}
+                                    onChange={e => setData('due_date', e.target.value)}
+                                />
+                                {errors.due_date && <p className="text-xs text-red-600">{errors.due_date}</p>}
+                            </div>
+
+                            {/* Proyecto (solo si hay proyectos) */}
+                            {projects.length > 0 && (
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="project_id">Proyecto</Label>
+                                    <select
+                                        id="project_id"
+                                        value={data.project_id}
+                                        onChange={e => setData('project_id', e.target.value)}
+                                        className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                                    >
+                                        <option value="">Sin proyecto</option>
+                                        {projects.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                    </select>
+                                    {errors.project_id && <p className="text-xs text-red-600">{errors.project_id}</p>}
+                                </div>
+                            )}
+
                             <div className="flex gap-3 pt-2">
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Guardando...' : 'Guardar cambios'}
+                                    {processing ? 'Creando...' : 'Crear tarea'}
                                 </Button>
-                                <Link href="/ideas">
+                                <Link href="/tasks">
                                     <Button type="button" variant="outline">Cancelar</Button>
                                 </Link>
                             </div>
