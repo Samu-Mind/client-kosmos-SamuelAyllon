@@ -47,7 +47,7 @@ export function AppSidebar() {
             href: '/ideas',
             icon: Lightbulb,
         },
-        ...(auth.is_premium || auth.is_admin ? [
+        ...(auth.is_premium ? [
             {
                 title: 'Proyectos',
                 href: '/projects',
