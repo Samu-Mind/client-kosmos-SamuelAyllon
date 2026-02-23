@@ -21,7 +21,8 @@
 | Frontend — Dashboard | ✅ Implementado (free: tareas+ideas, premium: +proyectos, admin: redirige) |
 | Frontend — Admin | ✅ Las 5 vistas admin implementadas con UI real |
 | Frontend — Types | ✅ Reorganizado en subcarpetas models/ shared/ pages/ admin/ |
-| Frontend — Features | ⚠️ Vistas user parciales (tasks/index skeleton, resto placeholders) |
+| Frontend — Features usuario | ✅ Todas las vistas de usuario implementadas con UI real |
+| Frontend — Features premium | ✅ Todas las vistas premium implementadas con UI real |
 | Frontend — Landing | ⚠️ welcome.tsx existe pero sin contenido Flowly |
 
 ---
@@ -129,33 +130,42 @@ toggle, toggle-group, tooltip
 - `use-initials.tsx` — iniciales de nombre
 - `use-clipboard.ts`, `use-current-url.ts`, `use-mobile-navigation.ts`, `use-two-factor-auth.ts`
 
-### ✅ Páginas existentes con UI real
-- `pages/welcome.tsx` — landing (pendiente de contenido Flowly)
-- `pages/dashboard.tsx` — dashboard con datos reales (free/premium condicional)
+### ✅ Páginas con UI real — Auth / Settings
 - `pages/auth/` — login, register, 2FA, reset, verify, forgot
 - `pages/settings/` — profile, password, appearance, two-factor
+
+### ✅ Páginas con UI real — Dashboard y Admin
+- `pages/dashboard.tsx` — dashboard con datos reales (free/premium condicional)
 - `pages/admin/dashboard.tsx` — stats globales + pagos/usuarios recientes
 - `pages/admin/users/index.tsx` — lista paginada con roles, plan, conteos
 - `pages/admin/users/show.tsx` — detalle usuario: actividad, suscripción, pagos
 - `pages/admin/payments/index.tsx` — resumen + lista paginada con estado e importe
 - `pages/admin/subscriptions/index.tsx` — resumen por plan + lista paginada
 
-### ⚠️ Páginas placeholder o skeleton (existen pero sin UI completa)
-- `pages/tasks/index.tsx` — skeleton funcional (lista + complete/reopen/delete)
-- `pages/tasks/edit.tsx` — placeholder
-- `pages/ideas/index.tsx` + `edit.tsx` — placeholder
-- `pages/projects/index.tsx` + `show.tsx` — placeholder
-- `pages/boxes/index.tsx` + `show.tsx` — placeholder
-- `pages/resources/create.tsx` — placeholder
-- `pages/subscription/index.tsx` — placeholder
-- `pages/checkout/index.tsx` — placeholder
+### ✅ Páginas con UI real — Features usuario (todos)
+- `pages/tasks/index.tsx` — lista pendientes/completadas, prioridad, fecha vencimiento, proyecto
+- `pages/tasks/create.tsx` — formulario completo, proyectos opcionales (premium)
+- `pages/tasks/edit.tsx` — formulario pre-rellenado
+- `pages/ideas/index.tsx` — lista activas/resueltas, prioridad, resolve/reactivate/delete
+- `pages/ideas/create.tsx` — formulario completo
+- `pages/ideas/edit.tsx` — formulario pre-rellenado
+- `pages/subscription/index.tsx` — plan actual + comparativa de planes
+- `pages/checkout/index.tsx` — selector de plan + formulario de tarjeta simulado
 
-### ❌ Páginas aún no creadas (ni placeholder)
-- `pages/tasks/create.tsx`
-- `pages/ideas/create.tsx`
-- `pages/projects/create.tsx` + `edit.tsx`
-- `pages/boxes/create.tsx` + `edit.tsx`
-- `pages/resources/edit.tsx`
+### ✅ Páginas con UI real — Features premium
+- `pages/projects/index.tsx` — cuadrícula con estado, color, contadores de tareas
+- `pages/projects/show.tsx` — detalle con stats, barra de progreso, tareas por estado
+- `pages/projects/create.tsx` — formulario con selector de color visual
+- `pages/projects/edit.tsx` — ídem + selector de estado
+- `pages/boxes/index.tsx` — cuadrícula con categoría y contador de recursos
+- `pages/boxes/show.tsx` — detalle con lista de recursos, tipo badge, enlace clicable
+- `pages/boxes/create.tsx` — formulario con nombre, categoría, descripción
+- `pages/boxes/edit.tsx` — ídem pre-rellenado
+- `pages/resources/create.tsx` — formulario con tipo, nombre, URL, descripción
+- `pages/resources/edit.tsx` — ídem pre-rellenado, vuelve a la caja padre
+
+### ⚠️ Pendiente
+- `pages/welcome.tsx` — landing page (existe pero sin contenido Flowly)
 
 ### ✅ Estructura de tipos TypeScript (`resources/js/types/`)
 ```
@@ -163,14 +173,21 @@ types/
 ├── auth.ts          → User (auth), Auth, TwoFactorSetupData
 ├── navigation.ts    → NavItem, BreadcrumbItem
 ├── ui.ts
-├── models/          → Task, Idea, Subscription, Payment, RecentPayment, Role
+├── models/          → Task, Idea, Project, Box, Resource,
+│                      Subscription, Payment, RecentPayment, Role
 ├── shared/          → PaginatedData<T>
-├── pages/           → DashboardProps, TasksProps
+├── pages/           → DashboardProps, TasksProps, IdeasProps,
+│                      SubscriptionProps (+ Plan), CheckoutProps (+ CheckoutPlan)
 ├── admin/           → AdminStats, AdminUser, AdminDashboardProps,
 │                      AdminUsersIndexProps, AdminUserShowProps,
 │                      AdminPaymentsProps, AdminSubscriptionsProps
-└── index.ts         → barrel (7 líneas usando sub-barrels)
+└── index.ts         → barrel (re-exports de sub-barrels)
 ```
+
+### ✅ Sidebar — Comportamiento por rol
+- **Admin**: solo sección "Administración" (Panel admin, Usuarios, Pagos, Suscripciones)
+- **Premium/Free**: solo sección "General" (Dashboard, Tareas, Ideas, Proyectos*, Cajas*, Suscripción)
+  - *Proyectos y Cajas solo visibles para premium
 
 ### ✅ Middleware HandleInertiaRequests
 Comparte en todas las páginas vía `usePage().props.auth`:
@@ -193,13 +210,12 @@ Fixes aplicados para llegar a 143/143:
 ---
 
 ## Próximo paso sugerido
-1. Implementar vistas usuario: `tasks/create.tsx`, `ideas/index.tsx`, `ideas/create.tsx`
-2. Implementar `subscription/index.tsx` y `checkout/index.tsx`
-3. Implementar vistas premium: `projects/*`, `boxes/*`, `resources/*`
-4. Landing page `welcome.tsx` con contenido Flowly real
+1. Landing page `welcome.tsx` con contenido Flowly real (pricing, features, CTA)
 
 ## Notas de implementación
 - `ResourceController` usa rutas anidadas bajo `/boxes/{box}/resources` para create/store
 - `CheckoutController` llama a `Payment::process()` que simula 80% éxito / 20% fallo
 - Policies registradas automáticamente por Laravel (naming convention Model → Policy)
 - `tasks.index` ordena: primero pendientes, luego completadas; dentro de cada grupo por prioridad DESC
+- Campos en BD: Task y Idea usan `name` (NO `title`) — los tipos TypeScript están actualizados
+- Error de pago en checkout viene como error de página (`usePage().props.errors.payment`), no como error de campo de formulario

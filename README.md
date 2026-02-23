@@ -52,28 +52,34 @@
 
 ## ✨ Features
 
-### Core (Todos los Usuarios) — Backend ✅ / Frontend ⚠️
+### Core (Todos los Usuarios) — ✅ Completado
 - ✅ Autenticación segura (registro, login, 2FA) — Fortify
-- ✅ Gestor de ideas sin límite (backend + tests)
-- ✅ Gestor de tareas con límite free (backend + tests)
+- ✅ Gestor de ideas sin límite (backend + frontend + tests)
+- ✅ Gestor de tareas con límite free (backend + frontend + tests)
 - ✅ Soft deletes en tareas e ideas
-- ✅ Checkout y suscripción simulada (backend + tests)
-- ⚠️ Dashboard personal (existe, sin datos reales todavía)
-- ⚠️ UI de tareas e ideas (páginas placeholder, sin UI real)
+- ✅ Checkout y suscripción simulada (backend + frontend + tests)
+- ✅ Dashboard personal con datos reales (free/premium condicional)
+- ✅ UI de tareas — lista pendientes/completadas, prioridades, fechas
+- ✅ UI de ideas — lista activas/resueltas, resolve/reactivate
 
-### Premium Features — Backend ✅ / Frontend ⚠️
-- ✅ Proyectos con jerarquía de tareas (backend + tests)
-- ✅ Cajas de conocimiento y recursos (backend + tests)
-- ⚠️ UI de proyectos, cajas, recursos (páginas placeholder)
+### Premium Features — ✅ Completado (excepto voz/IA)
+- ✅ Proyectos con jerarquía de tareas (backend + frontend + tests)
+- ✅ Cajas de conocimiento y recursos (backend + frontend + tests)
+- ✅ UI de proyectos — grid con estado, color, progreso de tareas
+- ✅ UI de cajas — grid con recursos, tipos badge, enlaces clicables
 - 🔲 Transcripción de voz (OpenAI Whisper) — pendiente
 - 🔲 Asistente IA — pendiente
 
-### Admin Features — Backend ✅ / Frontend ⚠️
-- ✅ Dashboard con estadísticas globales (backend + tests)
-- ✅ Gestión de usuarios (index + show + destroy)
+### Admin Features — ✅ Completado
+- ✅ Dashboard con estadísticas globales (backend + frontend + tests)
+- ✅ Gestión de usuarios — lista paginada + detalle + eliminar
 - ✅ Historial de pagos con resumen
 - ✅ Control de suscripciones con stats por plan
-- ⚠️ UI admin (páginas placeholder, sin UI real)
+- ✅ UI admin completa con datos reales (5 vistas)
+- ✅ Sidebar admin aislado (solo sección Administración)
+
+### Landing Page — ⚠️ Pendiente
+- ⚠️ `welcome.tsx` existe pero sin contenido Flowly (pricing, features, CTA)
 
 ---
 
@@ -260,7 +266,23 @@ flowly/
 │       └── UserSeeder.php    ← admin, premium, free
 ├── resources/
 │   ├── js/
-│   │   ├── pages/            ← minúsculas (Inertia)
+│   │   ├── pages/
+│   │   │   ├── auth/         ← login, register, 2fa, forgot...
+│   │   │   ├── settings/     ← profile, password, appearance
+│   │   │   ├── admin/        ← dashboard, users/, payments/, subscriptions/
+│   │   │   ├── tasks/        ← index, create, edit
+│   │   │   ├── ideas/        ← index, create, edit
+│   │   │   ├── projects/     ← index, show, create, edit
+│   │   │   ├── boxes/        ← index, show, create, edit
+│   │   │   ├── resources/    ← create, edit
+│   │   │   ├── subscription/ ← index
+│   │   │   ├── checkout/     ← index
+│   │   │   └── dashboard.tsx
+│   │   ├── types/
+│   │   │   ├── models/       ← Task, Idea, Project, Box, Resource, ...
+│   │   │   ├── pages/        ← props por página
+│   │   │   ├── admin/        ← props admin
+│   │   │   └── shared/       ← PaginatedData<T>
 │   │   ├── components/
 │   │   │   └── ui/           ← shadcn/ui
 │   │   └── layouts/
@@ -685,8 +707,9 @@ Desarrollado como proyecto intermodular para aprender:
 2. **Revisa el estado actual** (`.claude/PROJECT_STATE.md`)
 3. **Ejecuta los tests** (`php artisan test`) — deben pasar 143/143
 4. **Comienza a desarrollar** (`npm run dev` + `php artisan serve`)
-5. **Haz commits frecuentes** (`git commit -m 'feat: ...'`)
-6. **Deploya cuando esté listo**
+5. **Landing page** — implementar `welcome.tsx` con contenido Flowly real (pricing, features, CTA)
+6. **Haz commits frecuentes** (`git commit -m 'feat: ...'`)
+7. **Deploya cuando esté listo**
 
 ---
 
