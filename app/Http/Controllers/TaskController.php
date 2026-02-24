@@ -23,6 +23,8 @@ class TaskController extends Controller
 
         $tasks = $user->tasks()
             ->with('project')
+            // Primero pendientes (0), luego completadas (1);
+            // dentro de cada grupo el scope byPriority ordena high→medium→low
             ->orderByRaw("CASE status WHEN 'pending' THEN 0 ELSE 1 END")
             ->byPriority()
             ->get();
@@ -38,6 +40,8 @@ class TaskController extends Controller
     {
         $user = Auth::user();
 
+        // Solo premium pueden asignar tareas a proyectos;
+        // los free reciben colección vacía para no exponer la feature en el formulario
         $projects = $user->isPremiumUser() || $user->isAdmin()
             ? $user->projects()->active()->get(['id', 'name'])
             : collect();
@@ -72,6 +76,7 @@ class TaskController extends Controller
 
         $user = Auth::user();
 
+        // Igual que en create: proyectos solo para premium
         $projects = $user->isPremiumUser() || $user->isAdmin()
             ? $user->projects()->active()->get(['id', 'name'])
             : collect();
@@ -116,6 +121,8 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
 
+        // Reabrir cuenta como nueva tarea pendiente, por lo que también
+        // hay que respetar el límite de 5 activas para usuarios free
         if (! Auth::user()->canAddTask()) {
             return redirect()->back()->withErrors([
                 'limit' => 'Has alcanzado el límite de 5 tareas activas. Actualiza a Premium para reabrir esta tarea.',

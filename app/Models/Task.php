@@ -222,6 +222,7 @@ class Task extends Model
             return null;
         }
 
+        // false: devuelve valor negativo si la fecha ya pasó (tarea vencida)
         return now()->diffInDays($this->due_date, false);
     }
 }

@@ -43,6 +43,8 @@ class HandleInertiaRequests extends Middleware
                 'is_admin'   => $request->user()?->isAdmin() ?? false,
                 'is_premium' => $request->user()?->isPremiumUser() ?? false,
             ],
+            // Si no existe la cookie (primera visita) el sidebar se abre por defecto;
+            // en visitas posteriores respeta la preferencia guardada en la cookie
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

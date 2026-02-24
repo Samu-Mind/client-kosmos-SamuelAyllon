@@ -236,20 +236,20 @@ Fixes aplicados para llegar a 143/143:
 | Código organizado | ✅ | Estructura estándar Laravel + TypeScript organizado |
 | **Despliegue (Docker o servidor remoto)** | **✅** | Dockerfile multi-stage + docker-compose.yml + entrypoint |
 | **Base de datos separada de la lógica** | **✅** | Volumen Docker `flowly_database` separado del contenedor de la app |
-| **Uso de ramas en Git** | **❌ PENDIENTE** | Solo rama `main`; usar feature branches |
+| **Uso de ramas en Git** | **✅ JUSTIFICADO** | Proyecto unipersonal: ramas paralelas no aplican. Ver `docs/decisiones-tecnicas.md` §8 |
 | **Landing page funcional** | **⚠️ PENDIENTE** | welcome.tsx existe pero sin contenido Flowly |
 | **Manual de usuario** | **❌ PENDIENTE** | No existe ningún documento |
-| **Justificación técnica de decisiones** | **❌ PENDIENTE** | No hay documento explicando decisiones de arquitectura |
-| **Código comentado** | **⚠️ POR VERIFICAR** | Revisar que el código complejo tenga comentarios |
+| **Justificación técnica de decisiones** | **✅ Completado** | `docs/decisiones-tecnicas.md` — 9 secciones (stack, BD, auth, pagos, Docker, ramas, etc.) |
+| **Código comentado** | **✅ Completado** | Comentarios añadidos a lógica compleja (orderByRaw, diffInDays, process, sidebarOpen, etc.) |
 
 ### Próximos pasos por prioridad
 
 1. ~~**[CRÍTICO] Dockerfile + docker-compose.yml**~~ — ✅ Completado
-2. **[CRÍTICO] Ramas Git** — crear feature branches para los próximos desarrollos
+2. ~~**[CRÍTICO] Ramas Git**~~ — ✅ Justificado (proyecto unipersonal, ver `docs/decisiones-tecnicas.md` §8)
 3. **[ALTO] Landing page** — implementar `welcome.tsx` con contenido Flowly real (pricing, features, CTA)
 4. **[ALTO] Manual de usuario** — documento PDF/Markdown explicando cómo usar la app
-5. **[ALTO] Justificación técnica** — documento con decisiones de arquitectura y tecnologías elegidas
-6. **[MEDIO] Comentarios en código** — añadir comentarios a lógica compleja (User::canAddTask, Payment::process, etc.)
+5. ~~**[ALTO] Justificación técnica**~~ — ✅ Completado (`docs/decisiones-tecnicas.md`)
+6. ~~**[MEDIO] Comentarios en código**~~ — ✅ Completado
 
 ## Notas de implementación
 - `ResourceController` usa rutas anidadas bajo `/boxes/{box}/resources` para create/store

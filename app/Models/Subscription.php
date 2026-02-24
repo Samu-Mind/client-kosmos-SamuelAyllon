@@ -141,6 +141,7 @@ class Subscription extends Model
             return null;
         }
 
+        // false: permite valor negativo (suscripción expirada); max(0,...) lo clamp a 0
         return max(0, now()->diffInDays($this->expires_at, false));
     }
 }

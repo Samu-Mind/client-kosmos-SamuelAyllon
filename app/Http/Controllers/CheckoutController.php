@@ -52,15 +52,18 @@ class CheckoutController extends Controller
         ];
 
         $payment = Payment::create([
-            'user_id' => $user->id,
-            'plan' => $data['plan'],
-            'amount' => $prices[$data['plan']],
-            'status' => 'pending',
+            'user_id'      => $user->id,
+            'plan'         => $data['plan'],
+            'amount'       => $prices[$data['plan']],
+            'status'       => 'pending',
             'payment_method' => 'card',
             'transaction_id' => Payment::generateTransactionId(),
+            // Solo almacenamos los últimos 4 dígitos de la tarjeta (PCI-DSS)
             'card_last_four' => substr($data['card_number'], -4),
         ]);
 
+        // process() simula la pasarela: 80% éxito / 20% fallo
+        // En caso de éxito actualiza la suscripción y el rol del usuario
         $success = $payment->process();
 
         if ($success) {
