@@ -14,7 +14,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => redirect()->route('login'))->name('home');
+Route::get('/', fn() => inertia('welcome'))->name('home');
 
 // ==================== RUTAS AUTENTICADAS (todos los roles) ====================
 Route::middleware(['auth', 'verified'])->group(function () {

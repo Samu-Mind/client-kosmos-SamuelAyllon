@@ -237,8 +237,8 @@ Fixes aplicados para llegar a 143/143:
 | **Despliegue (Docker o servidor remoto)** | **✅** | Dockerfile multi-stage + docker-compose.yml + entrypoint |
 | **Base de datos separada de la lógica** | **✅** | Volumen Docker `flowly_database` separado del contenedor de la app |
 | **Uso de ramas en Git** | **✅ JUSTIFICADO** | Proyecto unipersonal: ramas paralelas no aplican. Ver `docs/decisiones-tecnicas.md` §8 |
-| **Landing page funcional** | **⚠️ PENDIENTE** | welcome.tsx existe pero sin contenido Flowly |
-| **Manual de usuario** | **❌ PENDIENTE** | No existe ningún documento |
+| **Landing page funcional** | **✅ Completado** | `welcome.tsx` con hero, features, pricing (Free/Premium mensual/anual) y footer |
+| **Manual de usuario** | **✅ Completado** | `docs/manual-usuario.md` — 10 secciones con todas las funcionalidades |
 | **Justificación técnica de decisiones** | **✅ Completado** | `docs/decisiones-tecnicas.md` — 9 secciones (stack, BD, auth, pagos, Docker, ramas, etc.) |
 | **Código comentado** | **✅ Completado** | Comentarios añadidos a lógica compleja (orderByRaw, diffInDays, process, sidebarOpen, etc.) |
 
@@ -246,8 +246,8 @@ Fixes aplicados para llegar a 143/143:
 
 1. ~~**[CRÍTICO] Dockerfile + docker-compose.yml**~~ — ✅ Completado
 2. ~~**[CRÍTICO] Ramas Git**~~ — ✅ Justificado (proyecto unipersonal, ver `docs/decisiones-tecnicas.md` §8)
-3. **[ALTO] Landing page** — implementar `welcome.tsx` con contenido Flowly real (pricing, features, CTA)
-4. **[ALTO] Manual de usuario** — documento PDF/Markdown explicando cómo usar la app
+3. ~~**[ALTO] Landing page**~~ — ✅ Completado (`resources/js/pages/welcome.tsx`)
+4. ~~**[ALTO] Manual de usuario**~~ — ✅ Completado (`docs/manual-usuario.md`)
 5. ~~**[ALTO] Justificación técnica**~~ — ✅ Completado (`docs/decisiones-tecnicas.md`)
 6. ~~**[MEDIO] Comentarios en código**~~ — ✅ Completado
 
