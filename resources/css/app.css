@@ -8,14 +8,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+    /* Flowly typography */
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Open Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+    /* Flowly radius tokens: sm=6px, md=10px, lg=16px */
+    --radius-lg: 1rem;
+    --radius-md: 0.625rem;
+    --radius-sm: 0.375rem;
 
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -62,74 +64,111 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    /* ── Flowly Design System — Light Mode ── */
+
+    /* Backgrounds */
+    --background: #E9EDC9;          /* bgBase: fondo general */
+    --foreground: #333333;          /* textMain */
+
+    /* Cards / paneles elevados */
+    --card: #DAD7CD;                /* bgElevated */
+    --card-foreground: #333333;
+
+    /* Popovers / dropdowns */
+    --popover: #DAD7CD;             /* bgElevated */
+    --popover-foreground: #333333;
+
+    /* Primary — verde Flowly */
+    --primary: #3A5A40;
+    --primary-foreground: #ffffff;
+
+    /* Secondary — fondo suave para badges, hover */
+    --secondary: #CAD2C5;           /* bgMuted */
+    --secondary-foreground: #3A5A40;
+
+    /* Muted — secciones secundarias */
+    --muted: #CAD2C5;               /* bgMuted */
+    --muted-foreground: rgba(51, 51, 51, 0.7); /* textMuted */
+
+    /* Accent — hover en menús y dropdowns */
+    --accent: #DAD7CD;              /* bgElevated */
+    --accent-foreground: #333333;
+
+    /* Destructive */
     --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
+    --destructive-foreground: #ffffff;
+
+    /* Bordes e inputs */
+    --border: rgba(51, 51, 51, 0.12);   /* borderSubtle */
+    --input: rgba(51, 51, 51, 0.12);
+    --ring: #A1B285;                    /* primarySoft para focus */
+
+    /* Gráficas con paleta Flowly */
+    --chart-1: #3A5A40;
+    --chart-2: #A1B285;
+    --chart-3: #708837;
+    --chart-4: #886237;
+    --chart-5: #884A37;
+
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+
+    /* Sidebar */
+    --sidebar: #CAD2C5;             /* bgMuted */
+    --sidebar-foreground: #333333;
+    --sidebar-primary: #3A5A40;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #DAD7CD;      /* bgElevated para hover */
+    --sidebar-accent-foreground: #333333;
+    --sidebar-border: rgba(51, 51, 51, 0.12);
+    --sidebar-ring: #A1B285;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+    /* ── Flowly Design System — Dark Mode ── */
+
+    --background: #1a1e1b;
+    --foreground: #edeee8;
+
+    --card: #242924;
+    --card-foreground: #edeee8;
+
+    --popover: #242924;
+    --popover-foreground: #edeee8;
+
+    /* Primary algo más claro para contraste en modo oscuro */
+    --primary: #6b9b73;
+    --primary-foreground: #0f1510;
+
+    --secondary: #2e342f;
+    --secondary-foreground: #edeee8;
+
+    --muted: #2e342f;
+    --muted-foreground: rgba(237, 238, 232, 0.6);
+
+    --accent: #2e342f;
+    --accent-foreground: #edeee8;
+
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+
+    --border: rgba(237, 238, 232, 0.1);
+    --input: rgba(237, 238, 232, 0.1);
+    --ring: #6b9b73;
+
+    --chart-1: #6b9b73;
+    --chart-2: #A1B285;
+    --chart-3: #708837;
+    --chart-4: #886237;
+    --chart-5: #884A37;
+
+    --sidebar: #1f241f;
+    --sidebar-foreground: #edeee8;
+    --sidebar-primary: #6b9b73;
+    --sidebar-primary-foreground: #0f1510;
+    --sidebar-accent: #2e342f;
+    --sidebar-accent-foreground: #edeee8;
+    --sidebar-border: rgba(237, 238, 232, 0.1);
+    --sidebar-ring: #6b9b73;
 }
 
 @layer base {
@@ -139,5 +178,15 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+
+    /* Nunito para títulos */
+    h1, h2, h3 {
+        font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+    }
+
+    /* Inter para botones y labels de UI */
+    button, [role="button"], label {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     }
 }

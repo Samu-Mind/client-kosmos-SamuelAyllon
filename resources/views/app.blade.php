@@ -22,11 +22,11 @@
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: #E9EDC9;
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: #1a1e1b;
             }
         </style>
 
@@ -37,7 +37,8 @@
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        {{-- Flowly Design System fonts: Nunito (títulos), Open Sans (cuerpo), Inter (UI/botones) --}}
+        <link href="https://fonts.bunny.net/css?family=nunito:400,600,700,800|open-sans:400,600|inter:400,500,600" rel="stylesheet" />
 
         @viteReactRefresh
         @vite(['resources/js/app.tsx'])
