@@ -26,12 +26,12 @@ it('premium user can access projects index', function () {
         ->assertInertia(fn ($page) => $page->component('projects/index'));
 });
 
-it('admin can access projects index', function () {
+it('admin cannot access projects index', function () {
     $user = createAdmin();
 
     $this->actingAs($user)
         ->get(route('projects.index'))
-        ->assertOk();
+        ->assertForbidden();
 });
 
 // ── Listado ──────────────────────────────────────────────────────────────────

@@ -24,10 +24,10 @@ it('premium user can access boxes index', function () {
         ->assertInertia(fn ($page) => $page->component('boxes/index'));
 });
 
-it('admin can access boxes index', function () {
+it('admin cannot access boxes index', function () {
     $this->actingAs(createAdmin())
         ->get(route('boxes.index'))
-        ->assertOk();
+        ->assertForbidden();
 });
 
 // ── Listado ──────────────────────────────────────────────────────────────────

@@ -3,14 +3,22 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class TwoFactorChallengeTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
 
     public function test_two_factor_challenge_redirects_to_login_when_not_authenticated(): void
     {
@@ -34,7 +42,11 @@ class TwoFactorChallengeTest extends TestCase
             'confirmPassword' => true,
         ]);
 
+        $this->seed(RoleSeeder::class);
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
         $user = User::factory()->create();
+        $user->assignRole('free_user');
 
         $user->forceFill([
             'two_factor_secret' => encrypt('test-secret'),
