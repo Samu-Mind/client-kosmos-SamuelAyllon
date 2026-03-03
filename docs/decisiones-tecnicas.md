@@ -2,7 +2,7 @@
 
 > Proyecto Intermodular — 2º DAM
 > Autor: Samuel Ayllón
-> Fecha: 2026-02-24
+> Fecha: 2026-03-03
 
 ---
 
@@ -184,3 +184,28 @@
 - Un solo archivo de tipos crece hasta ser inmanejable en proyectos medianos/grandes.
 - La estructura refleja la arquitectura de la aplicación: los tipos de modelos (`Task`, `Project`, etc.) están separados de los tipos de props de páginas y de los tipos de admin.
 - El archivo `types/index.ts` actúa como barrel de re-exportaciones, por lo que el resto del código solo necesita `import { Task } from '@/types'`.
+
+---
+
+## 11. Tutorial interactivo para nuevos usuarios
+
+**Decisión:** implementar un chatbot tutorial que aparece automáticamente la primera vez que un usuario accede al dashboard.
+
+**Justificación:**
+- Los usuarios nuevos en aplicaciones de productividad pueden sentirse abrumados por las múltiples funcionalidades disponibles.
+- Un tutorial guiado paso a paso reduce la curva de aprendizaje y mejora la retención de usuarios (onboarding efectivo).
+- El formato de chat con un asistente virtual ("Flowy") es más amigable e interactivo que un manual de texto estático.
+- El efecto de escritura progresiva simula una conversación real, haciendo la experiencia más personal.
+- La posibilidad de "saltar" respeta a usuarios experimentados que prefieren explorar por su cuenta.
+- Se persiste en BD (`tutorial_completed_at`) para no volver a mostrar el tutorial, reduciendo fricción en usos posteriores.
+
+**Implementación técnica:**
+- Migración `add_tutorial_completed_at_to_users_table` añade el campo al usuario
+- `TutorialController` con ruta `POST /tutorial/complete` marca el tutorial como completado
+- Componente React `tutorial-chatbot.tsx` con Dialog de shadcn/ui y efecto de escritura
+- Se muestra condicionalmente en el Dashboard basándose en `auth.user.tutorial_completed_at`
+
+**Alternativas descartadas:**
+- Tour de producto con tooltips (más intrusivo, requiere librerías adicionales como Shepherd.js)
+- Modal de bienvenida estático (menos interactivo, menor engagement)
+- Vídeo tutorial (mayor barrera de entrada, requiere infraestructura de hosting de vídeo)

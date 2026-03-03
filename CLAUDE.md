@@ -9,9 +9,9 @@ Auth: Laravel Fortify | Roles: Spatie Permission 6
 ## Estado actual del proyecto
 > Ver `.claude/PROJECT_STATE.md` para detalle completo.
 
-**TODO completado. 156/156 tests pasando (590 assertions).**
+**TODO completado. 160/160 tests pasando (596 assertions).**
 
-Lo que está creado: migraciones, modelos, seeders, controladores, Form Requests, Policies, rutas, tests, todas las páginas React con UI real, Design System Flowly, landing page, Docker, documentación, integración OpenAI Whisper (voz a texto).
+Lo que está creado: migraciones, modelos, seeders, controladores, Form Requests, Policies, rutas, tests, todas las páginas React con UI real, Design System Flowly, landing page, Docker, documentación, integración OpenAI Whisper (voz a texto), tutorial chatbot para nuevos usuarios.
 
 **Sin pendientes.** Todo el proyecto intermodular está entregable.
 
@@ -60,7 +60,7 @@ Aplicado en `resources/css/app.css` y `resources/views/app.blade.php`:
 
 **Auth:** login, register, two-factor-challenge, forgot-password, reset-password, confirm-password, verify-email
 **Settings:** profile, password, appearance, two-factor
-**Dashboard:** datos reales con condicional free/premium/admin
+**Dashboard:** datos reales con condicional free/premium/admin + tutorial chatbot para nuevos usuarios
 **Tasks:** index (+ voice quick-create), create (+ voice dictation), edit
 **Ideas:** index (+ voice quick-create), create (+ voice dictation), edit
 **Projects:** index, show, create, edit

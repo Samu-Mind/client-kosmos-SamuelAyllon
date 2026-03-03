@@ -1,5 +1,5 @@
 # Flowly — Estado Real del Proyecto
-> Última actualización: 2026-03-03 (sesión 4). Actualizar este archivo al completar cada sección.
+> Última actualización: 2026-03-03 (sesión 5). Actualizar este archivo al completar cada sección.
 
 ---
 
@@ -15,7 +15,7 @@
 | Controladores admin | ✅ AdminDashboardController, AdminUserController, AdminPaymentController, AdminSubscriptionController |
 | Form Requests | ✅ StoreTask/Update, StoreIdea/Update, StoreProject/Update, StoreBox/Update, StoreResource/Update, CheckoutRequest, StoreVoiceRecording |
 | Policies | ✅ TaskPolicy, IdeaPolicy, ProjectPolicy, BoxPolicy, ResourcePolicy |
-| Tests | ✅ 156/156 pasando (590 assertions) |
+| Tests | ✅ 160/160 pasando (596 assertions) |
 | Frontend — Auth | ✅ Páginas login, register, 2FA, forgot-password (Fortify) |
 | Frontend — Settings | ✅ Páginas profile, password, appearance, two-factor |
 | Frontend — Dashboard | ✅ Implementado (free: tareas+ideas, premium: +proyectos, admin: redirige) |
@@ -25,6 +25,7 @@
 | Frontend — Features premium | ✅ Todas las vistas premium implementadas con UI real |
 | Frontend — Landing | ✅ welcome.tsx con hero, features, pricing y footer |
 | Frontend — Design System | ✅ Flowly Design System aplicado (colores, fuentes, radius, shadows) |
+| Frontend — Tutorial | ✅ Chatbot tutorial interactivo para nuevos usuarios |
 | Frontend — Logo | ✅ Logo real en todas las vistas (navbar, auth layouts, sidebar) |
 | Base de datos | ✅ Migrada de SQLite a TiDB Cloud Serverless (MySQL) |
 | Despliegue (Docker) | ✅ Dockerfile + docker-compose.yml + .dockerignore + docker-entrypoint.sh |
@@ -79,6 +80,7 @@ En `app/Http/Controllers/`:
 - `SubscriptionController` — index (muestra planes y suscripción activa)
 - `CheckoutController` — index + store (pago simulado via Payment::process())
 - `VoiceRecordingController` — transcribe (recibe audio, llama OpenAI Whisper API, devuelve JSON con transcripción)
+- `TutorialController` — complete (marca tutorial como completado para el usuario)
 
 En `app/Http/Controllers/Admin/`:
 - `AdminDashboardController` — stats globales + recent payments/users
@@ -259,7 +261,7 @@ Migrado de SQLite en sesión 1.
 ---
 
 ## Tests — Estado actual
-✅ **156/156 tests pasando** (590 assertions)
+✅ **160/160 tests pasando** (596 assertions)
 
 Historial de fixes:
 - `app.blade.php` — quitado el componente de página de `@vite()` (solo queda `app.tsx`)
@@ -322,3 +324,12 @@ Historial de fixes:
 - Voice recording en tareas/ideas: botón "Dictar" en index (quick-create) y create (dictado nombre)
 - `IdeaController::store` acepta `source` desde request (default `manual`), permitiendo `source: 'voice'`
 - `openai-php/client` v0.19 instalado, config en `services.openai.key`
+### ✅ Sesión 5 — Cambios
+- **Tutorial chatbot** implementado para nuevos usuarios
+- Migración `add_tutorial_completed_at_to_users_table` — columna `tutorial_completed_at` en users
+- Modelo User: métodos `hasCompletedTutorial()` y `completeTutorial()`
+- Componente `tutorial-chatbot.tsx` — diálogo interactivo de 6 pasos con efecto de escritura
+- `TutorialController` con ruta `POST /tutorial/complete`
+- Integrado en Dashboard: aparece automáticamente a usuarios nuevos
+- Tipo TypeScript `User` actualizado con `tutorial_completed_at`
+- 4 nuevos tests en `TutorialControllerTest.php`

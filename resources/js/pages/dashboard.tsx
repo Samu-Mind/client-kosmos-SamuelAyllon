@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import TutorialChatbot from '@/components/tutorial-chatbot';
 import type { Auth, BreadcrumbItem } from '@/types';
 import { DashboardProps } from '@/types';
 import { dashboard } from '@/routes';
@@ -31,9 +33,18 @@ export default function Dashboard({ pendingTasks, activeIdeas, activeProjects, s
     const isPremium = subscription?.plan === 'premium_monthly'
                    || subscription?.plan === 'premium_yearly';
 
+    // Tutorial: mostrar si el usuario no lo ha completado
+    const [showTutorial, setShowTutorial] = useState(!auth.user.tutorial_completed_at);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
+
+            {/* Tutorial chatbot para nuevos usuarios */}
+            <TutorialChatbot 
+                show={showTutorial} 
+                onComplete={() => setShowTutorial(false)} 
+            />
 
             <div className="flex flex-col gap-6 p-6">
 

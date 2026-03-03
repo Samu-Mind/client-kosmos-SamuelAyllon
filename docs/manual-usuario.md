@@ -2,7 +2,7 @@
 
 > Proyecto Intermodular — 2º DAM
 > Autor: Samuel Ayllón
-> Fecha: 2026-02-24
+> Fecha: 2026-03-03
 
 ---
 
@@ -21,16 +21,17 @@ Flowly es una plataforma de productividad personal que te ayuda a:
 ## Índice
 
 1. [Registro e inicio de sesión](#1-registro-e-inicio-de-sesión)
-2. [Dashboard](#2-dashboard)
-3. [Gestión de tareas](#3-gestión-de-tareas)
-4. [Gestión de ideas](#4-gestión-de-ideas)
-5. [Creación por voz (Premium)](#5-creación-por-voz-premium)
-6. [Proyectos (Premium)](#6-proyectos-premium)
-7. [Cajas de recursos (Premium)](#7-cajas-de-recursos-premium)
-8. [Suscripción y planes](#8-suscripción-y-planes)
-9. [Configuración de cuenta](#9-configuración-de-cuenta)
-10. [Panel de administración (Admin)](#10-panel-de-administración-admin)
-11. [Preguntas frecuentes](#11-preguntas-frecuentes)
+2. [Tutorial inicial](#2-tutorial-inicial)
+3. [Dashboard](#3-dashboard)
+4. [Gestión de tareas](#4-gestión-de-tareas)
+5. [Gestión de ideas](#5-gestión-de-ideas)
+6. [Creación por voz (Premium)](#6-creación-por-voz-premium)
+7. [Proyectos (Premium)](#7-proyectos-premium)
+8. [Cajas de recursos (Premium)](#8-cajas-de-recursos-premium)
+9. [Suscripción y planes](#9-suscripción-y-planes)
+10. [Configuración de cuenta](#10-configuración-de-cuenta)
+11. [Panel de administración (Admin)](#11-panel-de-administración-admin)
+12. [Preguntas frecuentes](#12-preguntas-frecuentes)
 
 ---
 
@@ -74,7 +75,35 @@ Una vez activado, cada inicio de sesión te pedirá el código de tu aplicación
 
 ---
 
-## 2. Dashboard
+## 2. Tutorial inicial
+
+La primera vez que accedas a Flowly después de registrarte, aparecerá un **tutorial interactivo** en forma de chatbot para guiarte por las funciones principales de la aplicación.
+
+### El asistente Flowy
+
+Flowy es el asistente virtual de Flowly. Te dará la bienvenida y te explicará:
+
+1. **Dashboard** — Tu centro de control con el resumen de actividad
+2. **Tareas** — Cómo crear y gestionar tus tareas diarias
+3. **Ideas** — Cómo capturar inspiración al vuelo
+4. **Funciones Premium** — Proyectos, cajas y voz disponibles con suscripción
+
+### Navegación del tutorial
+
+- Utiliza **"Siguiente"** para avanzar paso a paso
+- Utiliza **"Anterior"** para volver a un paso previo
+- Los **puntos de progreso** muestran en qué paso estás
+- Haz clic en **"Saltar tutorial"** si prefieres explorar por tu cuenta
+
+### ¿Se puede volver a ver el tutorial?
+
+El tutorial solo aparece una vez, la primera vez que inicias sesión. Una vez completado o saltado, no volverá a mostrarse para no interrumpir tu trabajo.
+
+> **Consejo:** Si eres nuevo en aplicaciones de productividad, te recomendamos seguir el tutorial completo. ¡Solo toma un minuto!
+
+---
+
+## 3. Dashboard
 
 El dashboard es tu página principal al iniciar sesión. Muestra un resumen de tu actividad:
 
@@ -89,7 +118,7 @@ El sidebar izquierdo te da acceso a todas las secciones de la aplicación. Las s
 
 ---
 
-## 3. Gestión de tareas
+## 4. Gestión de tareas
 
 ### Ver tus tareas
 
@@ -140,7 +169,7 @@ Si necesitas volver a trabajar en una tarea completada:
 
 ---
 
-## 4. Gestión de ideas
+## 5. Gestión de ideas
 
 Las ideas son anotaciones rápidas para capturar pensamientos que quieres recordar.
 
@@ -176,7 +205,7 @@ Igual que con las tareas, usa los iconos de lápiz y papelera junto a cada idea.
 
 ---
 
-## 5. Creación por voz *(Premium)*
+## 6. Creación por voz *(Premium)*
 
 Los usuarios Premium pueden crear tareas e ideas utilizando su voz, gracias a la integración con OpenAI Whisper.
 
@@ -204,7 +233,7 @@ Los usuarios Premium pueden crear tareas e ideas utilizando su voz, gracias a la
 
 ---
 
-## 6. Proyectos *(Premium)*
+## 7. Proyectos *(Premium)*
 
 Los proyectos permiten agrupar tareas relacionadas bajo un mismo objetivo.
 
@@ -241,7 +270,7 @@ Al crear o editar una tarea (en el formulario de tareas), aparece un selector de
 
 ---
 
-## 7. Cajas de recursos *(Premium)*
+## 8. Cajas de recursos *(Premium)*
 
 Las cajas son colecciones de recursos organizados por tema (enlaces, documentos, vídeos, imágenes, etc.).
 
@@ -277,7 +306,7 @@ Los recursos de tipo **Enlace** son clicables directamente desde la lista.
 
 ---
 
-## 8. Suscripción y planes
+## 9. Suscripción y planes
 
 ### Ver tu plan actual
 
@@ -304,7 +333,7 @@ Accede desde el sidebar a **"Suscripción"**. Verás:
 
 ---
 
-## 9. Configuración de cuenta
+## 10. Configuración de cuenta
 
 Accede desde el menú de usuario (esquina superior derecha) o desde el sidebar → **"Configuración"**.
 
@@ -333,7 +362,7 @@ En **"Apariencia"** puedes alternar entre el **tema claro** y el **tema oscuro**
 
 ---
 
-## 10. Panel de administración *(Admin)*
+## 11. Panel de administración *(Admin)*
 
 Los usuarios con rol de administrador tienen acceso a un panel de gestión en `/admin`.
 
@@ -372,7 +401,7 @@ En **"Suscripciones"** el administrador puede ver:
 
 ---
 
-## 11. Preguntas frecuentes
+## 12. Preguntas frecuentes
 
 **¿Puedo tener más de 5 tareas en el plan gratuito?**
 No. El plan gratuito tiene un límite de 5 tareas en estado "pendiente" simultáneamente. Puedes completar tareas existentes para liberar espacio, o actualizar a Premium para tener tareas ilimitadas.
@@ -404,4 +433,4 @@ No. La eliminación de tareas es permanente. Las tareas completadas, en cambio, 
 
 ---
 
-*Manual generado para la versión actual de Flowly — 2026-02-24*
+*Manual generado para la versión actual de Flowly — 2026-03-03*

@@ -12,6 +12,7 @@ use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TutorialController;
 use App\Http\Controllers\VoiceRecordingController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,7 @@ Route::get('/', fn() => inertia('welcome'))->name('home');
 // ==================== RUTAS AUTENTICADAS (todos los roles) ====================
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('tutorial/complete', [TutorialController::class, 'complete'])->name('tutorial.complete');
 
     Route::resource('tasks', TaskController::class)->except(['show']);
     Route::patch('tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');

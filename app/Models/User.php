@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'user_modified_at',
+        'tutorial_completed_at',
     ];
 
     /**
@@ -44,6 +45,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'user_modified_at' => 'datetime',
+            'tutorial_completed_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -200,5 +202,21 @@ class User extends Authenticatable
             'total_projects' => $this->projects()->where('status', 'active')->count(),
             'is_premium' => $this->isPremiumUser() || $this->isAdmin(),
         ];
+    }
+
+    /**
+     * Verificar si el usuario ha completado el tutorial
+     */
+    public function hasCompletedTutorial(): bool
+    {
+        return $this->tutorial_completed_at !== null;
+    }
+
+    /**
+     * Marcar el tutorial como completado
+     */
+    public function completeTutorial(): void
+    {
+        $this->update(['tutorial_completed_at' => now()]);
     }
 }
