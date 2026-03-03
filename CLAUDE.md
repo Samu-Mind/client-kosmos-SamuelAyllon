@@ -115,7 +115,7 @@ types/
 |--------|-------|---------|
 | Task | status | `pending` \| `completed` — SIN 'in_progress' |
 | Task | priority | `low` \| `medium` \| `high` |
-| Project | status | `active` \| `created` \| `completed` — SIN 'archived' |
+| Project | status | `active` \| `inactive` \| `completed` — SIN 'archived', SIN 'created' |
 | Idea | status | `active` \| `resolved` — SIN 'archived' |
 | Idea | source | `manual` \| `voice` \| `ai_suggestion` |
 | Subscription | plan | `free` \| `premium_monthly` \| `premium_yearly` |

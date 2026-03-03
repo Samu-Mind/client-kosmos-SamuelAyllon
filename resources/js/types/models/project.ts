@@ -4,7 +4,7 @@ export interface Project {
     id: number;
     name: string;
     description: string | null;
-    status: 'created' | 'active' | 'completed';
+    status: 'inactive' | 'active' | 'completed';
     color: string | null;
     tasks_count?: number;
     pending_tasks_count?: number;

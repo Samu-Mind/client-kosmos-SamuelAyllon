@@ -35,7 +35,7 @@ class ProjectController extends Controller
     {
         $project = Auth::user()->projects()->create([
             ...$request->validated(),
-            'status' => 'created',
+            'status' => 'inactive',
             'user_modified_at' => now(),
         ]);
 

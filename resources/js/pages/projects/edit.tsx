@@ -89,7 +89,7 @@ export default function ProjectEdit({ project }: Props) {
                                     onChange={e => setData('status', e.target.value as Project['status'])}
                                     className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                                 >
-                                    <option value="created">Creado</option>
+                                    <option value="inactive">Inactivo</option>
                                     <option value="active">Activo</option>
                                     <option value="completed">Completado</option>
                                 </select>

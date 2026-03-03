@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             
-            // Status: active, created, completed
-            $table->enum('status', ['active', 'created', 'completed'])->default('created');
+            // Status: active, inactive, completed
+            $table->enum('status', ['active', 'inactive', 'completed'])->default('inactive');
             
             // Color para identificar visualmente el proyecto (hex)
             $table->string('color', 7)->default('#3B82F6');

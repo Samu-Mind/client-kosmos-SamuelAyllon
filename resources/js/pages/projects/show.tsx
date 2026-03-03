@@ -17,13 +17,13 @@ interface Props {
 }
 
 const statusColors: Record<string, string> = {
-    created:   'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
+    inactive:  'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
     active:    'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
     completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
 };
 
 const statusLabels: Record<string, string> = {
-    created: 'Creado', active: 'Activo', completed: 'Completado',
+    inactive: 'Inactivo', active: 'Activo', completed: 'Completado',
 };
 
 const priorityColors: Record<string, string> = {

@@ -54,11 +54,11 @@ class Project extends Model
     }
 
     /**
-     * Filtrar proyectos creados
+     * Filtrar proyectos inactivos
      */
-    public function scopeCreated($query)
+    public function scopeInactive($query)
     {
-        return $query->where('status', 'created');
+        return $query->where('status', 'inactive');
     }
 
     /**
@@ -135,7 +135,7 @@ class Project extends Model
     public function getStatusLabel(): string
     {
         return match($this->status) {
-            'created' => 'Creado',
+            'inactive' => 'Inactivo',
             'active' => 'Activo',
             'completed' => 'Completado',
             default => 'Desconocido',

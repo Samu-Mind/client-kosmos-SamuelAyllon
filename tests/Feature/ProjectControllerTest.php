@@ -64,7 +64,7 @@ it('premium user can create a project', function () {
     $this->assertDatabaseHas('projects', [
         'user_id' => $user->id,
         'name' => 'Nuevo proyecto',
-        'status' => 'created',
+        'status' => 'inactive',
     ]);
 });
 
