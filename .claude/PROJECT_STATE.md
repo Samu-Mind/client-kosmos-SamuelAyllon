@@ -1,5 +1,5 @@
 # Flowly — Estado Real del Proyecto
-> Última actualización: 2026-03-03 (sesión 6). Actualizar este archivo al completar cada sección.
+> Última actualización: 2026-03-04 (sesión 7). Actualizar este archivo al completar cada sección.
 
 ---
 
@@ -346,6 +346,17 @@ Historial de fixes:
 - Integrado en Dashboard: aparece automáticamente a usuarios nuevos, pasa `isPremium` al componente
 - Tipo TypeScript `User` actualizado con `tutorial_completed_at`
 - 4 nuevos tests en `TutorialControllerTest.php`
+
+### ✅ Sesión 7 — Cambios (2026-03-04)
+- **Fix CSRF 419**: `XSRF-TOKEN` eliminado de la lista `encryptCookies(except:[...])` en `bootstrap/app.php`. El token estaba en texto plano pero el middleware CSRF intenta desencriptarlo → token vacío → 419.
+- **Fix SSL PHP en Windows (Herd Lite)**: descargado `cacert.pem` y configurado en `C:\Users\usuario\.config\herd-lite\bin\php.ini` con `curl.cainfo` y `openssl.cafile`.
+- **Asistente IA ahora usa proveedor configurable (Groq por defecto)**:
+  - `config/services.php`: añadido `services.openai.base_url` (`OPENAI_BASE_URL`)
+  - `AiChatController`: usa `OpenAI::factory()->withBaseUri(config('services.openai.base_url'))->make()`
+  - Modelo configurable vía `OPENAI_MODEL` (default: `gpt-3.5-turbo`)
+  - Proveedor por defecto: **Groq** (gratuito, OpenAI-compatible, llama-3.3-70b-versatile)
+  - `.env` configurado con `OPENAI_BASE_URL=https://api.groq.com/openai/v1`
+- **Versión Laravel**: confirmada como **Laravel 12** (no 11 como indicaba CLAUDE.md por error)
 
 ### ✅ Sesión 6 — Cambios
 - **Asistente IA con chat** implementado para usuarios premium

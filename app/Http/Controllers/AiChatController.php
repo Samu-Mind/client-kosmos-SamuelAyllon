@@ -59,10 +59,13 @@ class AiChatController extends Controller
             ->toArray();
 
         try {
-            $client = OpenAI::client(config('services.openai.key'));
+            $client = OpenAI::factory()
+                ->withApiKey(config('services.openai.key'))
+                ->withBaseUri(config('services.openai.base_url'))
+                ->make();
 
             $response = $client->chat()->create([
-                'model' => 'gpt-3.5-turbo',
+                'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
                 'messages' => [
                     [
                         'role' => 'system',
@@ -80,7 +83,7 @@ class AiChatController extends Controller
             // Guardar respuesta del asistente
             $assistantMsg = AiConversation::addAssistantMessage($user, $assistantMessage, [
                 'tokens_used' => $tokensUsed,
-                'model' => 'gpt-3.5-turbo',
+                'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
             ]);
 
             return response()->json([

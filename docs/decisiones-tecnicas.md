@@ -2,7 +2,7 @@
 
 > Proyecto Intermodular — 2º DAM
 > Autor: Samuel Ayllón
-> Fecha: 2026-03-03
+> Fecha: 2026-03-04
 
 ---
 
@@ -176,29 +176,37 @@
 
 ---
 
-## 10. Asistente IA — OpenAI GPT-3.5-turbo
+## 10. Asistente IA — API OpenAI-compatible (Groq/GPT)
 
-**Decisión:** integrar la API de OpenAI Chat Completions con el modelo `gpt-3.5-turbo` para proporcionar un asistente conversacional de productividad.
+**Decisión:** integrar un asistente conversacional de productividad usando la API de OpenAI Chat Completions, con soporte configurable para distintos proveedores compatibles (OpenAI, Groq, Ollama, etc.).
 
 **Justificación:**
-- GPT-3.5-turbo ofrece un excelente balance entre calidad de respuestas, velocidad y coste, siendo ideal para un chat de productividad.
+- La API OpenAI Chat Completions es un estándar de facto adoptado por múltiples proveedores (Groq, Mistral, Together AI, Ollama), lo que permite cambiar de proveedor simplemente con variables de entorno, sin modificar código.
+- **Groq** es el proveedor por defecto en el entorno de desarrollo: ofrece un plan gratuito generoso (14.400 req/día), latencia mínima (tokens/segundo muy superiores a OpenAI) e inferencia de Llama 3.3 70B, que supera a GPT-3.5-turbo en razonamiento.
 - El modelo es capaz de mantener contexto conversacional al recibir el historial de mensajes previos.
-- La API devuelve respuestas en 1-3 segundos, suficientemente rápido para una experiencia de chat fluida sin necesidad de streaming.
 - El sistema de prompts permite especializar al asistente en temas de productividad personal (organización, priorización, técnicas como Pomodoro/Eisenhower).
 
+**Variables de entorno:**
+```env
+OPENAI_API_KEY=gsk_...          # clave del proveedor (Groq, OpenAI, etc.)
+OPENAI_BASE_URL=https://api.groq.com/openai/v1   # endpoint (default: OpenAI)
+OPENAI_MODEL=llama-3.3-70b-versatile             # modelo a usar
+```
+
 **Implementación técnica:**
-- Controller `AiChatController` con métodos `index()` (vista), `store()` (enviar mensaje) y `destroy()` (limpiar historial)
+- Controller `AiChatController` construye el cliente con `OpenAI::factory()->withBaseUri(...)` para soporte de base URL personalizada
 - Form Request `StoreAiChatRequest` valida mensajes (max 2000 caracteres)
-- Modelo `AiConversation` ya existente — almacena mensajes con rol `user` o `assistant`
+- Modelo `AiConversation` almacena mensajes con rol `user` o `assistant`
 - Historial limitado a 20 mensajes más recientes para contexto (evita exceder tokens)
 - System prompt personalizado con el nombre del usuario y enfocado en productividad
 - Rutas bajo middleware `role:premium_user` — funcionalidad exclusiva Premium
 - Frontend con React: chat UI completo, mensajes optimistas, sugerencias iniciales, auto-scroll
+- `config/services.php` expone `services.openai.key` y `services.openai.base_url`
 
-**Paquete:** `openai-php/client` — mismo paquete ya utilizado para Whisper.
+**Paquete:** `openai-php/client` — mismo paquete ya utilizado para Whisper. Compatible con cualquier API que implemente el protocolo OpenAI.
 
 **Alternativas descartadas:**
-- GPT-4: mayor calidad pero 10x más costoso y más lento; innecesario para este caso de uso
+- GPT-4 de OpenAI: mayor calidad pero más costoso; innecesario para este caso de uso
 - Claude API: requiere cuenta de pago desde el inicio
 - Ollama local: requiere GPU significativa para respuestas rápidas
 - Chatbot basado en reglas: funcionalidad muy limitada comparada con un LLM

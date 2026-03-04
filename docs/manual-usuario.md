@@ -2,7 +2,7 @@
 
 > Proyecto Intermodular — 2º DAM
 > Autor: Samuel Ayllón
-> Fecha: 2026-03-03
+> Fecha: 2026-03-04
 
 ---
 
@@ -504,4 +504,4 @@ No. La eliminación de tareas es permanente. Las tareas completadas, en cambio, 
 
 ---
 
-*Manual generado para la versión actual de Flowly — 2026-03-03*
+*Manual generado para la versión actual de Flowly — 2026-03-04*
