@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Pencil, Trash2, Table2, Calendar, LayoutGrid, ChevronLeft, ChevronRight, FolderOpen } from 'lucide-react';
+import { Pencil, Trash2, Table2, Calendar, LayoutGrid, ChevronLeft, ChevronRight, FolderOpen, Plus, CheckCircle2, FolderKanban, CalendarDays, ListTodo, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -12,9 +12,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const statusColors: Record<string, string> = {
-    inactive:  'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
-    active:    'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    inactive:  'bg-muted text-muted-foreground',
+    active:    'bg-blue-500/10 text-blue-600 border border-blue-500/20 dark:bg-blue-900/30 dark:text-blue-400',
+    completed: 'bg-green-500/10 text-green-600 border border-green-500/20 dark:bg-green-900/30 dark:text-green-400',
 };
 
 const statusLabels: Record<string, string> = {
@@ -35,37 +35,45 @@ function toggleComplete(project: Project) {
 
 function TableView({ projects }: { projects: Project[] }) {
     if (projects.length === 0) {
-        return <div className="rounded-lg border py-12 text-center text-sm text-muted-foreground">No hay proyectos con el filtro actual.</div>;
+        return (
+            <div className="rounded-2xl border-2 border-dashed py-12 text-center">
+                <div className="mx-auto h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                    <FolderKanban className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-sm text-muted-foreground">No hay proyectos con el filtro actual.</p>
+            </div>
+        );
     }
 
     return (
-        <div className="overflow-x-auto rounded-lg border">
+        <div className="overflow-x-auto rounded-xl border-2 bg-card/50">
             <table className="w-full text-sm">
-                <thead className="bg-muted/40">
+                <thead className="bg-muted/40 border-b">
                     <tr>
-                        <th className="w-10 p-3" />
-                        <th className="p-3 text-left font-medium">Nombre</th>
-                        <th className="p-3 text-left font-medium">Estado</th>
-                        <th className="hidden p-3 text-left font-medium sm:table-cell">Tareas</th>
-                        <th className="hidden p-3 text-left font-medium md:table-cell">Pendientes</th>
-                        <th className="hidden p-3 text-left font-medium md:table-cell">Creado</th>
-                        <th className="p-3 text-right font-medium">Acciones</th>
+                        <th className="w-10 p-4" />
+                        <th className="p-4 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">Nombre</th>
+                        <th className="p-4 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">Estado</th>
+                        <th className="hidden p-4 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground sm:table-cell">Tareas</th>
+                        <th className="hidden p-4 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground md:table-cell">Pendientes</th>
+                        <th className="hidden p-4 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground md:table-cell">Creado</th>
+                        <th className="p-4 text-right font-semibold text-xs uppercase tracking-wider text-muted-foreground">Acciones</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y">
                     {projects.map(project => (
-                        <tr key={project.id} className={`transition-colors hover:bg-muted/30 ${project.status === 'completed' ? 'opacity-60' : ''}`}>
-                            <td className="p-3">
+                        <tr key={project.id} className={`group transition-all hover:bg-primary/5 ${project.status === 'completed' ? 'opacity-60 bg-muted/20' : ''}`}>
+                            <td className="p-4">
                                 <Checkbox
                                     checked={project.status === 'completed'}
                                     onCheckedChange={() => toggleComplete(project)}
                                     title={project.status === 'completed' ? 'Reabrir' : 'Marcar como completado'}
+                                    className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
                                 />
                             </td>
-                            <td className="p-3">
+                            <td className="p-4">
                                 <div className="flex items-center gap-2">
                                     {project.color && (
-                                        <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: project.color }} />
+                                        <span className="h-3 w-3 shrink-0 rounded-full shadow-sm" style={{ backgroundColor: project.color }} />
                                     )}
                                     <span className={`font-medium ${project.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
                                         {project.name}
@@ -75,31 +83,40 @@ function TableView({ projects }: { projects: Project[] }) {
                                     <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{project.description}</p>
                                 )}
                             </td>
-                            <td className="p-3">
-                                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[project.status]}`}>
+                            <td className="p-4">
+                                <span className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${statusColors[project.status]}`}>
                                     {statusLabels[project.status]}
                                 </span>
                             </td>
-                            <td className="hidden p-3 text-muted-foreground sm:table-cell">
-                                {project.tasks_count ?? 0}
+                            <td className="hidden p-4 sm:table-cell">
+                                <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                                    <ListTodo className="h-3.5 w-3.5" />
+                                    {project.tasks_count ?? 0}
+                                </span>
                             </td>
-                            <td className="hidden p-3 text-orange-600 font-medium md:table-cell">
-                                {project.pending_tasks_count ?? 0}
+                            <td className="hidden p-4 md:table-cell">
+                                <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${(project.pending_tasks_count ?? 0) > 0 ? 'text-orange-600' : 'text-muted-foreground'}`}>
+                                    <Clock className="h-3.5 w-3.5" />
+                                    {project.pending_tasks_count ?? 0}
+                                </span>
                             </td>
-                            <td className="hidden p-3 text-xs text-muted-foreground md:table-cell">
-                                {new Date(project.created_at).toLocaleDateString('es-ES')}
+                            <td className="hidden p-4 md:table-cell">
+                                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    <CalendarDays className="h-3.5 w-3.5" />
+                                    {new Date(project.created_at).toLocaleDateString('es-ES')}
+                                </span>
                             </td>
-                            <td className="p-3">
-                                <div className="flex justify-end gap-1">
+                            <td className="p-4">
+                                <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <Link href={`/projects/${project.id}`}>
-                                        <Button size="sm" variant="ghost" title="Ver">Ver</Button>
+                                        <Button size="sm" variant="outline" className="h-8 px-3 rounded-lg border-2">Ver</Button>
                                     </Link>
                                     <Link href={`/projects/${project.id}/edit`}>
-                                        <Button size="sm" variant="ghost" title="Editar">
+                                        <Button size="sm" variant="ghost" title="Editar" className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary">
                                             <Pencil className="h-4 w-4" />
                                         </Button>
                                     </Link>
-                                    <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" title="Eliminar" onClick={() => deleteProject(project)}>
+                                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10" title="Eliminar" onClick={() => deleteProject(project)}>
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
@@ -136,26 +153,26 @@ function CalendarView({ projects }: { projects: Project[] }) {
     const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
     return (
-        <div className="rounded-lg border overflow-hidden">
-            <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-3">
-                <Button variant="ghost" size="sm" onClick={() => setViewDate(new Date(year, month - 1, 1))}>
-                    <ChevronLeft className="h-4 w-4" />
+        <div className="rounded-xl border-2 overflow-hidden bg-card/50">
+            <div className="flex items-center justify-between bg-gradient-to-r from-purple-500/10 to-transparent px-6 py-4">
+                <Button variant="ghost" size="sm" onClick={() => setViewDate(new Date(year, month - 1, 1))} className="h-9 w-9 p-0 rounded-lg hover:bg-primary/10">
+                    <ChevronLeft className="h-5 w-5" />
                 </Button>
-                <span className="font-medium capitalize">{monthLabel}</span>
-                <Button variant="ghost" size="sm" onClick={() => setViewDate(new Date(year, month + 1, 1))}>
-                    <ChevronRight className="h-4 w-4" />
+                <span className="font-bold text-lg capitalize">{monthLabel}</span>
+                <Button variant="ghost" size="sm" onClick={() => setViewDate(new Date(year, month + 1, 1))} className="h-9 w-9 p-0 rounded-lg hover:bg-primary/10">
+                    <ChevronRight className="h-5 w-5" />
                 </Button>
             </div>
 
-            <div className="grid grid-cols-7 border-b">
+            <div className="grid grid-cols-7 border-b bg-muted/30">
                 {dayNames.map(d => (
-                    <div key={d} className="py-2 text-center text-xs font-medium text-muted-foreground">{d}</div>
+                    <div key={d} className="py-3 text-center text-xs font-bold uppercase tracking-wider text-muted-foreground">{d}</div>
                 ))}
             </div>
 
             <div className="grid grid-cols-7">
                 {Array.from({ length: startDow }).map((_, i) => (
-                    <div key={`e-${i}`} className="min-h-[90px] border-b border-r bg-muted/10 p-1" />
+                    <div key={`e-${i}`} className="min-h-[100px] border-b border-r bg-muted/10 p-2" />
                 ))}
 
                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
@@ -164,16 +181,16 @@ function CalendarView({ projects }: { projects: Project[] }) {
                     const isToday = dateKey === todayStr;
 
                     return (
-                        <div key={day} className={`min-h-[90px] border-b border-r p-1 ${isToday ? 'bg-primary/5' : ''}`}>
-                            <div className={`mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium
-                                ${isToday ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
+                        <div key={day} className={`min-h-[100px] border-b border-r p-2 transition-colors hover:bg-primary/5 ${isToday ? 'bg-primary/10' : ''}`}>
+                            <div className={`mb-2 flex h-7 w-7 items-center justify-center rounded-lg text-sm font-bold
+                                ${isToday ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}>
                                 {day}
                             </div>
-                            <div className="flex flex-col gap-0.5">
+                            <div className="flex flex-col gap-1">
                                 {dayProjects.slice(0, 3).map(project => (
-                                    <div key={project.id} className="flex items-center gap-1 truncate rounded px-1 py-0.5 text-xs bg-muted text-muted-foreground">
+                                    <div key={project.id} className="flex items-center gap-1.5 truncate rounded-lg px-1.5 py-1 text-xs font-medium bg-purple-500/15 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 transition-all hover:scale-[1.02]">
                                         {project.color && (
-                                            <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: project.color }} />
+                                            <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: project.color }} />
                                         )}
                                         <span className={`truncate ${project.status === 'completed' ? 'line-through' : ''}`}>
                                             {project.name}
@@ -181,7 +198,7 @@ function CalendarView({ projects }: { projects: Project[] }) {
                                     </div>
                                 ))}
                                 {dayProjects.length > 3 && (
-                                    <span className="text-xs text-muted-foreground">+{dayProjects.length - 3} más</span>
+                                    <span className="text-xs font-semibold text-primary">+{dayProjects.length - 3} más</span>
                                 )}
                             </div>
                         </div>
@@ -196,57 +213,66 @@ function CalendarView({ projects }: { projects: Project[] }) {
 
 function GalleryView({ projects }: { projects: Project[] }) {
     if (projects.length === 0) {
-        return <div className="rounded-lg border py-12 text-center text-sm text-muted-foreground">No hay proyectos con el filtro actual.</div>;
+        return (
+            <div className="rounded-2xl border-2 border-dashed py-12 text-center">
+                <div className="mx-auto h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                    <FolderKanban className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-sm text-muted-foreground">No hay proyectos con el filtro actual.</p>
+            </div>
+        );
     }
 
     return (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map(project => (
-                <Card key={project.id} className={`flex flex-col ${project.status === 'completed' ? 'opacity-60' : ''}`}>
-                    <CardHeader className="pb-2">
+                <Card key={project.id} className={`group relative flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-2 border-transparent hover:border-primary/20 ${project.status === 'completed' ? 'opacity-60' : ''}`}>
+                    <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: project.color || '#8B5CF6' }} />
+                    <CardHeader className="pb-2 pl-5">
                         <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2 min-w-0">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <Checkbox
-                                    className="shrink-0"
+                                    className="shrink-0 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
                                     checked={project.status === 'completed'}
                                     onCheckedChange={() => toggleComplete(project)}
                                     title={project.status === 'completed' ? 'Reabrir proyecto' : 'Marcar como completado'}
                                 />
                                 {project.color && (
-                                    <span className="shrink-0 h-3 w-3 rounded-full" style={{ backgroundColor: project.color }} />
+                                    <span className="shrink-0 h-4 w-4 rounded-full shadow-sm" style={{ backgroundColor: project.color }} />
                                 )}
-                                <FolderOpen className="h-4 w-4 shrink-0 text-primary" />
-                                <CardTitle className={`truncate text-base ${project.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+                                <CardTitle className={`truncate text-base font-semibold ${project.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
                                     {project.name}
                                 </CardTitle>
                             </div>
-                            <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[project.status]}`}>
+                            <span className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold ${statusColors[project.status]}`}>
                                 {statusLabels[project.status]}
                             </span>
                         </div>
                     </CardHeader>
-                    <CardContent className="flex flex-1 flex-col gap-3">
+                    <CardContent className="flex flex-1 flex-col gap-3 pl-5">
                         {project.description && (
                             <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
                         )}
                         <div className="flex gap-4 text-sm">
-                            <span className="text-muted-foreground">
+                            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                                <ListTodo className="h-3.5 w-3.5" />
                                 <span className="font-medium text-foreground">{project.tasks_count ?? 0}</span> tareas
                             </span>
-                            <span className="text-muted-foreground">
-                                <span className="font-medium text-orange-600">{project.pending_tasks_count ?? 0}</span> pendientes
+                            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                                <Clock className="h-3.5 w-3.5" />
+                                <span className={`font-semibold ${(project.pending_tasks_count ?? 0) > 0 ? 'text-orange-600' : ''}`}>{project.pending_tasks_count ?? 0}</span> pendientes
                             </span>
                         </div>
-                        <div className="mt-auto flex gap-2">
+                        <div className="mt-auto flex gap-2 pt-2">
                             <Link href={`/projects/${project.id}`} className="flex-1">
-                                <Button size="sm" variant="outline" className="w-full">Ver</Button>
+                                <Button size="sm" variant="outline" className="w-full border-2 rounded-lg">Ver</Button>
                             </Link>
                             <Link href={`/projects/${project.id}/edit`}>
-                                <Button size="sm" variant="ghost" title="Editar">
+                                <Button size="sm" variant="ghost" title="Editar" className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                                     <Pencil className="h-4 w-4" />
                                 </Button>
                             </Link>
-                            <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" title="Eliminar" onClick={() => deleteProject(project)}>
+                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity" title="Eliminar" onClick={() => deleteProject(project)}>
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </div>
@@ -287,56 +313,86 @@ export default function ProjectsIndex({ projects }: { projects: Project[] }) {
 
             <div className="flex flex-col gap-6 p-6">
 
-                {/* Cabecera */}
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold">Mis proyectos</h1>
-                        <p className="text-sm text-muted-foreground">{projects.length} proyecto{projects.length !== 1 ? 's' : ''}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="flex rounded-lg border p-0.5 gap-0.5">
-                            {viewButtons.map(({ value, icon, title }) => (
-                                <Button key={value} size="sm" variant={view === value ? 'default' : 'ghost'}
-                                    className="h-7 w-7 p-0" onClick={() => setView(value)} title={title}>
-                                    {icon}
-                                </Button>
-                            ))}
+                {/* Cabecera mejorada */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 via-background to-primary/5 border-2 p-6">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                                <FolderKanban className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold">Mis proyectos</h1>
+                                <p className="text-sm text-muted-foreground">{projects.length} proyecto{projects.length !== 1 ? 's' : ''}</p>
+                            </div>
                         </div>
-                        <Link href="/projects/create"><Button>Nuevo proyecto</Button></Link>
+                        <div className="flex items-center gap-2">
+                            <div className="flex rounded-xl border-2 p-1 gap-1 bg-background/50">
+                                {viewButtons.map(({ value, icon, title }) => (
+                                    <Button key={value} size="sm" variant={view === value ? 'default' : 'ghost'}
+                                        className={`h-8 w-8 p-0 rounded-lg transition-all ${view === value ? 'shadow-sm' : ''}`} onClick={() => setView(value)} title={title}>
+                                        {icon}
+                                    </Button>
+                                ))}
+                            </div>
+                            <Link href="/projects/create">
+                                <Button className="gap-2 shadow-lg shadow-primary/25">
+                                    <Plus className="h-4 w-4" />
+                                    Nuevo proyecto
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
-                {/* Filtros por estado */}
-                <div className="flex flex-wrap gap-1">
+                {/* Filtros por estado mejorados */}
+                <div className="flex flex-wrap gap-2">
                     {statuses.map(({ value, label }) => (
                         <Button key={value} size="sm" variant={statusFilter === value ? 'default' : 'outline'}
-                            className="h-7 px-3 text-xs" onClick={() => setStatusFilter(value)}>
+                            className={`h-8 px-4 text-xs rounded-lg font-semibold border-2 transition-all ${statusFilter === value ? 'shadow-sm' : ''}`} onClick={() => setStatusFilter(value)}>
                             {label}
                         </Button>
                     ))}
                 </div>
 
-                {/* Flash */}
+                {/* Flash mejorado */}
                 {flash?.success && (
-                    <div className="rounded-lg bg-green-100 px-4 py-3 text-sm text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                        {flash.success}
+                    <div className="flex items-center gap-3 rounded-xl bg-green-500/10 border-2 border-green-500/20 px-4 py-3">
+                        <div className="h-8 w-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        </div>
+                        <span className="text-sm font-medium text-green-700 dark:text-green-400">{flash.success}</span>
                     </div>
                 )}
 
                 {/* Sin proyectos */}
                 {projects.length === 0 && (
-                    <Card>
-                        <CardContent className="flex flex-col items-center justify-center gap-3 py-12">
-                            <p className="text-muted-foreground">No tienes proyectos todavía.</p>
-                            <Link href="/projects/create"><Button>Crear primer proyecto</Button></Link>
+                    <Card className="border-2 border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center gap-4 py-16">
+                            <div className="h-16 w-16 rounded-2xl bg-purple-500/10 flex items-center justify-center">
+                                <FolderKanban className="h-8 w-8 text-purple-500" />
+                            </div>
+                            <div className="text-center">
+                                <p className="font-semibold">No tienes proyectos todavía</p>
+                                <p className="text-sm text-muted-foreground">Organiza tus tareas creando tu primer proyecto</p>
+                            </div>
+                            <Link href="/projects/create">
+                                <Button className="gap-2 shadow-lg shadow-primary/25">
+                                    <Plus className="h-4 w-4" />
+                                    Crear primer proyecto
+                                </Button>
+                            </Link>
                         </CardContent>
                     </Card>
                 )}
 
                 {projects.length > 0 && filtered.length === 0 && (
-                    <Card>
-                        <CardContent className="flex items-center justify-center py-12">
-                            <p className="text-muted-foreground">No hay proyectos con estado "{statusLabels[statusFilter]}".</p>
+                    <Card className="border-2 border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center gap-4 py-12">
+                            <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center">
+                                <FolderKanban className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <p className="text-muted-foreground text-center">No hay proyectos con estado "{statusLabels[statusFilter]}".</p>
                         </CardContent>
                     </Card>
                 )}

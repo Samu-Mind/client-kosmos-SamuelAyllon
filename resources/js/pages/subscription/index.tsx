@@ -3,25 +3,47 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SubscriptionProps } from '@/types';
+import { Crown, Check, Sparkles, Zap, Star, Calendar, Shield, CheckCircle2, Clock, XCircle, ArrowRight } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Suscripción', href: '/subscription' },
 ];
 
-const planColors: Record<string, string> = {
-    free:            'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
-    premium_monthly: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-    premium_yearly:  'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+const planIcons: Record<string, typeof Crown> = {
+    free: Zap,
+    premium_monthly: Crown,
+    premium_yearly: Star,
+};
+
+const planColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
+    free: {
+        bg: 'bg-slate-500/10',
+        text: 'text-slate-700 dark:text-slate-300',
+        border: 'border-slate-500/20',
+        gradient: 'from-slate-500 to-slate-600',
+    },
+    premium_monthly: {
+        bg: 'bg-violet-500/10',
+        text: 'text-violet-700 dark:text-violet-300',
+        border: 'border-violet-500/20',
+        gradient: 'from-violet-500 to-purple-600',
+    },
+    premium_yearly: {
+        bg: 'bg-amber-500/10',
+        text: 'text-amber-700 dark:text-amber-300',
+        border: 'border-amber-500/20',
+        gradient: 'from-amber-500 to-orange-600',
+    },
 };
 
 const planLabels: Record<string, string> = {
-    free: 'Gratuito', premium_monthly: 'Premium mensual', premium_yearly: 'Premium anual',
+    free: 'Gratuito', premium_monthly: 'Premium Mensual', premium_yearly: 'Premium Anual',
 };
 
-const statusColors: Record<string, string> = {
-    active:    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    expired:   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    cancelled: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; bg: string }> = {
+    active: { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-500/10 border-green-500/20' },
+    expired: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-500/10 border-red-500/20' },
+    cancelled: { icon: Clock, color: 'text-amber-600', bg: 'bg-amber-500/10 border-amber-500/20' },
 };
 
 const statusLabels: Record<string, string> = {
@@ -39,50 +61,100 @@ export default function SubscriptionIndex({ subscription, plans }: SubscriptionP
             <Head title="Suscripción" />
 
             <div className="flex flex-col gap-6 p-6">
-
-                <div>
-                    <h1 className="text-2xl font-bold">Suscripción</h1>
-                    <p className="text-sm text-muted-foreground">Gestiona tu plan y acceso a funcionalidades</p>
+                {/* Header con gradiente */}
+                <div className="rounded-2xl bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-fuchsia-500/10 border-2 border-violet-500/20 p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30">
+                                <Crown className="h-7 w-7" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold">Suscripción</h1>
+                                <p className="text-sm text-muted-foreground">Gestiona tu plan y acceso a funcionalidades</p>
+                            </div>
+                        </div>
+                        {isPremium && (
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30">
+                                <Sparkles className="h-4 w-4" />
+                                <span className="font-semibold">Premium Activo</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Flash */}
                 {flash?.success && (
-                    <div className="rounded-lg bg-green-100 px-4 py-3 text-sm text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                        {flash.success}
+                    <div className="flex items-center gap-3 rounded-xl bg-green-500/10 border-2 border-green-500/20 px-4 py-3">
+                        <div className="h-8 w-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        </div>
+                        <span className="text-sm font-medium text-green-700 dark:text-green-400">{flash.success}</span>
                     </div>
                 )}
 
                 {/* Plan actual */}
                 {subscription && (
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-base">Plan actual</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Plan</span>
-                                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${planColors[subscription.plan]}`}>
-                                    {planLabels[subscription.plan]}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Estado</span>
-                                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[subscription.status]}`}>
-                                    {statusLabels[subscription.status]}
-                                </span>
-                            </div>
-                            {subscription.expires_at && (
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-muted-foreground">Válido hasta</span>
-                                    <span className="text-sm">
-                                        {new Date(subscription.expires_at).toLocaleDateString('es-ES')}
-                                    </span>
+                    <Card className="border-2 rounded-2xl overflow-hidden">
+                        <CardHeader className="pb-3 bg-gradient-to-r from-muted/50 to-muted/30">
+                            <div className="flex items-center gap-3">
+                                <div className={`h-10 w-10 rounded-xl ${planColors[subscription.plan].bg} flex items-center justify-center`}>
+                                    {(() => {
+                                        const Icon = planIcons[subscription.plan];
+                                        return <Icon className={`h-5 w-5 ${planColors[subscription.plan].text}`} />;
+                                    })()}
                                 </div>
-                            )}
+                                <CardTitle className="text-lg">Tu plan actual</CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-4">
+                            <div className="grid gap-4 sm:grid-cols-3">
+                                <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-muted/30 border">
+                                    <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Plan</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-sm font-semibold ${planColors[subscription.plan].bg} ${planColors[subscription.plan].text} border ${planColors[subscription.plan].border}`}>
+                                            {(() => {
+                                                const Icon = planIcons[subscription.plan];
+                                                return <Icon className="h-3.5 w-3.5" />;
+                                            })()}
+                                            {planLabels[subscription.plan]}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-muted/30 border">
+                                    <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Estado</span>
+                                    <div className="flex items-center gap-2">
+                                        {(() => {
+                                            const config = statusConfig[subscription.status];
+                                            const Icon = config.icon;
+                                            return (
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-sm font-semibold border ${config.bg}`}>
+                                                    <Icon className={`h-3.5 w-3.5 ${config.color}`} />
+                                                    <span className={config.color}>{statusLabels[subscription.status]}</span>
+                                                </span>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
+                                {subscription.expires_at && (
+                                    <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-muted/30 border">
+                                        <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Válido hasta</span>
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                            <span className="text-sm font-semibold">
+                                                {new Date(subscription.expires_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             {!isPremium && (
-                                <div className="mt-2 border-t pt-3">
+                                <div className="mt-6 pt-4 border-t-2 border-dashed">
                                     <Link href="/checkout">
-                                        <Button className="w-full">Actualizar a Premium</Button>
+                                        <Button className="w-full h-12 text-base font-semibold rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-500/30 transition-all hover:shadow-xl hover:shadow-violet-500/40">
+                                            <Sparkles className="h-5 w-5 mr-2" />
+                                            Actualizar a Premium
+                                            <ArrowRight className="h-5 w-5 ml-2" />
+                                        </Button>
                                     </Link>
                                 </div>
                             )}
@@ -92,41 +164,97 @@ export default function SubscriptionIndex({ subscription, plans }: SubscriptionP
 
                 {/* Planes disponibles */}
                 <div>
-                    <h2 className="mb-3 text-lg font-semibold">Planes disponibles</h2>
-                    <div className="grid gap-4 sm:grid-cols-3">
-                        {plans.map(plan => (
-                            <Card key={plan.key} className={isPremium && (plan.key === subscription?.plan) ? 'ring-2 ring-purple-500' : ''}>
-                                <CardHeader className="pb-2">
-                                    <div className="flex items-center justify-between">
-                                        <CardTitle className="text-base">{plan.name}</CardTitle>
-                                        {isPremium && subscription?.plan === plan.key && (
-                                            <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
-                                                Activo
-                                            </span>
-                                        )}
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="flex flex-col gap-3">
-                                    <p className="text-2xl font-bold">
-                                        {plan.price === 0 ? 'Gratis' : `$${plan.price.toFixed(2)}`}
-                                        {plan.price > 0 && <span className="text-sm font-normal text-muted-foreground">/mes</span>}
-                                    </p>
-                                    <ul className="flex flex-col gap-1">
-                                        {plan.features.map((feature, i) => (
-                                            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                                <span className="mt-0.5 text-green-600">✓</span>
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    {!isPremium && plan.key !== 'free' && (
-                                        <Link href="/checkout">
-                                            <Button className="w-full" size="sm">Seleccionar</Button>
-                                        </Link>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                            <Shield className="h-5 w-5 text-violet-600" />
+                        </div>
+                        <h2 className="text-xl font-bold">Planes disponibles</h2>
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-3">
+                        {plans.map((plan, index) => {
+                            const isCurrentPlan = isPremium && subscription?.plan === plan.key;
+                            const isBestValue = plan.key === 'premium_yearly';
+                            const PlanIcon = planIcons[plan.key] || Zap;
+                            const colors = planColors[plan.key];
+                            
+                            return (
+                                <Card 
+                                    key={plan.key} 
+                                    className={`relative border-2 rounded-2xl transition-all hover:shadow-lg ${
+                                        isCurrentPlan 
+                                            ? 'ring-2 ring-violet-500 shadow-lg shadow-violet-500/20' 
+                                            : isBestValue 
+                                                ? 'ring-2 ring-amber-500 shadow-lg shadow-amber-500/20'
+                                                : 'hover:-translate-y-1'
+                                    }`}
+                                >
+                                    {isBestValue && (
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold shadow-lg">
+                                            Mejor valor
+                                        </div>
                                     )}
-                                </CardContent>
-                            </Card>
-                        ))}
+                                    {isCurrentPlan && (
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white text-xs font-bold shadow-lg">
+                                            Plan actual
+                                        </div>
+                                    )}
+                                    <CardHeader className="pb-2 pt-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center text-white shadow-lg`}>
+                                                <PlanIcon className="h-6 w-6" />
+                                            </div>
+                                            <CardTitle className="text-lg">{plan.name}</CardTitle>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-col gap-4">
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-3xl font-bold">
+                                                {plan.price === 0 ? 'Gratis' : `${plan.price.toFixed(2)}€`}
+                                            </span>
+                                            {plan.price > 0 && (
+                                                <span className="text-sm text-muted-foreground">
+                                                    /{plan.key === 'premium_yearly' ? 'año' : 'mes'}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {plan.key === 'premium_yearly' && (
+                                            <div className="text-sm text-amber-600 dark:text-amber-400 font-medium">
+                                                ¡Ahorra 2 meses!
+                                            </div>
+                                        )}
+                                        <ul className="flex flex-col gap-2.5 pt-2">
+                                            {plan.features.map((feature, i) => (
+                                                <li key={i} className="flex items-start gap-2.5 text-sm">
+                                                    <div className="mt-0.5 h-5 w-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                                                        <Check className="h-3 w-3 text-green-600" />
+                                                    </div>
+                                                    <span className="text-muted-foreground">{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        {!isPremium && plan.key !== 'free' && (
+                                            <Link href="/checkout" className="mt-2">
+                                                <Button 
+                                                    className={`w-full h-11 font-semibold rounded-xl transition-all ${
+                                                        isBestValue 
+                                                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg shadow-amber-500/30'
+                                                            : 'bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-500/30'
+                                                    }`}
+                                                >
+                                                    Seleccionar
+                                                    <ArrowRight className="h-4 w-4 ml-2" />
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {plan.key === 'free' && !isPremium && subscription?.plan === 'free' && (
+                                            <div className="mt-2 py-2 text-center text-sm text-muted-foreground font-medium">
+                                                Plan actual
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

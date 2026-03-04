@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { Lock, ShieldAlert } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,38 +11,46 @@ import { store } from '@/routes/password/confirm';
 export default function ConfirmPassword() {
     return (
         <AuthLayout
-            title="Confirm your password"
-            description="This is a secure area of the application. Please confirm your password before continuing."
+            title="Confirma tu contraseña"
+            description="Esta es una zona segura. Confirma tu contraseña para continuar."
         >
-            <Head title="Confirm password" />
+            <Head title="Confirmar contraseña" />
+
+            <div className="flex justify-center mb-6">
+                <div className="h-16 w-16 rounded-2xl bg-amber-500/10 flex items-center justify-center">
+                    <ShieldAlert className="h-8 w-8 text-amber-600" />
+                </div>
+            </div>
 
             <Form {...store.form()} resetOnSuccess={['password']}>
                 {({ processing, errors }) => (
                     <div className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                autoComplete="current-password"
-                                autoFocus
-                            />
+                            <Label htmlFor="password" className="text-sm font-semibold">Contraseña</Label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    placeholder="Tu contraseña actual"
+                                    autoComplete="current-password"
+                                    autoFocus
+                                    className="pl-10 h-11 border-2 rounded-xl transition-all focus:ring-2 focus:ring-primary/20"
+                                />
+                            </div>
 
                             <InputError message={errors.password} />
                         </div>
 
-                        <div className="flex items-center">
-                            <Button
-                                className="w-full"
-                                disabled={processing}
-                                data-test="confirm-password-button"
-                            >
-                                {processing && <Spinner />}
-                                Confirm password
-                            </Button>
-                        </div>
+                        <Button
+                            className="w-full h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
+                            disabled={processing}
+                            data-test="confirm-password-button"
+                        >
+                            {processing ? <Spinner /> : <Lock className="h-4 w-4 mr-2" />}
+                            Confirmar contraseña
+                        </Button>
                     </div>
                 )}
             </Form>

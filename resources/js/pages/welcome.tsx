@@ -14,48 +14,139 @@ import {
     Bot,
     Shield,
     Star,
+    ArrowRight,
+    Sparkles,
+    Target,
+    Zap,
+    Users,
+    TrendingUp,
+    Clock,
+    Brain,
+    Rocket,
+    ChevronRight,
+    Quote,
+    Play,
+    MessageSquare,
+    Calendar,
+    Award,
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
+import { useEffect, useState, useRef } from 'react';
+
+// Hook para animación de números
+function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
+    const [count, setCount] = useState(0);
+    const [hasStarted, setHasStarted] = useState(!startOnView);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (startOnView && ref.current) {
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting && !hasStarted) {
+                        setHasStarted(true);
+                    }
+                },
+                { threshold: 0.5 }
+            );
+            observer.observe(ref.current);
+            return () => observer.disconnect();
+        }
+    }, [startOnView, hasStarted]);
+
+    useEffect(() => {
+        if (!hasStarted) return;
+        
+        let startTime: number;
+        const animate = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            setCount(Math.floor(progress * end));
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+        requestAnimationFrame(animate);
+    }, [end, duration, hasStarted]);
+
+    return { count, ref };
+}
 
 export default function Welcome({ canRegister = true }: { canRegister?: boolean }) {
     const { auth } = usePage().props as { auth: { user: unknown } };
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        setIsLoaded(true);
+    }, []);
 
     return (
         <>
             <Head title="Flowly — Tu productividad, organizada" />
 
-            <div className="min-h-screen bg-background text-foreground">
+            <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
 
                 {/* ── Navbar ── */}
-                <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm">
+                <header className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl">
                     <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-                        <div className="flex items-center gap-2">
-                            <img src={logo} alt="Flowly" className="h-8 w-auto object-contain" />
-                            <span className="text-xl font-bold tracking-tight">Flowly</span>
+                        <div className="flex items-center gap-2 group cursor-pointer">
+                            <img 
+                                src={logo} 
+                                alt="Flowly" 
+                                className="h-8 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6" 
+                            />
+                            <span className="text-xl font-bold tracking-tight gradient-text-animated">
+                                Flowly
+                            </span>
                         </div>
 
-                        <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-                            <a href="#features" className="transition-colors hover:text-foreground">
+                        <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
+                            <a 
+                                href="#features" 
+                                className="relative text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+                            >
                                 Funcionalidades
                             </a>
-                            <a href="#pricing" className="transition-colors hover:text-foreground">
+                            <a 
+                                href="#how-it-works" 
+                                className="relative text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+                            >
+                                Cómo funciona
+                            </a>
+                            <a 
+                                href="#testimonials" 
+                                className="relative text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+                            >
+                                Testimonios
+                            </a>
+                            <a 
+                                href="#pricing" 
+                                className="relative text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+                            >
                                 Precios
                             </a>
                         </nav>
 
                         <div className="flex items-center gap-3">
                             {auth.user ? (
-                                <Button asChild>
-                                    <Link href={dashboard()}>Ir al dashboard</Link>
+                                <Button asChild className="group glow-primary">
+                                    <Link href={dashboard()} className="flex items-center gap-2">
+                                        Ir al dashboard
+                                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                    </Link>
                                 </Button>
                             ) : (
                                 <>
-                                    <Button variant="ghost" asChild>
+                                    <Button variant="ghost" asChild className="hidden sm:inline-flex">
                                         <Link href={login()}>Iniciar sesión</Link>
                                     </Button>
                                     {canRegister && (
-                                        <Button asChild>
-                                            <Link href={register()}>Registrarse</Link>
+                                        <Button asChild className="group glow-primary relative overflow-hidden">
+                                            <Link href={register()} className="flex items-center gap-2">
+                                                <span className="relative z-10">Empezar gratis</span>
+                                                <Sparkles className="h-4 w-4 relative z-10 transition-transform group-hover:rotate-12 group-hover:scale-125" />
+                                                <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </Link>
                                         </Button>
                                     )}
                                 </>
@@ -65,208 +156,695 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                 </header>
 
                 {/* ── Hero ── */}
-                <section className="mx-auto max-w-6xl px-6 py-24 text-center">
-                    <Badge variant="secondary" className="mb-4">
-                        Productividad personal freemium
-                    </Badge>
-                    <h1 className="mb-6 text-5xl font-bold tracking-tight leading-tight lg:text-6xl">
-                        Tu productividad,
-                        <br />
-                        <span className="text-primary">finalmente organizada</span>
-                    </h1>
-                    <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground">
-                        Flowly te ayuda a gestionar tareas, capturar ideas y organizar proyectos
-                        desde un solo lugar. Empieza gratis y escala cuando lo necesites.
-                    </p>
-                    <div className="flex flex-wrap items-center justify-center gap-4">
-                        {canRegister && (
-                            <Button size="lg" asChild>
-                                <Link href={register()}>Empezar gratis</Link>
-                            </Button>
-                        )}
-                        <Button size="lg" variant="outline" asChild>
-                            <Link href={login()}>Ya tengo cuenta</Link>
-                        </Button>
+                <section className="relative mx-auto max-w-6xl px-6 py-16 lg:py-28 overflow-hidden">
+                    {/* Animated background orbs */}
+                    <div className="absolute inset-0 -z-10 overflow-hidden">
+                        <div className="absolute top-20 right-1/4 h-96 w-96 rounded-full bg-gradient-to-br from-primary/30 to-primary/5 blur-3xl animate-orb-1" />
+                        <div className="absolute bottom-20 left-1/4 h-80 w-80 rounded-full bg-gradient-to-tr from-primary/20 to-transparent blur-3xl animate-orb-2" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary/5 blur-3xl animate-glow-pulse" />
+                        {/* Grid pattern */}
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
                     </div>
-                    <p className="mt-4 text-sm text-muted-foreground">
-                        Sin tarjeta de crédito · Plan gratuito para siempre
-                    </p>
+
+                    <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+                        <div className={`text-center lg:text-left ${isLoaded ? 'animate-fade-in-left' : 'opacity-0'}`}>
+                            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary mb-8 animate-shimmer backdrop-blur-sm">
+                                <div className="relative flex h-2 w-2">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+                                </div>
+                                Productividad personal reinventada
+                            </div>
+                            
+                            <h1 className="mb-6 text-4xl font-extrabold tracking-tight leading-[1.08] sm:text-5xl lg:text-6xl xl:text-7xl">
+                                <span className="animate-fade-in-up-delay-1">Organiza tu día,</span>
+                                <br />
+                                <span className="relative inline-block animate-fade-in-up-delay-2">
+                                    <span className="gradient-text-animated">
+                                        transforma tu vida
+                                    </span>
+                                    <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
+                                        <path 
+                                            d="M2 8c50-6 100-6 196 0" 
+                                            stroke="currentColor" 
+                                            strokeWidth="3" 
+                                            strokeLinecap="round" 
+                                            className="text-primary/40"
+                                            strokeDasharray="200"
+                                            strokeDashoffset="200"
+                                            style={{ animation: 'draw-line 1s ease-out 0.8s forwards' }}
+                                        />
+                                    </svg>
+                                </span>
+                            </h1>
+                            
+                            <p className="mb-10 max-w-xl text-lg text-muted-foreground lg:text-xl animate-fade-in-up-delay-3 leading-relaxed">
+                                Flowly unifica tareas, ideas y proyectos en una experiencia fluida. 
+                                Con <span className="text-primary font-semibold">IA integrada</span> y <span className="text-primary font-semibold">captura por voz</span>, tu productividad no tiene límites.
+                            </p>
+                            
+                            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up-delay-4">
+                                {canRegister && (
+                                    <Button size="lg" asChild className="w-full sm:w-auto group glow-primary-lg hover:scale-105 transition-all duration-300 text-base px-8 py-6">
+                                        <Link href={register()} className="flex items-center gap-3">
+                                            <span>Comenzar gratis</span>
+                                            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
+                                        </Link>
+                                    </Button>
+                                )}
+                                <Button size="lg" variant="outline" asChild className="w-full sm:w-auto group hover:bg-primary/5 transition-all duration-300 text-base px-8 py-6 border-2">
+                                    <Link href="#how-it-works" className="flex items-center gap-3">
+                                        <Play className="h-4 w-4 text-primary" />
+                                        Ver cómo funciona
+                                    </Link>
+                                </Button>
+                            </div>
+                            
+                            <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-muted-foreground">
+                                {[
+                                    { icon: CheckCircle2, text: 'Sin tarjeta de crédito' },
+                                    { icon: Zap, text: 'Activo en segundos' },
+                                    { icon: Shield, text: 'Datos seguros' },
+                                ].map((item, i) => (
+                                    <span key={i} className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2 backdrop-blur-sm">
+                                        <item.icon className="h-4 w-4 text-primary" />
+                                        {item.text}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Hero visual - Enhanced interactive preview */}
+                        <div className={`relative ${isLoaded ? 'animate-fade-in-right' : 'opacity-0'}`}>
+                            <div className="relative mx-auto max-w-md lg:max-w-none">
+                                {/* Floating elements */}
+                                <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl rotate-12 animate-float blur-sm" />
+                                <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-gradient-to-br from-primary/15 to-transparent rounded-3xl -rotate-12 animate-float-delayed blur-sm" />
+                                
+                                {/* Main preview card with glow */}
+                                <div className="relative">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-2xl blur-lg animate-glow-pulse" />
+                                    <Card className="relative overflow-hidden border-2 border-primary/30 shadow-2xl backdrop-blur-sm bg-card/95">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
+                                        <CardHeader className="pb-4 relative">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30">
+                                                        <Target className="h-6 w-6 text-primary-foreground" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-base font-semibold">Tu día de hoy</p>
+                                                        <p className="text-xs text-muted-foreground">3 tareas · 2 completadas</p>
+                                                    </div>
+                                                </div>
+                                                <Badge className="bg-gradient-to-r from-primary to-primary/70 text-primary-foreground border-0 shadow-lg shadow-primary/20">
+                                                    <Zap className="h-3 w-3 mr-1" />
+                                                    Productivo
+                                                </Badge>
+                                            </div>
+                                            {/* Progress bar */}
+                                            <div className="mt-4 h-2 bg-muted rounded-full overflow-hidden">
+                                                <div className="h-full w-2/3 bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-1000" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent className="space-y-3 relative">
+                                            <TaskPreviewItem priority="high" text="Finalizar presentación Q4" done />
+                                            <TaskPreviewItem priority="high" text="Llamar cliente importante" done />
+                                            <TaskPreviewItem priority="medium" text="Revisar propuesta" animate />
+                                            <div className="pt-3 flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-transparent border border-primary/20">
+                                                <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                                                    <Brain className="h-4 w-4 text-primary" />
+                                                </div>
+                                                <p className="text-sm text-muted-foreground flex-1">
+                                                    <span className="text-primary font-medium">IA:</span> "¡Vas genial! Solo queda la propuesta"
+                                                </p>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                {/* Floating notification badges */}
+                                <div className="absolute -right-4 top-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-bounce-subtle backdrop-blur-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500/20 to-red-500/5 flex items-center justify-center">
+                                            <Mic className="h-5 w-5 text-red-500" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold">Dictado por voz</p>
+                                            <p className="text-xs text-muted-foreground">Transcribe ideas al vuelo</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="absolute -left-4 bottom-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-float backdrop-blur-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center">
+                                            <Calendar className="h-5 w-5 text-blue-500" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold">Smart Calendar</p>
+                                            <p className="text-xs text-muted-foreground">Próx: Reunión 3:00 PM</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
-                <Separator />
+                {/* ── Trusted by / Stats ── */}
+                <section className="relative border-y bg-gradient-to-b from-muted/50 to-background">
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+                    <div className="relative mx-auto max-w-6xl px-6 py-16">
+                        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+                            <AnimatedStatItem value={10000} suffix="+" label="Usuarios activos" icon={<Users className="h-6 w-6" />} />
+                            <AnimatedStatItem value={50000} suffix="+" label="Tareas completadas" icon={<CheckCircle2 className="h-6 w-6" />} />
+                            <AnimatedStatItem value={98} suffix="%" label="Satisfacción" icon={<TrendingUp className="h-6 w-6" />} />
+                            <AnimatedStatItem value={2} suffix="h/día" label="Tiempo ahorrado" icon={<Clock className="h-6 w-6" />} />
+                        </div>
+                    </div>
+                </section>
 
-                {/* ── Features ── */}
-                <section id="features" className="mx-auto max-w-6xl px-6 py-20">
-                    <div className="mb-12 text-center">
-                        <h2 className="mb-3 text-3xl font-bold tracking-tight">
-                            Todo lo que necesitas en un solo lugar
+                {/* ── Features - Bento Grid ── */}
+                <section id="features" className="mx-auto max-w-6xl px-6 py-24">
+                    <div className="mb-16 text-center">
+                        <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
+                            <Sparkles className="h-3 w-3 mr-1 text-primary" />
+                            Funcionalidades
+                        </Badge>
+                        <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                            Todo lo que necesitas,{' '}
+                            <span className="gradient-text-animated">
+                                nada que no
+                            </span>
                         </h2>
-                        <p className="text-muted-foreground">
-                            Desde gestionar tareas del día a día hasta organizar proyectos complejos.
+                        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                            Herramientas potentes pero intuitivas para gestionar tu día a día 
+                            sin fricción ni distracciones.
                         </p>
                     </div>
 
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <FeatureCard
-                            icon={<CheckCircle2 className="h-6 w-6 text-primary" />}
-                            title="Gestión de tareas"
-                            description="Crea, prioriza y organiza tus tareas con niveles de prioridad (alta, media, baja), fechas de vencimiento y seguimiento de completado."
+                    {/* Bento Grid Layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                        {/* Feature grande - Tareas */}
+                        <BentoCard 
+                            className="md:col-span-2 lg:col-span-2"
+                            icon={<CheckCircle2 className="h-8 w-8" />}
+                            title="Gestión de tareas inteligente"
+                            description="Crea, prioriza y organiza tus tareas con niveles de prioridad, fechas de vencimiento y seguimiento visual del progreso. La IA te sugiere el orden óptimo."
                             badge="Gratis"
-                        />
-                        <FeatureCard
-                            icon={<Lightbulb className="h-6 w-6 text-primary" />}
+                            gradient="from-green-500/20 via-emerald-500/10 to-transparent"
+                            featured
+                        >
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                {['Alta prioridad', 'Media', 'Baja'].map((p, i) => (
+                                    <span key={i} className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                        i === 0 ? 'bg-red-500/20 text-red-600' : 
+                                        i === 1 ? 'bg-yellow-500/20 text-yellow-600' : 
+                                        'bg-blue-500/20 text-blue-600'
+                                    }`}>
+                                        {p}
+                                    </span>
+                                ))}
+                            </div>
+                        </BentoCard>
+
+                        {/* Ideas */}
+                        <BentoCard 
+                            icon={<Lightbulb className="h-7 w-7" />}
                             title="Captura de ideas"
-                            description="Nunca pierdas una buena idea. Guárdalas al instante, márcalas como resueltas y vuelve a ellas cuando las necesites."
+                            description="Guarda ideas al instante y organízalas cuando quieras."
                             badge="Gratis"
+                            gradient="from-yellow-500/20 via-amber-500/10 to-transparent"
                         />
-                        <FeatureCard
-                            icon={<FolderKanban className="h-6 w-6 text-primary" />}
-                            title="Proyectos"
-                            description="Agrupa tareas en proyectos con seguimiento de progreso, estado personalizable y una vista clara de todo lo que está en marcha."
+
+                        {/* Voz - destacado */}
+                        <BentoCard 
+                            icon={<Mic className="h-7 w-7" />}
+                            title="Dictado por voz"
+                            description="Graba ideas con tu voz. Transcripción automática con IA de última generación."
                             badge="Premium"
-                            badgeVariant="default"
-                        />
-                        <FeatureCard
-                            icon={<BookMarked className="h-6 w-6 text-primary" />}
-                            title="Cajas de recursos"
-                            description="Organiza enlaces, documentos, vídeos e imágenes en cajas temáticas para tener siempre a mano lo que necesitas."
-                            badge="Premium"
-                            badgeVariant="default"
-                        />
-                        <FeatureCard
-                            icon={<Mic className="h-6 w-6 text-primary" />}
-                            title="Notas de voz"
-                            description="Graba ideas o tareas con tu voz en segundos. Tus grabaciones se transcriben y almacenan automáticamente."
-                            badge="Premium"
-                            badgeVariant="default"
-                        />
-                        <FeatureCard
-                            icon={<Bot className="h-6 w-6 text-primary" />}
+                            gradient="from-red-500/20 via-rose-500/10 to-transparent"
+                            isPremium
+                        >
+                            <div className="mt-3 flex items-center gap-2">
+                                <div className="flex gap-0.5">
+                                    {[1,2,3,4,5].map(i => (
+                                        <div key={i} className={`w-1 bg-red-500 rounded-full animate-pulse`} 
+                                            style={{ height: `${8 + Math.random() * 12}px`, animationDelay: `${i * 0.1}s` }} 
+                                        />
+                                    ))}
+                                </div>
+                                <span className="text-xs text-muted-foreground">Grabando...</span>
+                            </div>
+                        </BentoCard>
+
+                        {/* IA - grande */}
+                        <BentoCard 
+                            className="md:col-span-2 lg:col-span-1 lg:row-span-2"
+                            icon={<Bot className="h-8 w-8" />}
                             title="Asistente IA"
-                            description="Chatea con un asistente de inteligencia artificial para obtener sugerencias, organizar tus ideas o priorizar tu jornada."
+                            description="Chatea con un asistente inteligente que te ayuda a priorizar, organizar y optimizar tu productividad."
                             badge="Premium"
-                            badgeVariant="default"
+                            gradient="from-indigo-500/20 via-purple-500/10 to-transparent"
+                            isPremium
+                            featured
+                        >
+                            <div className="mt-4 space-y-2">
+                                <div className="flex gap-2 items-start">
+                                    <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                                        <Bot className="h-3 w-3 text-primary" />
+                                    </div>
+                                    <p className="text-xs bg-muted/50 rounded-lg p-2 flex-1">
+                                        "Te recomiendo empezar por la tarea de alta prioridad"
+                                    </p>
+                                </div>
+                                <div className="flex gap-2 items-start justify-end">
+                                    <p className="text-xs bg-primary/10 rounded-lg p-2">
+                                        "¿Cuánto tiempo me tomará?"
+                                    </p>
+                                </div>
+                            </div>
+                        </BentoCard>
+
+                        {/* Proyectos */}
+                        <BentoCard 
+                            icon={<FolderKanban className="h-7 w-7" />}
+                            title="Proyectos"
+                            description="Agrupa tareas en proyectos con seguimiento de progreso y estados personalizables."
+                            badge="Premium"
+                            gradient="from-blue-500/20 via-cyan-500/10 to-transparent"
+                            isPremium
+                        />
+
+                        {/* Recursos */}
+                        <BentoCard 
+                            icon={<BookMarked className="h-7 w-7" />}
+                            title="Cajas de recursos"
+                            description="Organiza enlaces, documentos, vídeos e imágenes en cajas temáticas."
+                            badge="Premium"
+                            gradient="from-purple-500/20 via-violet-500/10 to-transparent"
+                            isPremium
                         />
                     </div>
                 </section>
 
-                <Separator />
+                {/* ── How it works ── */}
+                <section id="how-it-works" className="relative border-y overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-muted/20" />
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+                    
+                    <div className="relative mx-auto max-w-6xl px-6 py-24">
+                        <div className="mb-16 text-center">
+                            <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
+                                <Rocket className="h-3 w-3 mr-1 text-primary" />
+                                Cómo funciona
+                            </Badge>
+                            <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                                De cero a productivo en{' '}
+                                <span className="gradient-text-animated">
+                                    3 pasos
+                                </span>
+                            </h2>
+                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                                Empezar con Flowly es tan sencillo como respirar.
+                            </p>
+                        </div>
+
+                        <div className="relative grid gap-8 md:grid-cols-3">
+                            {/* Connector line */}
+                            <div className="hidden md:block absolute top-24 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                            
+                            <StepCard 
+                                number={1}
+                                title="Crea tu cuenta"
+                                description="Regístrate gratis en menos de 30 segundos. Sin tarjeta de crédito, sin compromisos."
+                                icon={<Users className="h-6 w-6" />}
+                            />
+                            <StepCard 
+                                number={2}
+                                title="Organiza tu mundo"
+                                description="Añade tus tareas, ideas y proyectos. Usa la voz o escribe, tú decides cómo fluye."
+                                icon={<Target className="h-6 w-6" />}
+                            />
+                            <StepCard 
+                                number={3}
+                                title="Conquista tu día"
+                                description="Sigue tu progreso, recibe insights de la IA y celebra cada tarea completada."
+                                icon={<Rocket className="h-6 w-6" />}
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── Testimonials ── */}
+                <section id="testimonials" className="mx-auto max-w-6xl px-6 py-24">
+                    <div className="mb-16 text-center">
+                        <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
+                            <MessageSquare className="h-3 w-3 mr-1 text-primary" />
+                            Testimonios
+                        </Badge>
+                        <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                            Lo que dicen{' '}
+                            <span className="gradient-text-animated">
+                                nuestros usuarios
+                            </span>
+                        </h2>
+                        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                            Miles de personas ya han transformado su productividad con Flowly.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <TestimonialCard 
+                            quote="Flowly ha cambiado completamente cómo organizo mi día. La IA es increíblemente útil para priorizar tareas."
+                            author="María García"
+                            role="Product Manager"
+                            avatar="M"
+                            rating={5}
+                        />
+                        <TestimonialCard 
+                            quote="El dictado por voz es un game changer. Capturo ideas mientras conduzco y aparecen perfectamente transcritas."
+                            author="Carlos Ruiz"
+                            role="Emprendedor"
+                            avatar="C"
+                            rating={5}
+                            featured
+                        />
+                        <TestimonialCard 
+                            quote="Probé muchas apps de productividad, pero Flowly es la única que realmente uso todos los días. Simple y potente."
+                            author="Ana López"
+                            role="Diseñadora UX"
+                            avatar="A"
+                            rating={5}
+                        />
+                        <TestimonialCard 
+                            quote="Las cajas de recursos me salvaron la vida organizando material para mis clases. Todo en un solo lugar."
+                            author="David Martín"
+                            role="Profesor"
+                            avatar="D"
+                            rating={5}
+                        />
+                        <TestimonialCard 
+                            quote="El plan gratuito tiene todo lo que necesito. Cuando crezca mi negocio, definitivamente iré a Premium."
+                            author="Laura Sánchez"
+                            role="Freelancer"
+                            avatar="L"
+                            rating={5}
+                        />
+                        <TestimonialCard 
+                            quote="Mi equipo y yo ahorramos al menos 2 horas diarias desde que usamos Flowly. ROI increíble."
+                            author="Pablo Fernández"
+                            role="CEO Startup"
+                            avatar="P"
+                            rating={5}
+                        />
+                    </div>
+
+                    {/* Trust indicators */}
+                    <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <div className="flex -space-x-2">
+                                {['M', 'C', 'A', 'D', 'L'].map((letter, i) => (
+                                    <div key={i} className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-xs font-semibold text-primary-foreground border-2 border-background">
+                                        {letter}
+                                    </div>
+                                ))}
+                            </div>
+                            <span className="text-sm">+10,000 usuarios satisfechos</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            {[1,2,3,4,5].map(i => (
+                                <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+                            ))}
+                            <span className="ml-2 text-sm text-muted-foreground">4.9/5 valoración media</span>
+                        </div>
+                    </div>
+                </section>
 
                 {/* ── Pricing ── */}
-                <section id="pricing" className="mx-auto max-w-6xl px-6 py-20">
-                    <div className="mb-12 text-center">
-                        <h2 className="mb-3 text-3xl font-bold tracking-tight">
-                            Planes para todos
-                        </h2>
-                        <p className="text-muted-foreground">
-                            Empieza sin coste alguno. Actualiza cuando tu productividad lo exija.
+                <section id="pricing" className="relative border-y bg-gradient-to-b from-background via-muted/20 to-background">
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+                    
+                    <div className="relative mx-auto max-w-6xl px-6 py-24">
+                        <div className="mb-16 text-center">
+                            <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
+                                <Star className="h-3 w-3 mr-1 text-primary" />
+                                Precios
+                            </Badge>
+                            <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                                Elige tu{' '}
+                                <span className="gradient-text-animated">
+                                    plan ideal
+                                </span>
+                            </h2>
+                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                                Empieza gratis y escala cuando tu productividad lo exija.
+                            </p>
+                        </div>
+
+                        <div className="grid gap-8 lg:grid-cols-3 items-start">
+                            {/* Free */}
+                            <Card className="group relative flex flex-col overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-transparent hover:border-muted">
+                                <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <CardHeader className="relative pb-2">
+                                    <div className="mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg">
+                                        <LayoutDashboard className="h-7 w-7 text-muted-foreground" />
+                                    </div>
+                                    <CardTitle className="text-2xl">Gratis</CardTitle>
+                                    <CardDescription className="text-base">Perfecto para empezar</CardDescription>
+                                    <div className="pt-6 pb-2">
+                                        <span className="text-6xl font-bold">0 €</span>
+                                        <span className="text-muted-foreground ml-2 text-lg">/ mes</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">Para siempre, sin límites de tiempo</p>
+                                </CardHeader>
+                                <CardContent className="relative flex flex-1 flex-col justify-between gap-8 pt-4">
+                                    <ul className="space-y-4 text-sm">
+                                        <PricingFeature text="Hasta 5 tareas activas" />
+                                        <PricingFeature text="Ideas ilimitadas" />
+                                        <PricingFeature text="Dashboard personal" />
+                                        <PricingFeature text="Autenticación con 2FA" />
+                                    </ul>
+                                    {canRegister && (
+                                        <Button variant="outline" size="lg" className="w-full group/btn border-2 hover:border-primary hover:bg-primary/5 transition-all duration-300" asChild>
+                                            <Link href={register()} className="flex items-center justify-center gap-2">
+                                                Empezar gratis
+                                                <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-2" />
+                                            </Link>
+                                        </Button>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            {/* Premium Mensual - Featured */}
+                            <Card className="group relative flex flex-col overflow-hidden border-2 border-primary shadow-2xl shadow-primary/20 scale-105 transition-all duration-500 hover:-translate-y-3 z-10">
+                                {/* Popular ribbon */}
+                                <div className="absolute -right-12 top-8 rotate-45 bg-gradient-to-r from-primary to-primary/80 px-14 py-1.5 text-xs font-bold text-primary-foreground shadow-lg">
+                                    Popular
+                                </div>
+                                {/* Glow effect */}
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity" />
+                                <div className="relative bg-card rounded-xl">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
+                                    <CardHeader className="relative pb-2">
+                                        <div className="mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-xl shadow-primary/30 transition-all duration-500 group-hover:scale-110">
+                                            <Star className="h-7 w-7 text-primary-foreground" />
+                                        </div>
+                                        <CardTitle className="text-2xl">Premium Mensual</CardTitle>
+                                        <CardDescription className="text-base">Acceso completo, sin ataduras</CardDescription>
+                                        <div className="pt-6 pb-2">
+                                            <span className="text-6xl font-bold">9,99 €</span>
+                                            <span className="text-muted-foreground ml-2 text-lg">/ mes</span>
+                                        </div>
+                                        <p className="text-sm text-primary font-medium">Cancela cuando quieras</p>
+                                    </CardHeader>
+                                    <CardContent className="relative flex flex-1 flex-col justify-between gap-8 pt-4">
+                                        <ul className="space-y-4 text-sm">
+                                            <PricingFeature text="Tareas ilimitadas" highlight />
+                                            <PricingFeature text="Ideas ilimitadas" />
+                                            <PricingFeature text="Proyectos y seguimiento" highlight />
+                                            <PricingFeature text="Cajas de recursos" />
+                                            <PricingFeature text="Dictado por voz (IA)" highlight />
+                                            <PricingFeature text="Asistente IA integrado" highlight />
+                                        </ul>
+                                        {canRegister && (
+                                            <Button size="lg" className="w-full group/btn glow-primary text-base transition-all duration-300 hover:scale-[1.02]" asChild>
+                                                <Link href={register()} className="flex items-center justify-center gap-2">
+                                                    Empezar ahora
+                                                    <Sparkles className="h-5 w-5 transition-transform group-hover/btn:rotate-12 group-hover/btn:scale-110" />
+                                                </Link>
+                                            </Button>
+                                        )}
+                                    </CardContent>
+                                </div>
+                            </Card>
+
+                            {/* Premium Anual */}
+                            <Card className="group relative flex flex-col overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-transparent hover:border-muted">
+                                <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <CardHeader className="relative pb-2">
+                                    <Badge variant="secondary" className="absolute right-4 top-4 gap-1 py-1">
+                                        <Zap className="h-3.5 w-3.5" />
+                                        Ahorra 17%
+                                    </Badge>
+                                    <div className="mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg">
+                                        <Shield className="h-7 w-7 text-muted-foreground" />
+                                    </div>
+                                    <CardTitle className="text-2xl">Premium Anual</CardTitle>
+                                    <CardDescription className="text-base">La opción más inteligente</CardDescription>
+                                    <div className="pt-6 pb-2">
+                                        <span className="text-6xl font-bold">99,99 €</span>
+                                        <span className="text-muted-foreground ml-2 text-lg">/ año</span>
+                                    </div>
+                                    <p className="text-sm text-primary font-semibold">
+                                        ≈ 8,33 €/mes — Ahorro de 19,89 €
+                                    </p>
+                                </CardHeader>
+                                <CardContent className="relative flex flex-1 flex-col justify-between gap-8 pt-4">
+                                    <ul className="space-y-4 text-sm">
+                                        <PricingFeature text="Todo lo de Premium Mensual" highlight />
+                                        <PricingFeature text="Facturación anual" />
+                                        <PricingFeature text="Soporte prioritario" highlight />
+                                        <PricingFeature text="Acceso anticipado a novedades" />
+                                    </ul>
+                                    {canRegister && (
+                                        <Button variant="outline" size="lg" className="w-full group/btn border-2 hover:border-primary hover:bg-primary/5 transition-all duration-300" asChild>
+                                            <Link href={register()} className="flex items-center justify-center gap-2">
+                                                Empezar ahora
+                                                <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-2" />
+                                            </Link>
+                                        </Button>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <p className="mt-12 text-center text-sm text-muted-foreground">
+                            Todos los planes incluyen soporte por email y actualizaciones gratuitas. 
+                            <span className="text-primary font-medium"> Sin sorpresas.</span>
                         </p>
-                    </div>
-
-                    <div className="grid gap-6 lg:grid-cols-3">
-                        {/* Free */}
-                        <Card className="flex flex-col">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <LayoutDashboard className="h-5 w-5" />
-                                    Gratis
-                                </CardTitle>
-                                <CardDescription>Para empezar sin compromisos</CardDescription>
-                                <div className="pt-2">
-                                    <span className="text-4xl font-bold">0 €</span>
-                                    <span className="text-muted-foreground"> / mes</span>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="flex flex-1 flex-col justify-between gap-6">
-                                <ul className="space-y-2 text-sm">
-                                    <PricingFeature text="Hasta 5 tareas activas" />
-                                    <PricingFeature text="Ideas ilimitadas" />
-                                    <PricingFeature text="Dashboard personal" />
-                                    <PricingFeature text="Autenticación con 2FA" />
-                                </ul>
-                                {canRegister && (
-                                    <Button variant="outline" className="w-full" asChild>
-                                        <Link href={register()}>Empezar gratis</Link>
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Premium Mensual */}
-                        <Card className="flex flex-col border-primary shadow-lg">
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Star className="h-5 w-5 text-primary" />
-                                        Premium Mensual
-                                    </CardTitle>
-                                    <Badge>Popular</Badge>
-                                </div>
-                                <CardDescription>Acceso completo, sin ataduras</CardDescription>
-                                <div className="pt-2">
-                                    <span className="text-4xl font-bold">9,99 €</span>
-                                    <span className="text-muted-foreground"> / mes</span>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="flex flex-1 flex-col justify-between gap-6">
-                                <ul className="space-y-2 text-sm">
-                                    <PricingFeature text="Tareas ilimitadas" />
-                                    <PricingFeature text="Ideas ilimitadas" />
-                                    <PricingFeature text="Proyectos y seguimiento" />
-                                    <PricingFeature text="Cajas de recursos" />
-                                    <PricingFeature text="Grabaciones de voz" />
-                                    <PricingFeature text="Asistente IA" />
-                                </ul>
-                                {canRegister && (
-                                    <Button className="w-full" asChild>
-                                        <Link href={register()}>Empezar ahora</Link>
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Premium Anual */}
-                        <Card className="flex flex-col">
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Shield className="h-5 w-5" />
-                                        Premium Anual
-                                    </CardTitle>
-                                    <Badge variant="secondary">Ahorra 2 meses</Badge>
-                                </div>
-                                <CardDescription>La opción más económica a largo plazo</CardDescription>
-                                <div className="pt-2">
-                                    <span className="text-4xl font-bold">99,99 €</span>
-                                    <span className="text-muted-foreground"> / año</span>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="flex flex-1 flex-col justify-between gap-6">
-                                <ul className="space-y-2 text-sm">
-                                    <PricingFeature text="Todo lo de Premium Mensual" />
-                                    <PricingFeature text="Facturado anualmente" />
-                                    <PricingFeature text="Equivale a 8,33 € / mes" />
-                                    <PricingFeature text="Ahorro de 19,89 € al año" />
-                                </ul>
-                                {canRegister && (
-                                    <Button variant="outline" className="w-full" asChild>
-                                        <Link href={register()}>Empezar ahora</Link>
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
                     </div>
                 </section>
 
-                <Separator />
+                {/* ── Final CTA ── */}
+                <section className="relative border-y overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+                    {/* Animated orbs */}
+                    <div className="absolute top-10 left-10 h-40 w-40 rounded-full bg-primary/10 blur-3xl animate-orb-1" />
+                    <div className="absolute bottom-10 right-10 h-32 w-32 rounded-full bg-primary/15 blur-3xl animate-orb-2" />
+                    
+                    <div className="relative mx-auto max-w-4xl px-6 py-28 text-center">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2 text-sm font-medium text-primary mb-8 backdrop-blur-sm">
+                            <div className="relative flex h-2 w-2">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+                            </div>
+                            ¿Listo para empezar?
+                        </div>
+                        <h2 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                            Tu mejor versión productiva{' '}
+                            <br className="hidden sm:block" />
+                            <span className="gradient-text-animated">
+                                comienza hoy
+                            </span>
+                        </h2>
+                        <p className="mx-auto mb-12 max-w-xl text-lg text-muted-foreground leading-relaxed">
+                            Únete a <span className="text-primary font-semibold">más de 10,000 personas</span> que ya han transformado su forma de trabajar. 
+                            El plan gratuito es para siempre.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            {canRegister && (
+                                <Button size="lg" asChild className="group glow-primary-lg hover:scale-105 transition-all duration-300 text-base px-10 py-6">
+                                    <Link href={register()} className="flex items-center gap-3">
+                                        <span>Crear cuenta gratuita</span>
+                                        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
+                                    </Link>
+                                </Button>
+                            )}
+                            <Button size="lg" variant="outline" asChild className="text-base px-10 py-6 border-2 hover:bg-primary/5">
+                                <Link href={login()}>Ya tengo cuenta</Link>
+                            </Button>
+                        </div>
+                        
+                        {/* Social proof mini */}
+                        <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <div className="flex -space-x-2">
+                                    {['M', 'C', 'A'].map((letter, i) => (
+                                        <div key={i} className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-xs font-semibold text-primary-foreground border-2 border-background">
+                                            {letter}
+                                        </div>
+                                    ))}
+                                </div>
+                                <span className="text-sm text-muted-foreground">+10K usuarios</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                {[1,2,3,4,5].map(i => (
+                                    <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                                ))}
+                                <span className="ml-1 text-sm text-muted-foreground">4.9/5</span>
+                            </div>
+                            <Badge variant="secondary" className="gap-1">
+                                <Award className="h-3 w-3" />
+                                App del mes
+                            </Badge>
+                        </div>
+                    </div>
+                </section>
 
                 {/* ── Footer ── */}
-                <footer className="mx-auto max-w-6xl px-6 py-10 text-center text-sm text-muted-foreground">
-                    <div className="mb-4 flex items-center justify-center gap-2">
-                        <img src={logo} alt="Flowly" className="h-6 w-auto object-contain" />
-                        <span className="font-semibold text-foreground">Flowly</span>
+                <footer className="border-t bg-gradient-to-b from-muted/30 to-background">
+                    <div className="mx-auto max-w-6xl px-6 py-16">
+                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12">
+                            {/* Brand */}
+                            <div className="lg:col-span-2">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <img 
+                                        src={logo} 
+                                        alt="Flowly" 
+                                        className="h-10 w-auto object-contain" 
+                                    />
+                                    <span className="text-2xl font-bold gradient-text-animated">
+                                        Flowly
+                                    </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
+                                    La plataforma de productividad personal que unifica tareas, ideas y proyectos con inteligencia artificial.
+                                </p>
+                            </div>
+                            
+                            {/* Links */}
+                            <div>
+                                <h4 className="font-semibold mb-4">Producto</h4>
+                                <ul className="space-y-3 text-sm text-muted-foreground">
+                                    <li><a href="#features" className="transition-colors hover:text-primary">Funcionalidades</a></li>
+                                    <li><a href="#how-it-works" className="transition-colors hover:text-primary">Cómo funciona</a></li>
+                                    <li><a href="#pricing" className="transition-colors hover:text-primary">Precios</a></li>
+                                    <li><a href="#testimonials" className="transition-colors hover:text-primary">Testimonios</a></li>
+                                </ul>
+                            </div>
+                            
+                            {/* CTA mini */}
+                            <div>
+                                <h4 className="font-semibold mb-4">Empezar</h4>
+                                <ul className="space-y-3 text-sm text-muted-foreground">
+                                    <li><Link href={register()} className="transition-colors hover:text-primary">Crear cuenta</Link></li>
+                                    <li><Link href={login()} className="transition-colors hover:text-primary">Iniciar sesión</Link></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <Separator className="mb-8" />
+                        
+                        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between text-sm text-muted-foreground">
+                            <p>© {new Date().getFullYear()} Flowly · Proyecto Intermodular 2º DAM</p>
+                            <p className="flex items-center gap-1.5">
+                                Hecho con <span className="text-red-500 animate-pulse">❤</span> para estudiantes productivos
+                            </p>
+                        </div>
                     </div>
-                    <p>© {new Date().getFullYear()} Flowly · Proyecto Intermodular 2º DAM</p>
                 </footer>
             </div>
         </>
@@ -275,36 +853,205 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
 
 /* ── Subcomponentes locales ── */
 
-function FeatureCard({
+function BentoCard({
     icon,
     title,
     description,
     badge,
-    badgeVariant = 'secondary',
+    gradient = 'from-primary/20 to-transparent',
+    className = '',
+    featured = false,
+    isPremium = false,
+    children,
 }: {
     icon: React.ReactNode;
     title: string;
     description: string;
     badge: string;
-    badgeVariant?: 'default' | 'secondary' | 'outline';
+    gradient?: string;
+    className?: string;
+    featured?: boolean;
+    isPremium?: boolean;
+    children?: React.ReactNode;
 }) {
     return (
-        <Card className="flex flex-col gap-3 p-6">
-            <div className="flex items-start justify-between">
-                <div className="rounded-lg bg-primary/10 p-2">{icon}</div>
-                <Badge variant={badgeVariant}>{badge}</Badge>
-            </div>
-            <h3 className="font-semibold">{title}</h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
+        <Card className={`group relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover-lift ${className} ${featured ? 'border-2 border-primary/30' : ''}`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-100 transition-opacity duration-500`} />
+            {featured && (
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-primary/10 to-primary/30 rounded-xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
+            )}
+            <CardContent className={`relative ${featured ? 'p-8' : 'p-6'}`}>
+                <div className="flex items-start justify-between mb-4">
+                    <div className={`rounded-2xl bg-gradient-to-br ${gradient} p-3 text-primary transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20`}>
+                        {icon}
+                    </div>
+                    <Badge 
+                        variant={isPremium ? 'default' : 'secondary'}
+                        className={`transition-all duration-300 group-hover:scale-105 ${isPremium ? 'bg-gradient-to-r from-primary to-primary/80 shadow-lg shadow-primary/20' : ''}`}
+                    >
+                        {isPremium && <Star className="h-3 w-3 mr-1" />}
+                        {badge}
+                    </Badge>
+                </div>
+                <h3 className={`font-bold mb-2 transition-colors group-hover:text-primary ${featured ? 'text-xl' : 'text-lg'}`}>
+                    {title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+                {children}
+            </CardContent>
         </Card>
     );
 }
 
-function PricingFeature({ text }: { text: string }) {
+function AnimatedStatItem({ 
+    value, 
+    suffix = '',
+    label, 
+    icon 
+}: { 
+    value: number; 
+    suffix?: string;
+    label: string; 
+    icon: React.ReactNode;
+}) {
+    const { count, ref } = useCountUp(value, 2000);
+    
     return (
-        <li className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
-            <span>{text}</span>
+        <div ref={ref} className="flex flex-col items-center text-center group">
+            <div className="mb-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 p-3 text-primary transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20">
+                {icon}
+            </div>
+            <p className="text-3xl font-bold tracking-tight sm:text-4xl gradient-text-animated">
+                {count.toLocaleString()}{suffix}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">{label}</p>
+        </div>
+    );
+}
+
+function TestimonialCard({
+    quote,
+    author,
+    role,
+    avatar,
+    rating,
+    featured = false,
+}: {
+    quote: string;
+    author: string;
+    role: string;
+    avatar: string;
+    rating: number;
+    featured?: boolean;
+}) {
+    return (
+        <Card className={`group relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-2 ${featured ? 'border-2 border-primary/30 md:scale-105 z-10' : ''}`}>
+            {featured && (
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 rounded-xl blur" />
+            )}
+            <CardContent className="relative p-6">
+                <div className="flex gap-1 mb-4">
+                    {Array.from({ length: rating }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                    ))}
+                </div>
+                <Quote className="h-8 w-8 text-primary/20 mb-2" />
+                <p className="text-sm leading-relaxed mb-6 text-muted-foreground">
+                    "{quote}"
+                </p>
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20">
+                        {avatar}
+                    </div>
+                    <div>
+                        <p className="font-semibold text-sm">{author}</p>
+                        <p className="text-xs text-muted-foreground">{role}</p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+function PricingFeature({ text, highlight = false }: { text: string; highlight?: boolean }) {
+    return (
+        <li className="flex items-center gap-3">
+            <div className={`flex-shrink-0 rounded-full p-0.5 ${highlight ? 'bg-primary/20' : ''}`}>
+                <CheckCircle2 className={`h-4 w-4 ${highlight ? 'text-primary' : 'text-primary/70'}`} />
+            </div>
+            <span className={highlight ? 'font-medium' : ''}>{text}</span>
         </li>
     );
 }
+
+function StepCard({
+    number,
+    title,
+    description,
+    icon,
+}: {
+    number: number;
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+}) {
+    return (
+        <div className="group relative">
+            <Card className="relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border-2 border-transparent hover:border-primary/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <CardContent className="relative pt-8 pb-6 px-6">
+                    <div className="mb-6 flex items-center gap-4">
+                        <div className="relative">
+                            <div className="absolute -inset-1 bg-primary/20 rounded-full blur-md group-hover:bg-primary/30 transition-colors" />
+                            <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground font-bold text-xl shadow-xl shadow-primary/30">
+                                {number}
+                            </div>
+                        </div>
+                        <div className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 p-3 text-primary transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg">
+                            {icon}
+                        </div>
+                    </div>
+                    <h3 className="mb-3 text-xl font-bold transition-colors group-hover:text-primary">
+                        {title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                        {description}
+                    </p>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
+function TaskPreviewItem({ 
+    priority, 
+    text, 
+    done = false,
+    animate = false,
+}: { 
+    priority: 'high' | 'medium' | 'low'; 
+    text: string; 
+    done?: boolean;
+    animate?: boolean;
+}) {
+    const priorityStyles = {
+        high: 'bg-red-500 shadow-red-500/50',
+        medium: 'bg-yellow-500 shadow-yellow-500/50',
+        low: 'bg-blue-500 shadow-blue-500/50',
+    };
+
+    return (
+        <div className={`flex items-center gap-3 rounded-xl border-2 p-3 transition-all duration-300 ${
+            done ? 'bg-muted/50 border-muted opacity-60' : 
+            animate ? 'bg-primary/5 border-primary/30 shadow-lg shadow-primary/10' : 'bg-card/80 border-border'
+        }`}>
+            <div className={`h-2.5 w-2.5 rounded-full ${priorityStyles[priority]} shadow-sm ${animate ? 'animate-pulse' : ''}`} />
+            <span className={`flex-1 text-sm ${done ? 'line-through text-muted-foreground' : ''}`}>
+                {text}
+            </span>
+            {done && <CheckCircle2 className="h-4 w-4 text-primary" />}
+            {animate && <ArrowRight className="h-4 w-4 text-primary animate-pulse" />}
+        </div>
+    );
+}
+
