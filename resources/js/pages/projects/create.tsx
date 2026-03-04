@@ -1,10 +1,12 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import { ArrowLeft, FolderKanban, FileText, Palette, Sparkles } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Proyectos', href: '/projects' },
@@ -12,8 +14,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const colorOptions = [
-    '#3B82F6', '#8B5CF6', '#EC4899', '#EF4444',
-    '#F59E0B', '#10B981', '#14B8A6', '#6B7280',
+    { color: '#3B82F6', name: 'Azul' },
+    { color: '#8B5CF6', name: 'Violeta' },
+    { color: '#EC4899', name: 'Rosa' },
+    { color: '#EF4444', name: 'Rojo' },
+    { color: '#F59E0B', name: 'Naranja' },
+    { color: '#10B981', name: 'Verde' },
+    { color: '#14B8A6', name: 'Turquesa' },
+    { color: '#6B7280', name: 'Gris' },
 ];
 
 export default function ProjectCreate() {
@@ -32,25 +40,45 @@ export default function ProjectCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Nuevo proyecto" />
 
-            <div className="flex flex-col gap-6 p-6">
-
+            <div className="flex flex-col gap-6 p-4 md:p-6">
+                {/* Header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Nuevo proyecto</h1>
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+                            <FolderKanban className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight">Nuevo proyecto</h1>
+                            <p className="text-sm text-muted-foreground">Agrupa tus tareas en un proyecto</p>
+                        </div>
+                    </div>
                     <Link href="/projects">
-                        <Button variant="outline">← Volver</Button>
+                        <Button variant="outline" size="sm" className="gap-2">
+                            <ArrowLeft className="h-4 w-4" />
+                            Volver
+                        </Button>
                     </Link>
                 </div>
 
-                <Card className="max-w-xl">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Datos del proyecto</CardTitle>
+                {/* Form Card */}
+                <Card className="max-w-2xl shadow-sm">
+                    <CardHeader className="border-b bg-muted/30 pb-4">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="h-4 w-4 text-blue-600" />
+                            <CardTitle className="text-base font-semibold">Datos del proyecto</CardTitle>
+                        </div>
+                        <CardDescription>
+                            Define los detalles de tu nuevo proyecto
+                        </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
+                    <CardContent className="pt-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Nombre */}
-                            <div className="flex flex-col gap-1.5">
-                                <Label htmlFor="name">Nombre *</Label>
+                            <div className="space-y-2">
+                                <Label htmlFor="name" className="flex items-center gap-2 text-sm font-medium">
+                                    <FileText className="h-4 w-4 text-muted-foreground" />
+                                    Nombre <span className="text-destructive">*</span>
+                                </Label>
                                 <Input
                                     id="name"
                                     value={data.name}
@@ -58,53 +86,118 @@ export default function ProjectCreate() {
                                     placeholder="Nombre del proyecto"
                                     autoFocus
                                 />
-                                {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
+                                {errors.name && (
+                                    <p className="text-sm text-destructive flex items-center gap-1">
+                                        <span className="inline-block h-1 w-1 rounded-full bg-destructive" />
+                                        {errors.name}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Descripción */}
-                            <div className="flex flex-col gap-1.5">
-                                <Label htmlFor="description">Descripción</Label>
-                                <textarea
+                            <div className="space-y-2">
+                                <Label htmlFor="description" className="flex items-center gap-2 text-sm font-medium">
+                                    <FileText className="h-4 w-4 text-muted-foreground" />
+                                    Descripción
+                                </Label>
+                                <Textarea
                                     id="description"
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    rows={3}
-                                    placeholder="Descripción opcional..."
-                                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    rows={4}
+                                    placeholder="Describe los objetivos del proyecto..."
+                                    className="resize-none"
                                 />
-                                {errors.description && <p className="text-xs text-red-600">{errors.description}</p>}
+                                {errors.description && (
+                                    <p className="text-sm text-destructive flex items-center gap-1">
+                                        <span className="inline-block h-1 w-1 rounded-full bg-destructive" />
+                                        {errors.description}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Color */}
-                            <div className="flex flex-col gap-1.5">
-                                <Label>Color</Label>
-                                <div className="flex flex-wrap gap-2">
-                                    {colorOptions.map(color => (
+                            <div className="space-y-3">
+                                <Label className="flex items-center gap-2 text-sm font-medium">
+                                    <Palette className="h-4 w-4 text-muted-foreground" />
+                                    Color del proyecto
+                                </Label>
+                                <div className="flex flex-wrap gap-3">
+                                    {colorOptions.map(({ color, name }) => (
                                         <button
                                             key={color}
                                             type="button"
                                             onClick={() => setData('color', color)}
-                                            className={`h-8 w-8 rounded-full transition-all ${data.color === color ? 'ring-2 ring-offset-2 ring-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
+                                            title={name}
+                                            className={`
+                                                group relative h-10 w-10 rounded-full transition-all duration-200
+                                                ${data.color === color 
+                                                    ? 'ring-2 ring-offset-2 ring-primary scale-110 shadow-lg' 
+                                                    : 'opacity-70 hover:opacity-100 hover:scale-105'
+                                                }
+                                            `}
                                             style={{ backgroundColor: color }}
-                                        />
+                                        >
+                                            {data.color === color && (
+                                                <span className="absolute inset-0 flex items-center justify-center">
+                                                    <span className="h-3 w-3 rounded-full bg-white/90 shadow" />
+                                                </span>
+                                            )}
+                                        </button>
                                     ))}
-                                    <Input
-                                        type="color"
-                                        value={data.color}
-                                        onChange={e => setData('color', e.target.value)}
-                                        className="h-8 w-8 cursor-pointer rounded-full p-0.5"
-                                        title="Color personalizado"
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            type="color"
+                                            value={data.color}
+                                            onChange={e => setData('color', e.target.value)}
+                                            className="h-10 w-10 cursor-pointer rounded-full border-2 border-dashed border-muted-foreground/30 p-1 hover:border-muted-foreground/50"
+                                            title="Color personalizado"
+                                        />
+                                    </div>
                                 </div>
-                                {errors.color && <p className="text-xs text-red-600">{errors.color}</p>}
+                                <p className="text-xs text-muted-foreground">
+                                    Elige un color para identificar fácilmente tu proyecto
+                                </p>
+                                {errors.color && (
+                                    <p className="text-sm text-destructive flex items-center gap-1">
+                                        <span className="inline-block h-1 w-1 rounded-full bg-destructive" />
+                                        {errors.color}
+                                    </p>
+                                )}
                             </div>
 
-                            <div className="flex gap-3 pt-2">
-                                <Button type="submit" disabled={processing}>
-                                    {processing ? 'Creando...' : 'Crear proyecto'}
+                            {/* Preview */}
+                            <div className="rounded-lg border bg-muted/20 p-4">
+                                <p className="text-xs font-medium text-muted-foreground mb-2">Vista previa</p>
+                                <div className="flex items-center gap-3">
+                                    <div 
+                                        className="h-8 w-8 rounded-lg flex items-center justify-center"
+                                        style={{ backgroundColor: data.color }}
+                                    >
+                                        <FolderKanban className="h-4 w-4 text-white" />
+                                    </div>
+                                    <span className="font-medium">
+                                        {data.name || 'Nombre del proyecto'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Botones */}
+                            <div className="flex items-center gap-3 border-t pt-6">
+                                <Button type="submit" disabled={processing} className="min-w-[120px]">
+                                    {processing ? (
+                                        <span className="flex items-center gap-2">
+                                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                            Creando...
+                                        </span>
+                                    ) : (
+                                        'Crear proyecto'
+                                    )}
                                 </Button>
                                 <Link href="/projects">
-                                    <Button type="button" variant="outline">Cancelar</Button>
+                                    <Button type="button" variant="ghost">
+                                        Cancelar
+                                    </Button>
                                 </Link>
                             </div>
                         </form>

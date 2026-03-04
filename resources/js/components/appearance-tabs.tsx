@@ -11,33 +11,46 @@ export default function AppearanceToggleTab({
 }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
 
-    const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
-        { value: 'light', icon: Sun, label: 'Light' },
-        { value: 'dark', icon: Moon, label: 'Dark' },
-        { value: 'system', icon: Monitor, label: 'System' },
+    const tabs: { value: Appearance; icon: LucideIcon; label: string; description: string }[] = [
+        { value: 'light', icon: Sun, label: 'Claro', description: 'Tema luminoso' },
+        { value: 'dark', icon: Moon, label: 'Oscuro', description: 'Tema oscuro' },
+        { value: 'system', icon: Monitor, label: 'Sistema', description: 'Según tu dispositivo' },
     ];
 
     return (
         <div
             className={cn(
-                'inline-flex gap-1 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800',
+                'grid grid-cols-3 gap-3',
                 className,
             )}
             {...props}
         >
-            {tabs.map(({ value, icon: Icon, label }) => (
+            {tabs.map(({ value, icon: Icon, label, description }) => (
                 <button
                     key={value}
                     onClick={() => updateAppearance(value)}
                     className={cn(
-                        'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
+                        'flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all hover:bg-muted/50',
                         appearance === value
-                            ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
-                            : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
+                            ? 'border-primary bg-primary/5 shadow-sm'
+                            : 'border-transparent bg-muted/30 hover:border-muted-foreground/20',
                     )}
                 >
-                    <Icon className="-ml-1 h-4 w-4" />
-                    <span className="ml-1.5 text-sm">{label}</span>
+                    <div className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-full transition-colors',
+                        appearance === value
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground'
+                    )}>
+                        <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="text-center">
+                        <span className={cn(
+                            'block text-sm font-medium',
+                            appearance === value ? 'text-primary' : ''
+                        )}>{label}</span>
+                        <span className="block text-xs text-muted-foreground">{description}</span>
+                    </div>
                 </button>
             ))}
         </div>

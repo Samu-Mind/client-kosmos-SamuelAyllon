@@ -1,14 +1,15 @@
 import { Head } from '@inertiajs/react';
 import AppearanceTabs from '@/components/appearance-tabs';
-import Heading from '@/components/heading';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import type { BreadcrumbItem } from '@/types';
 import { edit as editAppearance } from '@/routes/appearance';
+import { Palette } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Appearance settings',
+        title: 'Ajustes de apariencia',
         href: editAppearance().url,
     },
 ];
@@ -16,19 +17,30 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Appearance() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Appearance settings" />
+            <Head title="Ajustes de apariencia" />
 
-            <h1 className="sr-only">Appearance Settings</h1>
+            <h1 className="sr-only">Ajustes de Apariencia</h1>
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <Heading
-                        variant="small"
-                        title="Appearance settings"
-                        description="Update your account's appearance settings"
-                    />
-                    <AppearanceTabs />
-                </div>
+                <Card className="shadow-sm">
+                    <CardHeader className="border-b bg-muted/30 pb-4">
+                        <div className="flex items-center gap-2">
+                            <Palette className="h-5 w-5 text-primary" />
+                            <CardTitle className="text-base font-semibold">Tema de la aplicación</CardTitle>
+                        </div>
+                        <CardDescription>
+                            Personaliza la apariencia de tu cuenta
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        <div className="space-y-4">
+                            <p className="text-sm text-muted-foreground">
+                                Selecciona el tema que prefieras para la interfaz. El tema del sistema se adaptará automáticamente a la configuración de tu dispositivo.
+                            </p>
+                            <AppearanceTabs />
+                        </div>
+                    </CardContent>
+                </Card>
             </SettingsLayout>
         </AppLayout>
     );

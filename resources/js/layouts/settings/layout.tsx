@@ -10,27 +10,28 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
+import { User, Lock, Shield, Palette, Settings } from 'lucide-react';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'Perfil',
         href: edit(),
-        icon: null,
+        icon: User,
     },
     {
-        title: 'Password',
+        title: 'Contraseña',
         href: editPassword(),
-        icon: null,
+        icon: Lock,
     },
     {
-        title: 'Two-Factor Auth',
+        title: 'Autenticación 2FA',
         href: show(),
-        icon: null,
+        icon: Shield,
     },
     {
-        title: 'Appearance',
+        title: 'Apariencia',
         href: editAppearance(),
-        icon: null,
+        icon: Palette,
     },
 ];
 
@@ -43,17 +44,24 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     }
 
     return (
-        <div className="px-4 py-6">
-            <Heading
-                title="Settings"
-                description="Manage your profile and account settings"
-            />
+        <div className="px-4 py-6 md:px-6">
+            {/* Header con icono */}
+            <div className="mb-8 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                    <Settings className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Ajustes</h1>
+                    <p className="text-sm text-muted-foreground">Gestiona tu perfil y configuración de cuenta</p>
+                </div>
+            </div>
 
-            <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl lg:w-48">
+            <div className="flex flex-col lg:flex-row lg:gap-8">
+                {/* Sidebar de navegación */}
+                <aside className="w-full lg:w-56 shrink-0">
                     <nav
-                        className="flex flex-col space-y-1 space-x-0"
-                        aria-label="Settings"
+                        className="flex flex-row lg:flex-col gap-1 overflow-x-auto pb-2 lg:pb-0"
+                        aria-label="Ajustes"
                     >
                         {sidebarNavItems.map((item, index) => (
                             <Button
@@ -61,9 +69,12 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 size="sm"
                                 variant="ghost"
                                 asChild
-                                className={cn('w-full justify-start', {
-                                    'bg-muted': isCurrentUrl(item.href),
-                                })}
+                                className={cn(
+                                    'w-full justify-start gap-2 whitespace-nowrap',
+                                    isCurrentUrl(item.href) 
+                                        ? 'bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary' 
+                                        : ''
+                                )}
                             >
                                 <Link href={item.href}>
                                     {item.icon && (
@@ -78,8 +89,9 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                 <Separator className="my-6 lg:hidden" />
 
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
+                {/* Contenido principal */}
+                <div className="flex-1 min-w-0">
+                    <section className="max-w-2xl space-y-8">
                         {children}
                     </section>
                 </div>

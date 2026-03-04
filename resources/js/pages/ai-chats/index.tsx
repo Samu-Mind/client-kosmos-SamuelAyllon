@@ -303,7 +303,7 @@ export default function AiChatsIndex({ messages: initialMessages }: AiChatsProps
                                 </Button>
                             </form>
                             <p className="text-xs text-muted-foreground mt-2 text-center">
-                                Shift + Enter para nueva línea
+                                Flowly puede cometer fallos, revisa bien sus respuestas
                             </p>
                         </div>
                     </CardContent>
