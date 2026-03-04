@@ -135,7 +135,7 @@ export default function ProjectShow({ project, tasksSummary, progressPercentage 
                 {/* Tareas */}
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold">Tareas</h2>
-                    <Link href="/tasks/create">
+                    <Link href={`/tasks/create?project_id=${project.id}`}>
                         <Button size="sm">+ Añadir tarea</Button>
                     </Link>
                 </div>

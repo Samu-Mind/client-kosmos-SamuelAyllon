@@ -48,6 +48,7 @@ class TaskController extends Controller
 
         return Inertia::render('tasks/create', [
             'projects' => $projects,
+            'defaultProjectId' => request()->query('project_id'),
         ]);
     }
 

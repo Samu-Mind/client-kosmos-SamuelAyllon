@@ -17,9 +17,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Props {
     projects: { id: number; name: string }[];
+    defaultProjectId?: string | null;
 }
 
-export default function TaskCreate({ projects }: Props) {
+export default function TaskCreate({ projects, defaultProjectId }: Props) {
     const { props } = usePage<{ auth: { is_premium: boolean } }>();
     const isPremium = props.auth.is_premium;
     const { data, setData, post, processing, errors } = useForm({
@@ -27,7 +28,7 @@ export default function TaskCreate({ projects }: Props) {
         description: '',
         priority: 'medium' as 'low' | 'medium' | 'high',
         due_date: '',
-        project_id: '',
+        project_id: defaultProjectId ?? '',
     });
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -172,11 +173,12 @@ export default function TaskCreate({ projects }: Props) {
                                 <div className="space-y-2">
                                     <Label htmlFor="due_date" className="flex items-center gap-2 text-sm font-medium">
                                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                                        Fecha de vencimiento
+                                        Fecha de vencimiento <span className="text-destructive">*</span>
                                     </Label>
                                     <Input
                                         id="due_date"
                                         type="date"
+                                        required
                                         value={data.due_date}
                                         onChange={e => setData('due_date', e.target.value)}
                                         className="w-full"
