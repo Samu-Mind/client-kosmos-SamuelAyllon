@@ -35,7 +35,7 @@ export default function AiChatsIndex({ messages: initialMessages }: AiChatsProps
     // Auto-scroll al final cuando hay nuevos mensajes
     useEffect(() => {
         if (scrollAreaRef.current) {
-            const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+            const scrollContainer = scrollAreaRef.current.querySelector('[data-slot="scroll-area-viewport"]');
             if (scrollContainer) {
                 scrollContainer.scrollTop = scrollContainer.scrollHeight;
             }
@@ -154,7 +154,7 @@ export default function AiChatsIndex({ messages: initialMessages }: AiChatsProps
 
                     <CardContent className="flex-1 flex flex-col overflow-hidden p-0">
                         {/* Área de mensajes */}
-                        <ScrollArea ref={scrollAreaRef} className="flex-1 px-6">
+                        <ScrollArea ref={scrollAreaRef} className="h-0 flex-1 px-6">
                             {messages.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-full py-12 text-center">
                                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">

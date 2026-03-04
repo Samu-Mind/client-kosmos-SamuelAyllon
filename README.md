@@ -5,8 +5,8 @@
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react)](https://react.dev)
 [![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat-square&logo=php)](https://www.php.net)
+[![Tests](https://img.shields.io/badge/Tests-180%20passing-brightgreen?style=flat-square)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen?style=flat-square)]()
 
 ---
 
@@ -21,142 +21,122 @@
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [Comandos Útiles](#comandos-útiles)
 - [Roles y Permisos](#roles-y-permisos)
-- [API de Referencia](#api-de-referencia)
+- [Rutas de la Aplicación](#rutas-de-la-aplicación)
 - [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
-- [Contribución](#contribución)
 - [Licencia](#licencia)
 
 ---
 
 ## 🎯 Acerca de
 
-**Flowly** es una plataforma web de productividad personal que actúa como tu **centro de mando integrado** para gestionar:
+**Flowly** es una plataforma web de productividad personal freemium que actúa como tu **centro de mando integrado** para gestionar:
 
-- 📝 **Tareas** - Gestor completo con prioridades y fechas de vencimiento
-- 💡 **Ideas** - Captura rápida de inspiraciones y pensamientos
-- 📊 **Proyectos** - Organiza tareas en proyectos (feature premium)
-- 📚 **Cajas de Conocimiento** - Centraliza recursos y referencias
-- 🎙️ **Entrada de Voz** - Crea tareas e ideas hablando
-- 🤖 **Asistente IA** - Sugerencias inteligentes y análisis de productividad
+- 📝 **Tareas** — Gestor completo con prioridades y fechas de vencimiento
+- 💡 **Ideas** — Captura rápida de inspiraciones y pensamientos
+- 📊 **Proyectos** — Agrupa tareas en proyectos con seguimiento de progreso *(Premium)*
+- 📚 **Cajas de Recursos** — Centraliza enlaces, documentos y vídeos *(Premium)*
+- 🎙️ **Dictado por Voz** — Crea tareas e ideas hablando con OpenAI Whisper *(Premium)*
+- 🤖 **Asistente IA** — Chat de productividad personalizado con Groq/OpenAI *(Premium)*
 
 ### Modelo Freemium
 
 | Plan | Precio | Tareas | Ideas | Proyectos | Voz | IA |
 |------|--------|--------|-------|-----------|-----|-----|
-| **Free** | $0 | 5 máx | ✅ | ❌ | ❌ | ❌ |
-| **Premium Monthly** | $9.99 | ∞ | ✅ | ✅ | ✅ | ✅ |
-| **Premium Yearly** | $99.99 | ∞ | ✅ | ✅ | ✅ | ✅ |
+| **Free** | 0 € | 5 máx | ✅ | ❌ | ❌ | ❌ |
+| **Premium Mensual** | 9,99 €/mes | ∞ | ✅ | ✅ | ✅ | ✅ |
+| **Premium Anual** | 99,99 €/año | ∞ | ✅ | ✅ | ✅ | ✅ |
 
 ---
 
 ## ✨ Features
 
 ### Core (Todos los Usuarios) — ✅ Completado
-- ✅ Autenticación segura (registro, login, 2FA) — Fortify
-- ✅ Gestor de ideas sin límite (backend + frontend + tests)
+- ✅ Autenticación completa (registro, login, recuperación de contraseña, verificación email, 2FA) — Fortify
 - ✅ Gestor de tareas con límite free (backend + frontend + tests)
-- ✅ Soft deletes en tareas e ideas
+- ✅ Gestor de ideas sin límite (backend + frontend + tests)
 - ✅ Checkout y suscripción simulada (backend + frontend + tests)
-- ✅ Dashboard personal con datos reales (free/premium condicional)
-- ✅ UI de tareas — lista pendientes/completadas, prioridades, fechas
-- ✅ UI de ideas — lista activas/resueltas, resolve/reactivate
+- ✅ Dashboard personal con datos reales (condicional por plan)
+- ✅ Tutorial interactivo con tour guiado para nuevos usuarios (spotlight + chatbot)
+- ✅ Landing page completa (hero, features, pricing, footer)
 
-### Premium Features — ✅ Completado (excepto voz/IA)
-- ✅ Proyectos con jerarquía de tareas (backend + frontend + tests)
-- ✅ Cajas de conocimiento y recursos (backend + frontend + tests)
-- ✅ UI de proyectos — grid con estado, color, progreso de tareas
-- ✅ UI de cajas — grid con recursos, tipos badge, enlaces clicables
-- 🔲 Transcripción de voz (OpenAI Whisper) — pendiente
-- 🔲 Asistente IA — pendiente
+### Premium Features — ✅ Completado
+- ✅ Proyectos con agrupación de tareas y barra de progreso
+- ✅ Cajas de recursos (enlaces, documentos, vídeos, imágenes)
+- ✅ Transcripción de voz con OpenAI Whisper (quick-create + dictado en formulario)
+- ✅ Asistente IA conversacional con contexto real del usuario (Groq Llama 3.3 / OpenAI GPT)
 
 ### Admin Features — ✅ Completado
-- ✅ Dashboard con estadísticas globales (backend + frontend + tests)
-- ✅ Gestión de usuarios — lista paginada + detalle + eliminar
-- ✅ Historial de pagos con resumen
-- ✅ Control de suscripciones con stats por plan
-- ✅ UI admin completa con datos reales (5 vistas)
-- ✅ Sidebar admin aislado (solo sección Administración)
-
-### Landing Page — ⚠️ Pendiente
-- ⚠️ `welcome.tsx` existe pero sin contenido Flowly (pricing, features, CTA)
+- ✅ Dashboard con estadísticas globales de la plataforma
+- ✅ Gestión de usuarios (lista paginada + detalle + eliminar)
+- ✅ Historial de pagos con resumen de ingresos
+- ✅ Control de suscripciones con distribución por plan
 
 ---
 
 ## 🔧 Requisitos
 
-### Sistema
 ```
 PHP 8.2+
 Composer
 Node.js 18+
-npm o yarn
+npm
 Git
-SQLite (incluido con PHP)
+SQLite (incluido con PHP) — para desarrollo local
 ```
 
-### Opcionales (Recomendado)
+**Opcional:**
 ```
-OpenAI API Key (para Whisper + IA)
-```
-
-### Verificar Requisitos
-```bash
-php --version
-composer --version
-node --version
-npm --version
+OpenAI API Key o Groq API Key (gratuita) — para Whisper y asistente IA
 ```
 
 ---
 
 ## 🚀 Instalación Rápida
 
-### 1. Clonar el Repositorio
+### 1. Clonar el repositorio
 ```bash
-git clone <tu-repo-url>
-cd flowly
+git clone <repo-url>
+cd flowly-samuel-ayllon
 ```
 
-### 2. Instalar Dependencias
+### 2. Instalar dependencias
 ```bash
 composer install
 npm install
 ```
 
-### 3. Configurar Entorno
+### 3. Configurar entorno
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-### 4. Base de Datos
+### 4. Base de datos
 ```bash
-# Crear archivo SQLite
 touch database/database.sqlite
-
-# Ejecutar migraciones + seeders
 php artisan migrate:fresh --seed
 ```
 
-### 5. Variables de Entorno (Opcional)
+### 5. Variables de entorno opcionales
 ```env
-# En .env
-APP_NAME=Flowly
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost:8000
+# Asistente IA y voz (Groq — gratuito)
+OPENAI_API_KEY=gsk_xxxxxxxxxxxxxxxx
+OPENAI_BASE_URL=https://api.groq.com/openai/v1
+OPENAI_MODEL=llama-3.3-70b-versatile
 
-# OpenAI (para Whisper y IA)
-OPENAI_API_KEY=sk-xxxxxxxxxxxxx
+# O con OpenAI directamente
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_MODEL=gpt-3.5-turbo
 ```
 
-### 6. Iniciar Servidor
+### 6. Iniciar servidor
 ```bash
-# Terminal 1: Laravel
+# Terminal 1 — Backend
 php artisan serve
 
-# Terminal 2: Frontend (Vite)
+# Terminal 2 — Frontend (Vite)
 npm run dev
 ```
 
@@ -169,7 +149,7 @@ http://localhost:8000
 
 ## 👤 Credenciales de Prueba
 
-Después de ejecutar `php artisan migrate:fresh --seed`:
+Después de `php artisan migrate:fresh --seed`:
 
 ```
 ┌─────────────────┬───────────────────────┬──────────┐
@@ -189,30 +169,33 @@ Después de ejecutar `php artisan migrate:fresh --seed`:
 | Tecnología | Versión | Propósito |
 |-----------|---------|----------|
 | **Laravel** | 12 | Framework principal |
-| **Eloquent** | (Laravel 12) | ORM de base de datos |
+| **Eloquent** | (Laravel 12) | ORM |
 | **Laravel Fortify** | 1.x | Autenticación |
 | **Spatie Permission** | 6.x | Roles y permisos |
-| **Pest** | 2.x | Testing |
+| **Pest** | 3.x | Testing |
+| **openai-php/client** | 0.19 | OpenAI Whisper + Chat IA |
 
 ### Frontend
 | Tecnología | Versión | Propósito |
 |-----------|---------|----------|
 | **React** | 18+ | UI interactiva |
-| **Inertia.js** | 2.x | Puente Laravel ↔ React |
-| **Vite** | 5+ | Bundler y dev server |
-| **Tailwind CSS** | 3.x | Estilos (opcional) |
+| **TypeScript** | 5+ | Tipado estático |
+| **Inertia.js** | 2.x | Puente Laravel ↔ React (SPA monolítica) |
+| **shadcn/ui** | — | Componentes UI (Radix UI + Tailwind) |
+| **Vite** | 5+ | Bundler |
 
 ### Base de Datos
-| Tecnología | Uso |
-|-----------|-----|
-| **SQLite** | Base de datos local |
-| **PHP 8.2+** | Runtime |
+| Entorno | Motor |
+|---------|-------|
+| **Desarrollo / Tests** | SQLite (sin configuración) |
+| **Producción** | TiDB Cloud Serverless (MySQL-compatible) |
 
-### Integraciones Externas (Opcional)
-```
-OpenAI Whisper API → Transcripción de audio
-OpenAI GPT-3.5 Turbo → Asistente IA
-```
+### Integraciones IA
+| Servicio | Uso | Plan gratuito |
+|---------|-----|---------------|
+| **Groq** (recomendado) | Chat IA — Llama 3.3 70B | ✅ 14.400 req/día |
+| **OpenAI Whisper** | Transcripción de voz | ❌ De pago |
+| **OpenAI GPT** | Chat IA alternativo | ❌ De pago |
 
 ---
 
@@ -230,72 +213,64 @@ flowly/
 │   │   │   ├── ResourceController.php
 │   │   │   ├── SubscriptionController.php
 │   │   │   ├── CheckoutController.php
-│   │   │   ├── DashboardController.php
+│   │   │   ├── VoiceRecordingController.php  ← Whisper API
+│   │   │   ├── AiChatController.php          ← Chat IA
+│   │   │   ├── TutorialController.php        ← Tour guiado
 │   │   │   └── Admin/
 │   │   │       ├── AdminDashboardController.php
 │   │   │       ├── AdminUserController.php
 │   │   │       ├── AdminPaymentController.php
 │   │   │       └── AdminSubscriptionController.php
-│   │   ├── Requests/
-│   │   │   ├── StoreTaskRequest.php / UpdateTaskRequest.php
-│   │   │   ├── StoreIdeaRequest.php / UpdateIdeaRequest.php
-│   │   │   └── ...
-│   │   └── (Middleware via Spatie roles)
+│   │   └── Requests/                         ← Form Requests con validación en español
 │   ├── Models/
-│   │   ├── User.php
-│   │   ├── Task.php          ← SoftDeletes
-│   │   ├── Idea.php          ← SoftDeletes
+│   │   ├── User.php          ← hasRole, canAddTask(), completeTutorial()
+│   │   ├── Task.php          ← sin SoftDeletes (hard delete)
+│   │   ├── Idea.php          ← sin SoftDeletes (hard delete)
 │   │   ├── Project.php
 │   │   ├── Box.php
 │   │   ├── Resource.php
 │   │   ├── Subscription.php
-│   │   ├── Payment.php
+│   │   ├── Payment.php       ← process() simula 80%/20%
 │   │   ├── AiConversation.php
 │   │   └── VoiceRecording.php
-│   └── Policies/
-│       ├── TaskPolicy.php
-│       ├── IdeaPolicy.php
-│       ├── ProjectPolicy.php
-│       ├── BoxPolicy.php
-│       └── ResourcePolicy.php
+│   └── Policies/             ← TaskPolicy, IdeaPolicy, ProjectPolicy, BoxPolicy, ResourcePolicy
 ├── database/
 │   ├── migrations/           ← 13 tablas
-│   ├── factories/
 │   └── seeders/
-│       ├── RoleSeeder.php    ← 3 roles Spatie
-│       └── UserSeeder.php    ← admin, premium, free
-├── resources/
-│   ├── js/
-│   │   ├── pages/
-│   │   │   ├── auth/         ← login, register, 2fa, forgot...
-│   │   │   ├── settings/     ← profile, password, appearance
-│   │   │   ├── admin/        ← dashboard, users/, payments/, subscriptions/
-│   │   │   ├── tasks/        ← index, create, edit
-│   │   │   ├── ideas/        ← index, create, edit
-│   │   │   ├── projects/     ← index, show, create, edit
-│   │   │   ├── boxes/        ← index, show, create, edit
-│   │   │   ├── resources/    ← create, edit
-│   │   │   ├── subscription/ ← index
-│   │   │   ├── checkout/     ← index
-│   │   │   └── dashboard.tsx
-│   │   ├── types/
-│   │   │   ├── models/       ← Task, Idea, Project, Box, Resource, ...
-│   │   │   ├── pages/        ← props por página
-│   │   │   ├── admin/        ← props admin
-│   │   │   └── shared/       ← PaginatedData<T>
-│   │   ├── components/
-│   │   │   └── ui/           ← shadcn/ui
-│   │   └── layouts/
-│   └── views/
-│       └── app.blade.php
-├── routes/
-│   └── web.php
-├── tests/
-│   └── Feature/              ← 143 tests Pest
-├── .claude/                  ← Documentación del proyecto
-├── .env.example
-├── README.md
-└── composer.json
+│       ├── RoleSeeder.php    ← admin, premium_user, free_user
+│       └── UserSeeder.php    ← 3 usuarios de prueba
+├── resources/js/
+│   ├── pages/
+│   │   ├── auth/             ← login, register, 2fa, forgot-password, reset, verify
+│   │   ├── settings/         ← profile, password, appearance, two-factor
+│   │   ├── dashboard.tsx     ← condicional free/premium + tutorial
+│   │   ├── tasks/            ← index, create, edit
+│   │   ├── ideas/            ← index, create, edit
+│   │   ├── projects/         ← index, show, create, edit
+│   │   ├── boxes/            ← index, show, create, edit
+│   │   ├── resources/        ← create, edit
+│   │   ├── subscription/     ← index
+│   │   ├── checkout/         ← index
+│   │   ├── ai-chats/         ← index (chat IA)
+│   │   ├── admin/            ← dashboard, users/, payments/, subscriptions/
+│   │   └── welcome.tsx       ← landing page
+│   ├── components/
+│   │   ├── ui/               ← shadcn/ui primitivos
+│   │   ├── voice-recorder.tsx ← MediaRecorder + Whisper
+│   │   └── tutorial-chatbot.tsx ← tour guiado con spotlight
+│   └── types/
+│       ├── models/           ← Task, Idea, Project, Box, Resource, AiMessage...
+│       ├── pages/            ← props por página
+│       ├── admin/            ← props admin
+│       └── shared/           ← PaginatedData<T>
+├── routes/web.php
+├── tests/Feature/            ← 180 tests Pest / 692 assertions
+├── docs/
+│   ├── manual-usuario.md
+│   └── decisiones-tecnicas.md
+├── Dockerfile                ← multi-stage build
+├── docker-compose.yml
+└── docker-entrypoint.sh
 ```
 
 ---
@@ -304,420 +279,235 @@ flowly/
 
 ### Desarrollo
 ```bash
-# Iniciar servidor
-php artisan serve
-
-# Compilar assets (watch)
-npm run dev
-
-# Compilar para producción
-npm run build
-
-# Acceder a la consola interactiva
-php artisan tinker
+php artisan serve          # Servidor Laravel
+npm run dev                # Frontend con hot reload
+npm run build              # Build de producción
 ```
 
 ### Base de Datos
 ```bash
-# Ejecutar migraciones
-php artisan migrate
-
-# Ejecutar con seeders
-php artisan migrate:fresh --seed
-
-# Revertir migraciones
-php artisan migrate:rollback
-
-# Resetear BD completamente
-php artisan migrate:refresh
-
-# Ejecutar seeder específico
-php artisan db:seed --class=UserSeeder
+php artisan migrate:fresh --seed    # Resetear BD con datos de prueba
+php artisan migrate                 # Aplicar nuevas migraciones
+php artisan db:seed --class=RoleSeeder
 ```
 
 ### Testing
 ```bash
-# Ejecutar todos los tests
-php artisan test
-
-# Tests específicos
-php artisan test --filter=TaskControllerTest
-
-# Tests con coverage
-php artisan test --coverage
-
-# Ver rutas
-php artisan route:list
-
-# Ver config
-php artisan config:cache
+php artisan test                             # Todos los tests
+php artisan test --filter=TaskControllerTest # Test específico
+php artisan test --coverage                  # Con cobertura
 ```
 
-### Roles y Permisos (Spatie)
+### Caché
 ```bash
-# Desde tinker
-php artisan tinker
-
->>> $user = App\Models\User::find(1)
->>> $user->assignRole('admin')
->>> $user->hasRole('admin')
->>> $user->getRoleNames()
->>> $user->removeRole('free_user')
->>> $user->syncRoles('premium_user')
-```
-
-### Limpiar Caché
-```bash
-php artisan cache:clear
+php artisan optimize:clear    # Limpia config, caché, vistas
 php artisan config:clear
-php artisan view:clear
-php artisan optimize:clear
 ```
 
 ---
 
 ## 🔐 Roles y Permisos
 
-### Tres Roles Implementados
+### Tres roles implementados (Spatie Permission)
 
-#### 1. **admin** → Acceso Total
+#### `admin` — Solo panel de administración
 ```
-✅ Ver dashboard admin
-✅ Gestionar usuarios
-✅ Ver pagos y suscripciones
-✅ Acceso a todas las features
-✅ Sin límites de tareas
-```
-
-#### 2. **premium_user** → Acceso Premium
-```
-✅ Crear tareas ilimitadas
-✅ Crear proyectos
-✅ Crear cajas de conocimiento
-✅ Usar entrada de voz
-✅ Usar asistente IA
-✅ Ver sus estadísticas
+✅ /admin/dashboard
+✅ /admin/users
+✅ /admin/payments
+✅ /admin/subscriptions
+❌ NO accede a /projects, /boxes, /resources, /ai-chats
 ```
 
-#### 3. **free_user** → Acceso Limitado
+#### `premium_user` — Acceso completo de usuario
 ```
-✅ Crear ideas ilimitadas
-✅ Crear máximo 5 tareas activas
-❌ Sin proyectos
-❌ Sin entrada de voz
-❌ Sin asistente IA
-❌ Sin cajas de conocimiento
+✅ Tareas ilimitadas
+✅ Proyectos y cajas de recursos
+✅ Dictado por voz (Whisper)
+✅ Asistente IA
 ```
 
-### Protecciones Implementadas
+#### `free_user` — Acceso limitado
+```
+✅ Ideas ilimitadas
+✅ Máximo 5 tareas en estado "pending" simultáneamente
+❌ Sin proyectos, voz ni IA
+```
 
-| Aspecto | Protección | Validación |
-|--------|-----------|-----------|
-| **Límite de Tareas** | Free: 5 máx | StoreTaskRequest |
-| **Acceso a Proyectos** | Premium only | Middleware `role:premium_user` |
-| **Ownership Check** | Solo owner edita | FormRequest `authorize()` |
-| **Admin Protegido** | Solo admin accede | Middleware `role:admin` |
+### Capas de protección
+
+| Nivel | Mecanismo |
+|-------|-----------|
+| **Rutas** | Middleware `role:premium_user` / `role:admin` (Spatie) |
+| **Recursos** | Policies — solo el propietario puede modificar |
+| **Lógica** | `User::canAddTask()` — valida límite de 5 tareas free |
 
 ---
 
-## 🔗 API de Referencia
+## 🔗 Rutas de la Aplicación
 
-### Rutas Públicas
+### Públicas
 ```
-GET  /                    Landing page
-GET  /pricing             Página de precios
-GET  /login               Formulario de login
-POST /login               Procesar login (Fortify)
-GET  /register            Formulario de registro
-POST /register            Procesar registro (Fortify)
+GET  /          Landing page
+GET  /login     Login
+GET  /register  Registro
 ```
 
-### Rutas Autenticadas (Todos)
+### Autenticadas (todos los roles de usuario)
 ```
-GET  /dashboard           Dashboard personal
-GET  /tasks               Listar mis tareas
-POST /tasks               Crear tarea
-PUT  /tasks/{id}          Actualizar tarea
-DELETE /tasks/{id}        Eliminar tarea
-GET  /ideas               Listar mis ideas
-POST /ideas               Crear idea
-GET  /subscription        Ver suscripción actual
-GET  /checkout            Formulario de pago
-POST /checkout            Procesar pago simulado
+GET/POST/PUT/DELETE  /tasks           Gestión de tareas
+GET/POST/PUT/DELETE  /ideas           Gestión de ideas
+GET                  /subscription    Ver suscripción y planes
+GET/POST             /checkout        Pago simulado
+POST                 /tutorial/complete  Marcar tutorial completado
 ```
 
-### Rutas Premium (premium_user + admin)
+### Premium (solo `premium_user`)
 ```
-GET    /projects            Listar proyectos
-POST   /projects            Crear proyecto
-PUT    /projects/{project}  Actualizar proyecto
-DELETE /projects/{project}  Eliminar proyecto
-GET    /boxes               Listar cajas
-POST   /boxes               Crear caja
-PUT    /boxes/{box}         Actualizar caja
-DELETE /boxes/{box}         Eliminar caja
-GET    /boxes/{box}/resources/create  Crear recurso en caja
-POST   /boxes/{box}/resources         Guardar recurso
-PUT    /resources/{resource}          Actualizar recurso
-DELETE /resources/{resource}          Eliminar recurso
+GET/POST/PUT/DELETE  /projects                    Proyectos
+GET/POST/PUT/DELETE  /boxes                       Cajas
+GET/POST/PUT/DELETE  /boxes/{box}/resources        Recursos en cajas
+POST                 /voice/transcribe             Transcripción Whisper (JSON)
+GET/POST/DELETE      /ai-chats                    Chat con IA
 ```
 
-### Rutas Admin (admin only)
+### Admin (solo `admin`)
 ```
-GET    /admin/dashboard              Dashboard admin
-GET    /admin/users                  Listar usuarios
-GET    /admin/users/{user}           Ver detalle de usuario
-DELETE /admin/users/{user}           Eliminar usuario
-GET    /admin/payments               Listar pagos con resumen
-GET    /admin/subscriptions          Listar suscripciones con stats
+GET         /admin/dashboard
+GET         /admin/users
+GET/DELETE  /admin/users/{user}
+GET         /admin/payments
+GET         /admin/subscriptions
 ```
 
 ---
 
 ## 🧪 Testing
 
-### Ejecutar Tests
 ```bash
-# Todos los tests
 php artisan test
-
-# Tests de Feature
-php artisan test tests/Feature
-
-# Test específico
-php artisan test tests/Feature/TaskControllerTest
-
-# Con output verboso
-php artisan test --verbose
-
-# Con coverage
-php artisan test --coverage
 ```
 
-### Tests Incluidos
-```
-✅ 143 tests de Feature / 551 assertions — todos pasando
-✅ Cobertura de CRUD completo
-✅ Tests de autorización (roles + ownership)
-✅ Tests de validación (válido e inválido)
-✅ Tests de límites (free: 5 tareas pendientes)
-✅ Tests de flujos críticos (checkout, admin)
-```
+**Estado actual: 180 tests / 692 assertions — 100% pasando**
 
-### Ver Cobertura
-```bash
-php artisan test --coverage --min=80
-```
+Cobertura:
+- ✅ CRUD completo de todas las entidades
+- ✅ Autorización por rol y ownership
+- ✅ Validación (casos válidos e inválidos)
+- ✅ Límite de tareas en plan free
+- ✅ Flujo de checkout (éxito y fallo)
+- ✅ Transcripción de voz (Whisper)
+- ✅ Chat IA (store, destroy, historial)
+- ✅ Tutorial (completar)
+- ✅ Panel de administración
 
 ---
 
-## ⚙️ Configuración Importante
+## ⚙️ Configuración — .env
 
-### .env - Variables Esenciales
 ```env
-# App
 APP_NAME=Flowly
 APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
 
-# Database
+# Base de datos (SQLite para dev)
 DB_CONNECTION=sqlite
-DB_DATABASE=database/database.sqlite
 
-# Mail (Fortify)
-MAIL_DRIVER=log
+# Sesión
+SESSION_DRIVER=file
 
-# OpenAI (Opcional)
-OPENAI_API_KEY=sk-xxxxxxxxxxxxx
+# IA y voz — Groq (gratuito, recomendado)
+OPENAI_API_KEY=gsk_xxxxxxxxxxxxxxxx
+OPENAI_BASE_URL=https://api.groq.com/openai/v1
+OPENAI_MODEL=llama-3.3-70b-versatile
 
-# Session
-SESSION_DRIVER=database
-```
-
-### Configurar Laravel Fortify
-```php
-// config/fortify.php
-'features' => [
-    Features::registration(),
-    Features::resetPasswords(),
-    Features::emailVerification(),
-    Features::updateProfileInformation(),
-    Features::updatePasswords(),
-    Features::twoFactorAuthentication(['confirmPassword' => true]),
-],
-```
-
-### Configurar Spatie Permission
-```php
-// config/permission.php
-'default' => 'eloquent',
-'providers' => [
-    'database' => true,  // Usar BD para roles
-],
+# IA y voz — OpenAI (de pago)
+# OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
+# OPENAI_BASE_URL=https://api.openai.com/v1
+# OPENAI_MODEL=gpt-3.5-turbo
 ```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Error: "No such file or directory" en database.sqlite
+### Error 419 al hacer login o enviar formularios
 ```bash
-touch database/database.sqlite
-php artisan migrate
+# Limpiar sesiones y caché de configuración
+rm -f storage/framework/sessions/*
+php artisan config:clear
+# Borrar cookies del navegador para localhost
 ```
 
-### Error: "Spatie\Permission\Exceptions\RoleDoesNotExist"
+### Error SSL en llamadas a OpenAI/Groq (Windows)
 ```bash
-php artisan migrate
-php artisan db:seed --class=RoleSeeder
+# Descargar certificados CA y configurar en php.ini
+# curl.cainfo = "ruta/a/cacert.pem"
+# openssl.cafile = "ruta/a/cacert.pem"
 ```
 
-### Error: "Class not found"
-```bash
-composer dump-autoload
-php artisan cache:clear
-```
-
-### Error: "SQLSTATE[HY000]: General error"
+### "Spatie\Permission\Exceptions\RoleDoesNotExist"
 ```bash
 php artisan migrate:fresh --seed
-# O resetear completamente
-rm database/database.sqlite
+```
+
+### "No such file or directory" en database.sqlite
+```bash
 touch database/database.sqlite
 php artisan migrate --seed
 ```
 
-### Frontend no ve cambios en JavaScript
+### Frontend no actualiza
 ```bash
-# Reiniciar Vite
-npm run dev
-
-# O compilar manualmente
-npm run build
-
-# Limpiar caché (Ctrl+Shift+R en navegador)
+npm run dev    # Reiniciar Vite
+# O Ctrl+Shift+R en el navegador para forzar recarga
 ```
 
-### OpenAI API: Error 401
+### OpenAI API: Rate limit / Error 422 en chat IA
 ```
-Verificar que OPENAI_API_KEY está en .env
-Las llamadas DEBEN ser desde backend (VoiceController, AiAssistantController)
-NO llamar directamente desde frontend
+Verificar que OPENAI_API_KEY tiene créditos disponibles.
+Alternativa gratuita: usar Groq (console.groq.com)
 ```
 
 ---
 
-## 📖 Documentación Adicional
+## 🐳 Docker
 
-Para información más detallada, ver la carpeta `.claude/`:
-
-- 📄 **[.claude/PROJECT_STATE.md](.claude/PROJECT_STATE.md)** - Estado actual del proyecto (qué está hecho y qué falta)
-- 🔍 **[.claude/QUICK_REFERENCE.md](.claude/QUICK_REFERENCE.md)** - Referencia rápida: roles, rutas, enums, errores comunes
-- 📋 **[.claude/CHECKLIST_DESARROLLO.md](.claude/CHECKLIST_DESARROLLO.md)** - Checklist de desarrollo y deployment
-- 🗺️ **[.claude/INDEX_TOTAL_ARCHIVOS.md](.claude/INDEX_TOTAL_ARCHIVOS.md)** - Mapa completo de archivos del proyecto
-
----
-
-## 🤝 Contribución
-
-Las contribuciones son bienvenidas. Por favor:
-
-1. **Fork** el repositorio
-2. **Crea una rama** para tu feature: `git checkout -b feature/mi-feature`
-3. **Commit** tus cambios: `git commit -m 'feat: agregar nueva feature'`
-4. **Escribe tests** para tu código
-5. **Push** a la rama: `git push origin feature/mi-feature`
-6. **Abre un Pull Request**
-
-### Estándares de Código
-```
-✅ PSR-12 para PHP
-✅ ES6+ para JavaScript
-✅ Tests antes de merge
-✅ Documentación actualizada
-✅ Commits descriptivos
-```
-
----
-
-## 📋 Checklist Pre-Deploy
-
-- [ ] Todos los tests pasan: `php artisan test`
-- [ ] No hay warnings: `php artisan tinker`
-- [ ] BD actualizada: `php artisan migrate`
-- [ ] Assets compilados: `npm run build`
-- [ ] .env configurado correctamente
-- [ ] OpenAI API key (si usas features de voz/IA)
-- [ ] Logs limpios en `storage/logs/`
-- [ ] Cache limpiado: `php artisan optimize:clear`
-
----
-
-## 📞 Soporte
-
-### Documentación
-- Leer archivos en `/docs`
-- Revisar tests en `/tests`
-- Consultar código comentado
-
-### Debugging
 ```bash
-php artisan tinker
->>> App\Models\User::all()
->>> App\Models\Task::where('user_id', 1)->get()
->>> Auth::user()
+# Construir imagen
+docker compose build
+
+# Iniciar (ejecuta migraciones y seeders automáticamente)
+docker compose up
+
+# Acceder
+http://localhost:8000
 ```
 
-### Reportar Bugs
-1. Describir el problema claramente
-2. Pasos para reproducir
-3. Versión de PHP/Laravel/Node
-4. Archivos de log relevantes
+El `docker-entrypoint.sh` ejecuta `migrate --force` y `db:seed` al arrancar.
+
+---
+
+## 📖 Documentación
+
+| Documento | Descripción |
+|-----------|-------------|
+| [docs/manual-usuario.md](docs/manual-usuario.md) | Manual de uso para el usuario final |
+| [docs/decisiones-tecnicas.md](docs/decisiones-tecnicas.md) | Justificación técnica de cada decisión de arquitectura |
+| [.claude/PROJECT_STATE.md](.claude/PROJECT_STATE.md) | Estado detallado del proyecto (sesión a sesión) |
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto está bajo la licencia **MIT**. Ver [LICENSE](LICENSE) para más detalles.
-
-```
-MIT License (Código libre para uso educativo y comercial)
-```
+MIT — Ver [LICENSE](LICENSE) para más detalles.
 
 ---
 
 ## 👨‍💻 Autor
 
-**Proyecto de Aprendizaje - 2º DAM**
-
-Desarrollado como proyecto intermodular para aprender:
-- ✅ Laravel y Eloquent
-- ✅ React e Inertia.js
-- ✅ Testing con Pest
-- ✅ Arquitectura de aplicaciones
-- ✅ Gestión de permisos y roles
-- ✅ Integración con APIs externas
-
----
-
-## 🚀 Próximos Pasos
-
-1. **Instala el proyecto** (ver [Instalación Rápida](#instalación-rápida))
-2. **Revisa el estado actual** (`.claude/PROJECT_STATE.md`)
-3. **Ejecuta los tests** (`php artisan test`) — deben pasar 143/143
-4. **Comienza a desarrollar** (`npm run dev` + `php artisan serve`)
-5. **Landing page** — implementar `welcome.tsx` con contenido Flowly real (pricing, features, CTA)
-6. **Haz commits frecuentes** (`git commit -m 'feat: ...'`)
-7. **Deploya cuando esté listo**
-
----
-
-## ✨ ¡Gracias por usar Flowly!
-
-**¿Necesitas ayuda?** Revisa la documentación o abre un issue.
-
-**¿Te gusta el proyecto?** ⭐ Déjanos una estrella en GitHub!
+**Samuel Ayllón** — Proyecto Intermodular 2º DAM
 
 ---
 
