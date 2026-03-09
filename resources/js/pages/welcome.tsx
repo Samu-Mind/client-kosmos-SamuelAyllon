@@ -19,16 +19,13 @@ import {
     Target,
     Zap,
     Users,
-    TrendingUp,
-    Clock,
     Brain,
     Rocket,
-    ChevronRight,
     Quote,
     Play,
-    MessageSquare,
-    Calendar,
-    Award,
+    Menu,
+    X,
+    Leaf,
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { useEffect, useState, useRef } from 'react';
@@ -75,6 +72,7 @@ function useCountUp(end: number, duration: number = 2000, startOnView: boolean =
 export default function Welcome({ canRegister = true }: { canRegister?: boolean }) {
     const { auth } = usePage().props as { auth: { user: unknown } };
     const [isLoaded, setIsLoaded] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         setIsLoaded(true);
@@ -141,7 +139,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                         <Link href={login()}>Iniciar sesión</Link>
                                     </Button>
                                     {canRegister && (
-                                        <Button asChild className="group glow-primary relative overflow-hidden">
+                                        <Button asChild className="group glow-primary relative overflow-hidden hidden sm:inline-flex">
                                             <Link href={register()} className="flex items-center gap-2">
                                                 <span className="relative z-10">Empezar gratis</span>
                                                 <Sparkles className="h-4 w-4 relative z-10 transition-transform group-hover:rotate-12 group-hover:scale-125" />
@@ -151,8 +149,53 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                     )}
                                 </>
                             )}
+                            {/* Mobile hamburger */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="md:hidden"
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                aria-label="Abrir menú"
+                            >
+                                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                            </Button>
                         </div>
                     </div>
+
+                    {/* Mobile menu */}
+                    {isMobileMenuOpen && (
+                        <div className="md:hidden border-t bg-background/95 backdrop-blur-xl animate-fade-in">
+                            <nav className="flex flex-col px-6 py-4 gap-1">
+                                {[
+                                    { href: '#features', label: 'Funcionalidades' },
+                                    { href: '#how-it-works', label: 'Cómo funciona' },
+                                    { href: '#testimonials', label: 'Testimonios' },
+                                    { href: '#pricing', label: 'Precios' },
+                                ].map((item) => (
+                                    <a
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/5 hover:text-foreground"
+                                    >
+                                        {item.label}
+                                    </a>
+                                ))}
+                                {!auth.user && (
+                                    <div className="mt-3 flex flex-col gap-2 border-t pt-4">
+                                        <Button variant="outline" asChild className="w-full">
+                                            <Link href={login()}>Iniciar sesión</Link>
+                                        </Button>
+                                        {canRegister && (
+                                            <Button asChild className="w-full">
+                                                <Link href={register()}>Empezar gratis</Link>
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+                            </nav>
+                        </div>
+                    )}
                 </header>
 
                 {/* ── Hero ── */}
@@ -284,7 +327,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 </div>
 
                                 {/* Floating notification badges */}
-                                <div className="absolute -right-4 top-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-bounce-subtle backdrop-blur-sm">
+                                <div className="hidden lg:block absolute -right-4 top-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-bounce-subtle backdrop-blur-sm">
                                     <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500/20 to-red-500/5 flex items-center justify-center">
                                             <Mic className="h-5 w-5 text-red-500" />
@@ -296,14 +339,14 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                     </div>
                                 </div>
 
-                                <div className="absolute -left-4 bottom-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-float backdrop-blur-sm">
+                                <div className="hidden lg:block absolute -left-4 bottom-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-float backdrop-blur-sm">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center">
-                                            <Calendar className="h-5 w-5 text-blue-500" />
+                                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 flex items-center justify-center">
+                                            <Bot className="h-5 w-5 text-indigo-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-semibold">Smart Calendar</p>
-                                            <p className="text-xs text-muted-foreground">Próx: Reunión 3:00 PM</p>
+                                            <p className="text-xs font-semibold">Asistente IA</p>
+                                            <p className="text-xs text-muted-foreground">Organiza tu productividad</p>
                                         </div>
                                     </div>
                                 </div>
@@ -312,140 +355,156 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                     </div>
                 </section>
 
-                {/* ── Trusted by / Stats ── */}
-                <section className="relative border-y bg-gradient-to-b from-muted/50 to-background">
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
-                    <div className="relative mx-auto max-w-6xl px-6 py-16">
-                        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-                            <AnimatedStatItem value={10000} suffix="+" label="Usuarios activos" icon={<Users className="h-6 w-6" />} />
-                            <AnimatedStatItem value={50000} suffix="+" label="Tareas completadas" icon={<CheckCircle2 className="h-6 w-6" />} />
-                            <AnimatedStatItem value={98} suffix="%" label="Satisfacción" icon={<TrendingUp className="h-6 w-6" />} />
-                            <AnimatedStatItem value={2} suffix="h/día" label="Tiempo ahorrado" icon={<Clock className="h-6 w-6" />} />
-                        </div>
-                    </div>
-                </section>
 
                 {/* ── Features - Bento Grid ── */}
-                <section id="features" className="mx-auto max-w-6xl px-6 py-24">
-                    <div className="mb-16 text-center">
-                        <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
-                            <Sparkles className="h-3 w-3 mr-1 text-primary" />
-                            Funcionalidades
-                        </Badge>
-                        <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                            Todo lo que necesitas,{' '}
-                            <span className="gradient-text-animated">
-                                nada que no
-                            </span>
-                        </h2>
-                        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-                            Herramientas potentes pero intuitivas para gestionar tu día a día 
-                            sin fricción ni distracciones.
-                        </p>
+                <section id="features" className="relative py-28 overflow-hidden">
+                    {/* Section background */}
+                    <div className="absolute inset-0 -z-10">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.03] to-transparent" />
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.04)_1px,transparent_1px)] bg-[size:48px_48px]" />
                     </div>
 
-                    {/* Bento Grid Layout */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                        {/* Feature grande - Tareas */}
-                        <BentoCard 
-                            className="md:col-span-2 lg:col-span-2"
-                            icon={<CheckCircle2 className="h-8 w-8" />}
-                            title="Gestión de tareas inteligente"
-                            description="Crea, prioriza y organiza tus tareas con niveles de prioridad, fechas de vencimiento y seguimiento visual del progreso. La IA te sugiere el orden óptimo."
-                            badge="Gratis"
-                            gradient="from-green-500/20 via-emerald-500/10 to-transparent"
-                            featured
-                        >
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                {['Alta prioridad', 'Media', 'Baja'].map((p, i) => (
-                                    <span key={i} className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                        i === 0 ? 'bg-red-500/20 text-red-600' : 
-                                        i === 1 ? 'bg-yellow-500/20 text-yellow-600' : 
-                                        'bg-blue-500/20 text-blue-600'
-                                    }`}>
-                                        {p}
-                                    </span>
-                                ))}
-                            </div>
-                        </BentoCard>
+                    <div className="mx-auto max-w-6xl px-6">
+                        <div className="mb-20 text-center">
+                            <Badge variant="outline" className="mb-6 border-primary/30 bg-primary/5 px-4 py-1.5 text-sm">
+                                <Sparkles className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                                Funcionalidades
+                            </Badge>
+                            <h2 className="mb-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+                                Todo lo que necesitas,{' '}
+                                <span className="gradient-text-animated">
+                                    nada que no
+                                </span>
+                            </h2>
+                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
+                                Herramientas potentes pero intuitivas para gestionar tu día a día
+                                sin fricción ni distracciones.
+                            </p>
+                        </div>
 
-                        {/* Ideas */}
-                        <BentoCard 
-                            icon={<Lightbulb className="h-7 w-7" />}
-                            title="Captura de ideas"
-                            description="Guarda ideas al instante y organízalas cuando quieras."
-                            badge="Gratis"
-                            gradient="from-yellow-500/20 via-amber-500/10 to-transparent"
-                        />
-
-                        {/* Voz - destacado */}
-                        <BentoCard 
-                            icon={<Mic className="h-7 w-7" />}
-                            title="Dictado por voz"
-                            description="Graba ideas con tu voz. Transcripción automática con IA de última generación."
-                            badge="Premium"
-                            gradient="from-red-500/20 via-rose-500/10 to-transparent"
-                            isPremium
-                        >
-                            <div className="mt-3 flex items-center gap-2">
-                                <div className="flex gap-0.5">
-                                    {[1,2,3,4,5].map(i => (
-                                        <div key={i} className={`w-1 bg-red-500 rounded-full animate-pulse`} 
-                                            style={{ height: `${8 + Math.random() * 12}px`, animationDelay: `${i * 0.1}s` }} 
-                                        />
+                        {/* Bento Grid Layout */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+                            {/* Feature grande - Tareas */}
+                            <BentoCard
+                                className="md:col-span-2 lg:col-span-2"
+                                icon={<CheckCircle2 className="h-8 w-8" />}
+                                title="Gestión de tareas inteligente"
+                                description="Crea, prioriza y organiza tus tareas con niveles de prioridad, fechas de vencimiento y seguimiento visual del progreso. La IA te sugiere el orden óptimo."
+                                badge="Gratis"
+                                gradient="from-green-500/20 via-emerald-500/10 to-transparent"
+                                featured
+                                delay={0}
+                            >
+                                <div className="mt-5 flex flex-wrap gap-2">
+                                    {[
+                                        { label: 'Alta prioridad', color: 'bg-red-500/15 text-red-600 ring-1 ring-red-500/20' },
+                                        { label: 'Media', color: 'bg-yellow-500/15 text-yellow-600 ring-1 ring-yellow-500/20' },
+                                        { label: 'Baja', color: 'bg-blue-500/15 text-blue-600 ring-1 ring-blue-500/20' },
+                                    ].map((p, i) => (
+                                        <span key={i} className={`px-3 py-1.5 rounded-full text-xs font-semibold ${p.color}`}>
+                                            {p.label}
+                                        </span>
                                     ))}
                                 </div>
-                                <span className="text-xs text-muted-foreground">Grabando...</span>
-                            </div>
-                        </BentoCard>
+                            </BentoCard>
 
-                        {/* IA - grande */}
-                        <BentoCard 
-                            className="md:col-span-2 lg:col-span-1 lg:row-span-2"
-                            icon={<Bot className="h-8 w-8" />}
-                            title="Asistente IA"
-                            description="Chatea con un asistente inteligente que te ayuda a priorizar, organizar y optimizar tu productividad."
-                            badge="Premium"
-                            gradient="from-indigo-500/20 via-purple-500/10 to-transparent"
-                            isPremium
-                            featured
-                        >
-                            <div className="mt-4 space-y-2">
-                                <div className="flex gap-2 items-start">
-                                    <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                                        <Bot className="h-3 w-3 text-primary" />
+                            {/* Ideas */}
+                            <BentoCard
+                                icon={<Lightbulb className="h-7 w-7" />}
+                                title="Captura de ideas"
+                                description="Guarda ideas al instante y organízalas cuando quieras."
+                                badge="Gratis"
+                                gradient="from-yellow-500/20 via-amber-500/10 to-transparent"
+                                delay={1}
+                            />
+
+                            {/* Voz - destacado */}
+                            <BentoCard
+                                icon={<Mic className="h-7 w-7" />}
+                                title="Dictado por voz"
+                                description="Graba ideas con tu voz. Transcripción automática con IA de última generación."
+                                badge="Premium"
+                                gradient="from-red-500/20 via-rose-500/10 to-transparent"
+                                isPremium
+                                delay={2}
+                            >
+                                <div className="mt-4 flex items-center gap-3 p-2.5 rounded-xl bg-red-500/5 ring-1 ring-red-500/10">
+                                    <div className="flex items-end gap-[3px]">
+                                        {[1,2,3,4,5,4,3].map((v, i) => (
+                                            <div key={i} className="w-1 bg-red-500/80 rounded-full animate-pulse"
+                                                style={{ height: `${6 + v * 3}px`, animationDelay: `${i * 0.12}s` }}
+                                            />
+                                        ))}
                                     </div>
-                                    <p className="text-xs bg-muted/50 rounded-lg p-2 flex-1">
-                                        "Te recomiendo empezar por la tarea de alta prioridad"
-                                    </p>
+                                    <span className="text-xs font-medium text-red-600/80">Grabando...</span>
                                 </div>
-                                <div className="flex gap-2 items-start justify-end">
-                                    <p className="text-xs bg-primary/10 rounded-lg p-2">
-                                        "¿Cuánto tiempo me tomará?"
-                                    </p>
+                            </BentoCard>
+
+                            {/* IA - grande */}
+                            <BentoCard
+                                className="md:col-span-2 lg:col-span-1 lg:row-span-2"
+                                icon={<Bot className="h-8 w-8" />}
+                                title="Asistente IA"
+                                description="Chatea con un asistente inteligente que te ayuda a priorizar, organizar y optimizar tu productividad."
+                                badge="Premium"
+                                gradient="from-indigo-500/20 via-purple-500/10 to-transparent"
+                                isPremium
+                                featured
+                                delay={3}
+                            >
+                                <div className="mt-5 space-y-3">
+                                    <div className="flex gap-2.5 items-start">
+                                        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center flex-shrink-0 ring-1 ring-primary/20">
+                                            <Bot className="h-3.5 w-3.5 text-primary" />
+                                        </div>
+                                        <div className="bg-muted/60 rounded-2xl rounded-tl-sm px-3.5 py-2.5 flex-1 ring-1 ring-border/50">
+                                            <p className="text-xs leading-relaxed">
+                                                "Te recomiendo empezar por la tarea de alta prioridad"
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2.5 items-start justify-end">
+                                        <div className="bg-primary/10 rounded-2xl rounded-tr-sm px-3.5 py-2.5 ring-1 ring-primary/20">
+                                            <p className="text-xs leading-relaxed">
+                                                "¿Cuánto tiempo me tomará?"
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2.5 items-start">
+                                        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center flex-shrink-0 ring-1 ring-primary/20">
+                                            <Bot className="h-3.5 w-3.5 text-primary" />
+                                        </div>
+                                        <div className="bg-muted/60 rounded-2xl rounded-tl-sm px-3.5 py-2.5 flex-1 ring-1 ring-border/50">
+                                            <p className="text-xs leading-relaxed">
+                                                "Unos 45 min. ¿La agendamos ahora?"
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </BentoCard>
+                            </BentoCard>
 
-                        {/* Proyectos */}
-                        <BentoCard 
-                            icon={<FolderKanban className="h-7 w-7" />}
-                            title="Proyectos"
-                            description="Agrupa tareas en proyectos con seguimiento de progreso y estados personalizables."
-                            badge="Premium"
-                            gradient="from-blue-500/20 via-cyan-500/10 to-transparent"
-                            isPremium
-                        />
+                            {/* Proyectos */}
+                            <BentoCard
+                                icon={<FolderKanban className="h-7 w-7" />}
+                                title="Proyectos"
+                                description="Agrupa tareas en proyectos con seguimiento de progreso y estados personalizables."
+                                badge="Premium"
+                                gradient="from-blue-500/20 via-cyan-500/10 to-transparent"
+                                isPremium
+                                delay={4}
+                            />
 
-                        {/* Recursos */}
-                        <BentoCard 
-                            icon={<BookMarked className="h-7 w-7" />}
-                            title="Cajas de recursos"
-                            description="Organiza enlaces, documentos, vídeos e imágenes en cajas temáticas."
-                            badge="Premium"
-                            gradient="from-purple-500/20 via-violet-500/10 to-transparent"
-                            isPremium
-                        />
+                            {/* Recursos */}
+                            <BentoCard
+                                icon={<BookMarked className="h-7 w-7" />}
+                                title="Cajas de recursos"
+                                description="Organiza enlaces, documentos, vídeos e imágenes en cajas temáticas."
+                                badge="Premium"
+                                gradient="from-purple-500/20 via-violet-500/10 to-transparent"
+                                isPremium
+                                delay={5}
+                            />
+                        </div>
                     </div>
                 </section>
 
@@ -453,27 +512,27 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                 <section id="how-it-works" className="relative border-y overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-muted/20" />
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
-                    
-                    <div className="relative mx-auto max-w-6xl px-6 py-24">
-                        <div className="mb-16 text-center">
-                            <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
-                                <Rocket className="h-3 w-3 mr-1 text-primary" />
+
+                    <div className="relative mx-auto max-w-6xl px-6 py-28">
+                        <div className="mb-20 text-center">
+                            <Badge variant="outline" className="mb-6 border-primary/30 bg-primary/5 px-4 py-1.5 text-sm">
+                                <Rocket className="h-3.5 w-3.5 mr-1.5 text-primary" />
                                 Cómo funciona
                             </Badge>
-                            <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                            <h2 className="mb-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
                                 De cero a productivo en{' '}
                                 <span className="gradient-text-animated">
                                     3 pasos
                                 </span>
                             </h2>
-                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
                                 Empezar con Flowly es tan sencillo como respirar.
                             </p>
                         </div>
 
                         <div className="relative grid gap-8 md:grid-cols-3">
                             {/* Connector line */}
-                            <div className="hidden md:block absolute top-24 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                            <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                             
                             <StepCard 
                                 number={1}
@@ -498,86 +557,51 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                 </section>
 
                 {/* ── Testimonials ── */}
-                <section id="testimonials" className="mx-auto max-w-6xl px-6 py-24">
-                    <div className="mb-16 text-center">
-                        <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
-                            <MessageSquare className="h-3 w-3 mr-1 text-primary" />
-                            Testimonios
-                        </Badge>
-                        <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                            Lo que dicen{' '}
-                            <span className="gradient-text-animated">
-                                nuestros usuarios
-                            </span>
-                        </h2>
-                        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-                            Miles de personas ya han transformado su productividad con Flowly.
-                        </p>
+                <section id="testimonials" className="relative py-28 overflow-hidden">
+                    <div className="absolute inset-0 -z-10">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        <TestimonialCard 
-                            quote="Flowly ha cambiado completamente cómo organizo mi día. La IA es increíblemente útil para priorizar tareas."
-                            author="María García"
-                            role="Product Manager"
-                            avatar="M"
-                            rating={5}
-                        />
-                        <TestimonialCard 
-                            quote="El dictado por voz es un game changer. Capturo ideas mientras conduzco y aparecen perfectamente transcritas."
-                            author="Carlos Ruiz"
-                            role="Emprendedor"
-                            avatar="C"
-                            rating={5}
-                            featured
-                        />
-                        <TestimonialCard 
-                            quote="Probé muchas apps de productividad, pero Flowly es la única que realmente uso todos los días. Simple y potente."
-                            author="Ana López"
-                            role="Diseñadora UX"
-                            avatar="A"
-                            rating={5}
-                        />
-                        <TestimonialCard 
-                            quote="Las cajas de recursos me salvaron la vida organizando material para mis clases. Todo en un solo lugar."
-                            author="David Martín"
-                            role="Profesor"
-                            avatar="D"
-                            rating={5}
-                        />
-                        <TestimonialCard 
-                            quote="El plan gratuito tiene todo lo que necesito. Cuando crezca mi negocio, definitivamente iré a Premium."
-                            author="Laura Sánchez"
-                            role="Freelancer"
-                            avatar="L"
-                            rating={5}
-                        />
-                        <TestimonialCard 
-                            quote="Mi equipo y yo ahorramos al menos 2 horas diarias desde que usamos Flowly. ROI increíble."
-                            author="Pablo Fernández"
-                            role="CEO Startup"
-                            avatar="P"
-                            rating={5}
-                        />
-                    </div>
-
-                    {/* Trust indicators */}
-                    <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                            <div className="flex -space-x-2">
-                                {['M', 'C', 'A', 'D', 'L'].map((letter, i) => (
-                                    <div key={i} className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-xs font-semibold text-primary-foreground border-2 border-background">
-                                        {letter}
-                                    </div>
-                                ))}
-                            </div>
-                            <span className="text-sm">+10,000 usuarios satisfechos</span>
+                    <div className="mx-auto max-w-6xl px-6">
+                        <div className="mb-16 text-center">
+                            <Badge variant="outline" className="mb-6 border-primary/30 bg-primary/5 px-4 py-1.5 text-sm">
+                                <Quote className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                                Testimonios
+                            </Badge>
+                            <h2 className="mb-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+                                Lo que dicen{' '}
+                                <span className="gradient-text-animated">
+                                    nuestros usuarios
+                                </span>
+                            </h2>
+                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
+                                Personas reales, productividad real.
+                            </p>
                         </div>
-                        <div className="flex items-center gap-1">
-                            {[1,2,3,4,5].map(i => (
-                                <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
-                            ))}
-                            <span className="ml-2 text-sm text-muted-foreground">4.9/5 valoración media</span>
+
+                        <div className="grid gap-6 md:grid-cols-3">
+                            <TestimonialCard
+                                quote="Flowly ha simplificado mi rutina diaria. Antes usaba tres apps distintas, ahora todo está en un solo lugar."
+                                author="María García"
+                                role="Diseñadora freelance"
+                                avatar="M"
+                                rating={5}
+                            />
+                            <TestimonialCard
+                                quote="El dictado por voz es increíble. Capturo ideas mientras camino y cuando llego al ordenador ya están organizadas."
+                                author="Carlos López"
+                                role="Estudiante de Ingeniería"
+                                avatar="C"
+                                rating={5}
+                                featured
+                            />
+                            <TestimonialCard
+                                quote="El asistente IA me ayuda a priorizar cuando tengo demasiadas tareas. Es como tener un coach de productividad."
+                                author="Ana Martínez"
+                                role="Product Manager"
+                                avatar="A"
+                                rating={5}
+                            />
                         </div>
                     </div>
                 </section>
@@ -585,20 +609,20 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                 {/* ── Pricing ── */}
                 <section id="pricing" className="relative border-y bg-gradient-to-b from-background via-muted/20 to-background">
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(58,90,64,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(58,90,64,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
-                    
-                    <div className="relative mx-auto max-w-6xl px-6 py-24">
-                        <div className="mb-16 text-center">
-                            <Badge variant="outline" className="mb-4 border-primary/30 bg-primary/5">
-                                <Star className="h-3 w-3 mr-1 text-primary" />
+
+                    <div className="relative mx-auto max-w-6xl px-6 py-28">
+                        <div className="mb-20 text-center">
+                            <Badge variant="outline" className="mb-6 border-primary/30 bg-primary/5 px-4 py-1.5 text-sm">
+                                <Star className="h-3.5 w-3.5 mr-1.5 text-primary" />
                                 Precios
                             </Badge>
-                            <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                            <h2 className="mb-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
                                 Elige tu{' '}
                                 <span className="gradient-text-animated">
                                     plan ideal
                                 </span>
                             </h2>
-                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                            <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
                                 Empieza gratis y escala cuando tu productividad lo exija.
                             </p>
                         </div>
@@ -638,7 +662,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             </Card>
 
                             {/* Premium Mensual - Featured */}
-                            <Card className="group relative flex flex-col overflow-hidden border-2 border-primary shadow-2xl shadow-primary/20 scale-105 transition-all duration-500 hover:-translate-y-3 z-10">
+                            <Card className="group relative flex flex-col overflow-hidden border-2 border-primary shadow-2xl shadow-primary/20 lg:scale-105 transition-all duration-500 hover:-translate-y-3 z-10">
                                 {/* Popular ribbon */}
                                 <div className="absolute -right-12 top-8 rotate-45 bg-gradient-to-r from-primary to-primary/80 px-14 py-1.5 text-xs font-bold text-primary-foreground shadow-lg">
                                     Popular
@@ -728,22 +752,18 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                 </section>
 
                 {/* ── Final CTA ── */}
-                <section className="relative border-y overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-                    {/* Animated orbs */}
-                    <div className="absolute top-10 left-10 h-40 w-40 rounded-full bg-primary/10 blur-3xl animate-orb-1" />
-                    <div className="absolute bottom-10 right-10 h-32 w-32 rounded-full bg-primary/15 blur-3xl animate-orb-2" />
-                    
-                    <div className="relative mx-auto max-w-4xl px-6 py-28 text-center">
+                <section className="relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/[0.06] to-background" />
+                    {/* Subtle orbs */}
+                    <div className="absolute top-1/3 left-1/4 h-64 w-64 rounded-full bg-primary/10 blur-3xl animate-orb-1" />
+                    <div className="absolute bottom-1/3 right-1/4 h-48 w-48 rounded-full bg-primary/8 blur-3xl animate-orb-2" />
+
+                    <div className="relative mx-auto max-w-4xl px-6 py-32 text-center">
                         <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2 text-sm font-medium text-primary mb-8 backdrop-blur-sm">
-                            <div className="relative flex h-2 w-2">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-                                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
-                            </div>
+                            <Leaf className="h-3.5 w-3.5" />
                             ¿Listo para empezar?
                         </div>
-                        <h2 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                        <h2 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
                             Tu mejor versión productiva{' '}
                             <br className="hidden sm:block" />
                             <span className="gradient-text-animated">
@@ -751,7 +771,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             </span>
                         </h2>
                         <p className="mx-auto mb-12 max-w-xl text-lg text-muted-foreground leading-relaxed">
-                            Únete a <span className="text-primary font-semibold">más de 10,000 personas</span> que ya han transformado su forma de trabajar. 
+                            Únete a personas que ya han transformado su forma de trabajar.
                             El plan gratuito es para siempre.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -768,50 +788,43 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             </Button>
                         </div>
                         
-                        {/* Social proof mini */}
-                        <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
-                            <div className="flex items-center gap-2">
-                                <div className="flex -space-x-2">
-                                    {['M', 'C', 'A'].map((letter, i) => (
-                                        <div key={i} className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-xs font-semibold text-primary-foreground border-2 border-background">
-                                            {letter}
-                                        </div>
-                                    ))}
-                                </div>
-                                <span className="text-sm text-muted-foreground">+10K usuarios</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                {[1,2,3,4,5].map(i => (
-                                    <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                                ))}
-                                <span className="ml-1 text-sm text-muted-foreground">4.9/5</span>
-                            </div>
-                            <Badge variant="secondary" className="gap-1">
-                                <Award className="h-3 w-3" />
-                                App del mes
-                            </Badge>
+                        {/* Trust signals */}
+                        <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
+                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                                Sin tarjeta de crédito
+                            </span>
+                            <span className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
+                                <Shield className="h-4 w-4 text-primary" />
+                                Datos protegidos
+                            </span>
+                            <span className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
+                                <Zap className="h-4 w-4 text-primary" />
+                                Activo en segundos
+                            </span>
                         </div>
                     </div>
                 </section>
 
                 {/* ── Footer ── */}
-                <footer className="border-t bg-gradient-to-b from-muted/30 to-background">
+                <footer className="border-t bg-gradient-to-b from-muted/20 to-background">
                     <div className="mx-auto max-w-6xl px-6 py-16">
-                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12">
+                        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4 mb-12">
                             {/* Brand */}
                             <div className="lg:col-span-2">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <img 
-                                        src={logo} 
-                                        alt="Flowly" 
-                                        className="h-10 w-auto object-contain" 
+                                    <img
+                                        src={logo}
+                                        alt="Flowly"
+                                        className="h-10 w-auto object-contain"
                                     />
                                     <span className="text-2xl font-bold gradient-text-animated">
                                         Flowly
                                     </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-                                    La plataforma de productividad personal que unifica tareas, ideas y proyectos con inteligencia artificial.
+                                    Productividad personal que fluye como la naturaleza.
+                                    Tareas, ideas y proyectos con inteligencia artificial.
                                 </p>
                             </div>
                             
@@ -862,6 +875,7 @@ function BentoCard({
     className = '',
     featured = false,
     isPremium = false,
+    delay = 0,
     children,
 }: {
     icon: React.ReactNode;
@@ -872,34 +886,61 @@ function BentoCard({
     className?: string;
     featured?: boolean;
     isPremium?: boolean;
+    delay?: number;
     children?: React.ReactNode;
 }) {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        if (!cardRef.current) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
+            { threshold: 0.15 }
+        );
+        observer.observe(cardRef.current);
+        return () => observer.disconnect();
+    }, []);
+
     return (
-        <Card className={`group relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover-lift ${className} ${featured ? 'border-2 border-primary/30' : ''}`}>
-            <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-100 transition-opacity duration-500`} />
-            {featured && (
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-primary/10 to-primary/30 rounded-xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
-            )}
-            <CardContent className={`relative ${featured ? 'p-8' : 'p-6'}`}>
-                <div className="flex items-start justify-between mb-4">
-                    <div className={`rounded-2xl bg-gradient-to-br ${gradient} p-3 text-primary transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20`}>
-                        {icon}
+        <div
+            ref={cardRef}
+            className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+            style={{ transitionDelay: `${delay * 100}ms` }}
+        >
+            <Card className={`group relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 h-full ${className} ${featured ? 'border-2 border-primary/20 hover:border-primary/40' : 'border border-border/60 hover:border-primary/30'}`}>
+                {/* Background gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-40 group-hover:opacity-80 transition-opacity duration-500`} />
+
+                {/* Featured glow */}
+                {featured && (
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 rounded-xl opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
+                )}
+
+                {/* Shine sweep on hover */}
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none" />
+
+                <CardContent className={`relative ${featured ? 'p-8' : 'p-6'} h-full`}>
+                    <div className="flex items-start justify-between mb-5">
+                        <div className={`rounded-2xl bg-gradient-to-br ${gradient} p-3.5 text-primary ring-1 ring-primary/10 transition-all duration-500 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/15 group-hover:ring-primary/25`}>
+                            {icon}
+                        </div>
+                        <Badge
+                            variant={isPremium ? 'default' : 'secondary'}
+                            className={`transition-all duration-300 text-[11px] tracking-wide uppercase font-semibold ${isPremium ? 'bg-gradient-to-r from-primary to-primary/80 shadow-md shadow-primary/20' : 'bg-secondary/80'}`}
+                        >
+                            {isPremium && <Star className="h-3 w-3 mr-1 fill-current" />}
+                            {badge}
+                        </Badge>
                     </div>
-                    <Badge 
-                        variant={isPremium ? 'default' : 'secondary'}
-                        className={`transition-all duration-300 group-hover:scale-105 ${isPremium ? 'bg-gradient-to-r from-primary to-primary/80 shadow-lg shadow-primary/20' : ''}`}
-                    >
-                        {isPremium && <Star className="h-3 w-3 mr-1" />}
-                        {badge}
-                    </Badge>
-                </div>
-                <h3 className={`font-bold mb-2 transition-colors group-hover:text-primary ${featured ? 'text-xl' : 'text-lg'}`}>
-                    {title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-                {children}
-            </CardContent>
-        </Card>
+                    <h3 className={`font-bold mb-2.5 transition-colors duration-300 group-hover:text-primary ${featured ? 'text-xl' : 'text-lg'}`}>
+                        {title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+                    {children}
+                </CardContent>
+            </Card>
+        </div>
     );
 }
 
