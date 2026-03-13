@@ -7,6 +7,7 @@ use App\Models\AiConversation;
 use App\Models\Idea;
 use App\Models\Project;
 use App\Models\Task;
+use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -69,10 +70,20 @@ class AiChatController extends Controller
             ->toArray();
 
         try {
-            $client = OpenAI::factory()
+            $factory = OpenAI::factory()
                 ->withApiKey(config('services.openai.key'))
-                ->withBaseUri(config('services.openai.base_url'))
-                ->make();
+                ->withBaseUri(config('services.openai.base_url'));
+
+            $disableSslVerification = (bool) config('services.openai.disable_ssl_verification', false);
+            $caBundle = config('services.openai.ca_bundle');
+
+            if ($disableSslVerification) {
+                $factory->withHttpClient(new GuzzleClient(['verify' => false]));
+            } elseif (filled($caBundle) && is_string($caBundle) && file_exists($caBundle)) {
+                $factory->withHttpClient(new GuzzleClient(['verify' => $caBundle]));
+            }
+
+            $client = $factory->make();
 
             $response = $client->chat()->create([
                 'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
