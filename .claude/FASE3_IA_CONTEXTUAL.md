@@ -4,66 +4,66 @@ Objetivo: sustituir el chat IA genérico por 3 acciones muy concretas apoyadas e
 
 ## 1. Modelo y migración de AiLog
 
-- [ ] Verificar que la migración `create_ai_logs_table` ya existe (Fase 1)
-- [ ] Crear modelo `AiLog` (si no se creó) con:
-  - [ ] `belongsTo(User::class)`
-  - [ ] `belongsTo(Project::class)` nullable
-  - [ ] `$fillable`: `user_id`, `project_id`, `action_type`, `input_context`, `output_text`
-  - [ ] `$casts`: `input_context` → array
+- [x] Verificar que la migración `create_ai_logs_table` ya existe (Fase 1)
+- [x] Crear modelo `AiLog` (si no se creó) con:
+  - [x] `belongsTo(User::class)`
+  - [x] `belongsTo(Project::class)` nullable
+  - [x] `$fillable`: `user_id`, `project_id`, `action_type`, `input_context`, `output_text`
+  - [x] `$casts`: `input_context` → array
 
 ## 2. AiController (nuevo)
 
-- [ ] Crear `app/Http/Controllers/AiController.php`
-- [ ] Método `planDay()`:
-  - [ ] Recoge todas las tareas pendientes de todos los clientes
-  - [ ] Llama al proveedor IA usando `config('services.openai.*')`
-  - [ ] Devuelve lista priorizada de 3–5 acciones con justificación
-  - [ ] Guarda la petición y respuesta en `ai_logs`
-- [ ] Método `clientSummary(Project $project)`:
-  - [ ] Recoge datos de ficha (tareas, ideas, recursos, fechas)
-  - [ ] Genera resumen de 3–4 líneas
-  - [ ] Guarda en `ai_logs`
-- [ ] Método `clientUpdate(Project $project)`:
-  - [ ] Recoge tareas completadas, pendientes y notas recientes
-  - [ ] Genera texto tipo update profesional listo para email/Slack
-  - [ ] Guarda en `ai_logs`
+- [x] Crear `app/Http/Controllers/AiController.php`
+- [x] Método `planDay()`:
+  - [x] Recoge todas las tareas pendientes de todos los clientes
+  - [x] Llama al proveedor IA usando `config('services.openai.*')`
+  - [x] Devuelve lista priorizada de 3–5 acciones con justificación
+  - [x] Guarda la petición y respuesta en `ai_logs`
+- [x] Método `clientSummary(Project $project)`:
+  - [x] Recoge datos de ficha (tareas, ideas, recursos, fechas)
+  - [x] Genera resumen de 3–4 líneas
+  - [x] Guarda en `ai_logs`
+- [x] Método `clientUpdate(Project $project)`:
+  - [x] Recoge tareas completadas, pendientes y notas recientes
+  - [x] Genera texto tipo update profesional listo para email/Slack
+  - [x] Guarda en `ai_logs`
 
 ## 3. Rutas IA
 
-- [ ] Añadir en `routes/web.php` (grupo premium_user):
-  - [ ] `POST /ai/plan-day` → `AiController@planDay`
-  - [ ] `POST /ai/client-summary/{project}` → `AiController@clientSummary`
-  - [ ] `POST /ai/client-update/{project}` → `AiController@clientUpdate`
+- [x] Añadir en `routes/web.php` (grupo premium_user):
+  - [x] `POST /ai/plan-day` → `AiController@planDay`
+  - [x] `POST /ai/client-summary/{project}` → `AiController@clientSummary`
+  - [x] `POST /ai/client-update/{project}` → `AiController@clientUpdate`
 
 ## 4. Integración frontend
 
 ### 4.1 Dashboard
 
-- [ ] Añadir botón "Planifica mi día" que:
-  - [ ] Lanza petición POST a `/ai/plan-day`
-  - [ ] Muestra resultado (lista de 3–5 tareas) en un panel o modal
-  - [ ] Muestra modal de upgrade si el usuario es `free_user`
+- [x] Añadir botón "Planifica mi día" que:
+  - [x] Lanza petición POST a `/ai/plan-day`
+  - [x] Muestra resultado (lista de 3–5 tareas) en un panel o modal
+  - [x] Muestra modal de upgrade si el usuario es `free_user`
 
 ### 4.2 Ficha de cliente
 
-- [ ] Añadir botón "Recuérdame cómo está este cliente" que:
-  - [ ] Lanza POST a `/ai/client-summary/{id}`
-  - [ ] Muestra resumen en un panel o toast
-- [ ] Añadir botón "Prepárame un update para enviarle" que:
-  - [ ] Lanza POST a `/ai/client-update/{id}`
-  - [ ] Muestra texto para copiar/pegar en email/Slack
+- [x] Añadir botón "Recuérdame cómo está este cliente" que:
+  - [x] Lanza POST a `/ai/client-summary/{id}`
+  - [x] Muestra resumen en un panel o toast
+- [x] Añadir botón "Prepárame un update para enviarle" que:
+  - [x] Lanza POST a `/ai/client-update/{id}`
+  - [x] Muestra texto para copiar/pegar en email/Slack
 
 ## 5. Eliminación del chat IA genérico
 
-- [ ] Asegurarse de que `AiChatController` y las rutas `ai-chats` ya no se usan
-- [ ] Eliminar vistas/pages relacionadas con chat libre
-- [ ] Confirmar que ninguna parte del frontend referencia aún `ai-chats`
+- [x] Asegurarse de que `AiChatController` y las rutas `ai-chats` ya no se usan
+- [x] Eliminar vistas/pages relacionadas con chat libre
+- [x] Confirmar que ninguna parte del frontend referencia aún `ai-chats`
 
 ## 6. Tests
 
-- [ ] Crear `tests/Feature/AiControllerTest.php` con al menos:
-  - [ ] `planDay_returns_prioritized_actions_for_premium_user`
-  - [ ] `clientSummary_returns_summary_for_given_project`
-  - [ ] `clientUpdate_returns_update_text_for_given_project`
-  - [ ] Tests de autorización (free_user no accede, premium_user sí)
-- [ ] Ejecutar `php artisan test`
+- [x] Crear `tests/Feature/AiControllerTest.php` con al menos:
+  - [x] `planDay_returns_prioritized_actions_for_premium_user`
+  - [x] `clientSummary_returns_summary_for_given_project`
+  - [x] `clientUpdate_returns_update_text_for_given_project`
+  - [x] Tests de autorización (free_user no accede, premium_user sí)
+- [x] Ejecutar `php artisan test`

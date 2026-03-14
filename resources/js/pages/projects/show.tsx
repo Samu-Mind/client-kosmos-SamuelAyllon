@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,10 @@ import {
     Sparkles,
     AlertCircle,
     FolderKanban,
+    Loader2,
+    X,
+    Copy,
+    Check,
 } from 'lucide-react';
 
 interface TasksSummary {
@@ -68,6 +73,56 @@ export default function ProjectShow({ project, recentCompleted, upcomingPending,
     const { props } = usePage<{ flash?: { success?: string } }>();
     const flash = props.flash;
 
+    const [summaryLoading, setSummaryLoading] = useState(false);
+    const [summaryResult, setSummaryResult] = useState<string | null>(null);
+    const [summaryCopied, setSummaryCopied] = useState(false);
+    const [updateLoading, setUpdateLoading] = useState(false);
+    const [updateResult, setUpdateResult] = useState<string | null>(null);
+    const [updateCopied, setUpdateCopied] = useState(false);
+
+    const csrfToken = () =>
+        decodeURIComponent(document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '');
+
+    const handleSummary = () => {
+        setSummaryLoading(true);
+        setSummaryResult(null);
+        fetch(`/ai/client-summary/${project.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': csrfToken(),
+            },
+        })
+            .then(res => res.json())
+            .then(data => setSummaryResult(data.output ?? 'Sin respuesta.'))
+            .catch(() => setSummaryResult('Error al conectar con la IA.'))
+            .finally(() => setSummaryLoading(false));
+    };
+
+    const handleUpdate = () => {
+        setUpdateLoading(true);
+        setUpdateResult(null);
+        fetch(`/ai/client-update/${project.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': csrfToken(),
+            },
+        })
+            .then(res => res.json())
+            .then(data => setUpdateResult(data.output ?? 'Sin respuesta.'))
+            .catch(() => setUpdateResult('Error al conectar con la IA.'))
+            .finally(() => setUpdateLoading(false));
+    };
+
+    const copyText = (text: string, setter: (v: boolean) => void) => {
+        navigator.clipboard.writeText(text);
+        setter(true);
+        setTimeout(() => setter(false), 2000);
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={project.name} />
@@ -100,12 +155,30 @@ export default function ProjectShow({ project, recentCompleted, upcomingPending,
                         <div className="flex shrink-0 gap-2">
                             {isPremium && (
                                 <>
-                                    <Button variant="outline" size="sm" className="gap-2 border-2" disabled>
-                                        <Sparkles className="h-4 w-4" />
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-2 border-2"
+                                        disabled={summaryLoading}
+                                        onClick={handleSummary}
+                                    >
+                                        {summaryLoading
+                                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                                            : <Sparkles className="h-4 w-4" />
+                                        }
                                         Resume cliente
                                     </Button>
-                                    <Button variant="outline" size="sm" className="gap-2 border-2" disabled>
-                                        <FileText className="h-4 w-4" />
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-2 border-2"
+                                        disabled={updateLoading}
+                                        onClick={handleUpdate}
+                                    >
+                                        {updateLoading
+                                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                                            : <FileText className="h-4 w-4" />
+                                        }
                                         Genera update
                                     </Button>
                                 </>
@@ -134,6 +207,56 @@ export default function ProjectShow({ project, recentCompleted, upcomingPending,
                         </div>
                         <span className="text-sm font-medium text-green-700 dark:text-green-400">{flash.success}</span>
                     </div>
+                )}
+
+                {/* Resultado de Resume cliente */}
+                {summaryResult && (
+                    <Card className="overflow-hidden border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-transparent">
+                        <CardHeader className="flex flex-row items-center justify-between pb-3">
+                            <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                    <Sparkles className="h-4 w-4 text-purple-600" />
+                                </div>
+                                <CardTitle className="text-base">Resumen del cliente</CardTitle>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <Button size="sm" variant="ghost" onClick={() => copyText(summaryResult, setSummaryCopied)} className="h-8 w-8 p-0">
+                                    {summaryCopied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => setSummaryResult(null)} className="h-8 w-8 p-0">
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-2">
+                            <p className="text-sm whitespace-pre-line">{summaryResult}</p>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Resultado de Genera update */}
+                {updateResult && (
+                    <Card className="overflow-hidden border-2 border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent">
+                        <CardHeader className="flex flex-row items-center justify-between pb-3">
+                            <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                    <FileText className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <CardTitle className="text-base">Update para el cliente</CardTitle>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <Button size="sm" variant="ghost" onClick={() => copyText(updateResult, setUpdateCopied)} className="h-8 w-8 p-0">
+                                    {updateCopied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => setUpdateResult(null)} className="h-8 w-8 p-0">
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-2">
+                            <p className="text-sm whitespace-pre-line">{updateResult}</p>
+                        </CardContent>
+                    </Card>
                 )}
 
                 {/* Estadísticas rápidas */}

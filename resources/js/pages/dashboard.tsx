@@ -13,6 +13,10 @@ import {
     AlertTriangle,
     CalendarClock,
     FolderKanban,
+    Loader2,
+    X,
+    Copy,
+    Check,
 } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import TutorialChatbot from '@/components/tutorial-chatbot';
@@ -45,6 +49,36 @@ export default function Dashboard({ todayTasks, activeProjects, atRiskProjects, 
                    || subscription?.plan === 'premium_yearly';
 
     const [showTutorial, setShowTutorial] = useState(!auth.user.tutorial_completed_at);
+    const [planLoading, setPlanLoading] = useState(false);
+    const [planResult, setPlanResult] = useState<string | null>(null);
+    const [planCopied, setPlanCopied] = useState(false);
+
+    const handlePlanDay = () => {
+        setPlanLoading(true);
+        setPlanResult(null);
+        fetch('/ai/plan-day', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': decodeURIComponent(
+                    document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? ''
+                ),
+            },
+        })
+            .then(res => res.json())
+            .then(data => setPlanResult(data.output ?? 'Sin respuesta.'))
+            .catch(() => setPlanResult('Error al conectar con la IA. Inténtalo más tarde.'))
+            .finally(() => setPlanLoading(false));
+    };
+
+    const copyPlan = () => {
+        if (planResult) {
+            navigator.clipboard.writeText(planResult);
+            setPlanCopied(true);
+            setTimeout(() => setPlanCopied(false), 2000);
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -76,8 +110,16 @@ export default function Dashboard({ todayTasks, activeProjects, atRiskProjects, 
                         </div>
                         <div className="flex items-center gap-2 self-start sm:self-auto">
                             {isPremium && (
-                                <Button variant="outline" className="gap-2 border-2" disabled>
-                                    <Sparkles className="h-4 w-4" />
+                                <Button
+                                    variant="outline"
+                                    className="gap-2 border-2"
+                                    disabled={planLoading}
+                                    onClick={handlePlanDay}
+                                >
+                                    {planLoading
+                                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                                        : <Sparkles className="h-4 w-4" />
+                                    }
                                     Planifica mi día
                                 </Button>
                             )}
@@ -91,6 +133,33 @@ export default function Dashboard({ todayTasks, activeProjects, atRiskProjects, 
                         </div>
                     </div>
                 </div>
+
+                {/* Resultado de Planifica mi día */}
+                {planResult && (
+                    <Card className="overflow-hidden border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-transparent">
+                        <CardHeader className="flex flex-row items-center justify-between pb-3 bg-gradient-to-r from-purple-500/5 to-transparent">
+                            <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                    <Sparkles className="h-4 w-4 text-purple-600" />
+                                </div>
+                                <CardTitle className="text-base">Tu plan para hoy</CardTitle>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <Button size="sm" variant="ghost" onClick={copyPlan} className="h-8 w-8 p-0">
+                                    {planCopied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => setPlanResult(null)} className="h-8 w-8 p-0">
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-4">
+                            <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-line text-sm">
+                                {planResult}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Tareas críticas del día, agrupadas por cliente */}
                 <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg">
