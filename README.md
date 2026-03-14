@@ -1,12 +1,12 @@
 # Flowly
 
-> **Plataforma de Productividad Personal — Tu Centro de Mando Integrado**
+> **Tu memoria operativa por cliente — Gestiona freelance sin perder contexto**
 
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=flat-square&logo=php)](https://www.php.net)
-[![Tests](https://img.shields.io/badge/Tests-191%20cases-brightgreen?style=flat-square)]()
+[![Tests](https://img.shields.io/badge/Tests-156%20cases-brightgreen?style=flat-square)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
 ---
@@ -16,6 +16,7 @@
 - [Acerca de](#acerca-de)
 - [Modelo Freemium](#modelo-freemium)
 - [Features](#features)
+- [Fases del Desarrollo](#fases-del-desarrollo)
 - [Requisitos](#requisitos)
 - [Instalacion Rapida](#instalacion-rapida)
 - [Credenciales de Prueba](#credenciales-de-prueba)
@@ -36,33 +37,33 @@
 
 ## Acerca de
 
-**Flowly** es una plataforma web de productividad personal freemium que actua como un **centro de mando integrado**. Nace de la necesidad de los estudiantes y profesionales jovenes de tener un unico lugar donde gestionar tareas, capturar ideas, organizar recursos y recibir asistencia inteligente, sin saltar entre multiples herramientas.
+**Flowly** es una plataforma web freemium pensada para **freelancers que gestionan varios clientes a la vez**. Cada cliente tiene su propia ficha con tareas, notas, recursos y contexto, de modo que al cambiar de cliente retomas justo donde lo dejaste.
 
 ### Que problema resuelve
 
-La fragmentacion de herramientas de productividad (una app para tareas, otra para notas, otra para enlaces, otra para IA) genera:
-- **Friccion cognitiva**: cambiar constantemente de contexto reduce la concentracion.
-- **Perdida de informacion**: las ideas se quedan en notas sueltas, los enlaces utiles se pierden en marcadores.
-- **Barrera de entrada**: muchas herramientas son de pago o demasiado complejas para un uso personal.
+La fragmentacion de herramientas (una app para tareas, otra para notas, otra para enlaces) genera:
+- **Perdida de contexto**: al saltar de un cliente a otro se pierden detalles cruciales.
+- **Informacion dispersa**: notas sueltas, enlaces en marcadores, tareas sin vincular a quien pertenecen.
+- **Falta de vision diaria**: no hay un lugar que muestre "que tengo que hacer hoy y para quien".
 
-Flowly unifica estas necesidades en una sola plataforma con un modelo freemium accesible:
+Flowly unifica estas necesidades en fichas de cliente con:
 
-- **Tareas** con prioridades, fechas de vencimiento y asignacion a proyectos
-- **Ideas** para captura rapida de inspiraciones
-- **Proyectos** que agrupan tareas con seguimiento de progreso *(Premium)*
-- **Cajas de Recursos** para centralizar enlaces, documentos y videos *(Premium)*
-- **Dictado por Voz** para crear tareas e ideas hablando *(Premium)*
-- **Asistente IA** conversacional con contexto real del usuario *(Premium)*
+- **Clientes** como unidad central: cada cliente agrupa tareas, notas e ideas, y recursos
+- **Tareas** con prioridades, fechas de vencimiento y vinculacion a cliente
+- **Notas e ideas** para captura rapida, ligadas a un cliente
+- **Recursos** (enlaces, documentos, videos) organizados dentro de cada ficha *(Solo)*
+- **IA contextual** con 3 acciones inteligentes: resumen de cliente, sugerencia de siguientes pasos y redaccion de emails *(Solo)*
+- **Panel Hoy** que muestra todas las tareas del dia agrupadas por cliente
 
 ---
 
 ## Modelo Freemium
 
-| Plan | Precio | Tareas | Ideas | Proyectos | Voz | IA |
-|------|--------|--------|-------|-----------|-----|-----|
-| **Free** | 0 EUR | 5 max pendientes | Ilimitadas | -- | -- | -- |
-| **Premium Mensual** | 9,99 EUR/mes | Ilimitadas | Ilimitadas | Si | Si | Si |
-| **Premium Anual** | 99,99 EUR/ano | Ilimitadas | Ilimitadas | Si | Si | Si |
+| Plan | Precio | Clientes | Tareas | Notas | Recursos | IA |
+|------|--------|----------|--------|-------|----------|-----|
+| **Gratuito** | 0 € | 1 | 5 max pendientes | Ilimitadas | — | — |
+| **Solo Mensual** | 11,99 €/mes | Ilimitados | Ilimitadas | Ilimitadas | Si | 3 acciones |
+| **Solo Anual** | 119 €/ano | Ilimitados | Ilimitadas | Ilimitadas | Si | 3 acciones |
 
 ---
 
@@ -70,25 +71,43 @@ Flowly unifica estas necesidades en una sola plataforma con un modelo freemium a
 
 ### Core (Todos los Usuarios)
 - Autenticacion completa: registro, login, recuperacion de contrasena, verificacion email, 2FA (Fortify)
-- Gestor de tareas con limite free (5 pendientes max) — CRUD completo + completar/reabrir
-- Gestor de ideas sin limite — CRUD completo + resolver/reactivar
+- Fichas de cliente con nombre, descripcion, color y estado (activo/inactivo/completado)
+- Gestor de tareas vinculadas a cliente con limite free (5 pendientes max) — CRUD + completar/reabrir
+- Gestor de notas/ideas sin limite — CRUD + resolver/reactivar
+- Panel Hoy con tareas del dia agrupadas por cliente
 - Checkout y suscripcion simulada (80% exito / 20% fallo)
 - Dashboard personal con datos reales condicional por plan
 - Tutorial interactivo con tour guiado (spotlight + chatbot) para nuevos usuarios
 - Landing page completa (hero, features, pricing, footer)
 - Modo oscuro/claro con persistencia
 
-### Premium
-- Proyectos con agrupacion de tareas, colores y barra de progreso
-- Cajas de recursos (enlaces, documentos, videos, imagenes)
-- Transcripcion de voz con OpenAI Whisper (quick-create + dictado en formulario)
-- Asistente IA conversacional con contexto real del usuario (Groq Llama 3.3 / OpenAI GPT)
+### Solo (Premium)
+- Clientes ilimitados
+- Tareas ilimitadas
+- Recursos por cliente (enlaces, documentos, videos, imagenes)
+- IA contextual — 3 acciones por cliente:
+  - `planDay`: planifica tu dia con la informacion de todos tus clientes
+  - `clientSummary`: resume el estado actual de un cliente
+  - `clientUpdate`: redacta un email de seguimiento para un cliente
 
 ### Admin
 - Dashboard con estadisticas globales
-- Gestion de usuarios (lista paginada + detalle + eliminacion con AlertDialog)
+- Gestion de usuarios (lista paginada + detalle + eliminacion)
 - Historial de pagos con resumen de ingresos
 - Control de suscripciones con distribucion por plan
+
+---
+
+## Fases del Desarrollo
+
+El proyecto se desarrollo en 4 fases incrementales:
+
+| Fase | Descripcion | Estado |
+|------|-------------|--------|
+| **Fase 1** | Restructuracion backend: "Proyectos" → "Clientes", eliminacion de Cajas/Voz/Chat, limpieza de rutas y modelos | ✅ |
+| **Fase 2** | Ficha de cliente completa (tareas + notas + recursos en una sola vista) y dashboard "Panel Hoy" | ✅ |
+| **Fase 3** | IA contextual con 3 endpoints: plan-day, client-summary, client-update (Groq/OpenAI) | ✅ |
+| **Fase 4** | Pulido, landing page, precios actualizados (11,99/119 €), datos demo en seeders, README | ✅ |
 
 ---
 
@@ -105,7 +124,7 @@ SQLite (incluido con PHP) — para desarrollo local
 
 **Opcional:**
 ```
-OpenAI API Key o Groq API Key (gratuita) — para Whisper y asistente IA
+Groq API Key (gratuita) o OpenAI API Key — para IA contextual
 ```
 
 ---
@@ -136,7 +155,9 @@ touch database/database.sqlite
 php artisan migrate:fresh --seed
 ```
 
-### 5. Variables de entorno opcionales (IA y voz)
+Esto crea 3 usuarios de prueba con datos demo: clientes, tareas, notas y recursos.
+
+### 5. Variables de entorno opcionales (IA contextual)
 ```env
 # Groq (gratuito, recomendado)
 OPENAI_API_KEY=gsk_xxxxxxxxxxxxxxxx
@@ -169,11 +190,11 @@ http://localhost:8000
 
 Despues de `php artisan migrate:fresh --seed`:
 
-| Rol | Email | Password |
-|-----|-------|----------|
-| Admin | admin@flowly.test | password |
-| Premium User | premium@flowly.test | password |
-| Free User | free@flowly.test | password |
+| Rol | Email | Password | Datos demo |
+|-----|-------|----------|------------|
+| Admin | admin@flowly.test | password | — |
+| Premium (Solo) | premium@flowly.test | password | 3 clientes, tareas, notas, recursos |
+| Free | free@flowly.test | password | 1 cliente, 3 tareas, 1 nota |
 
 ---
 
@@ -187,8 +208,8 @@ Despues de `php artisan migrate:fresh --seed`:
 | Eloquent | (Laravel 12) | ORM |
 | Laravel Fortify | 1.x | Autenticacion (login, registro, 2FA, verificacion) |
 | Spatie Permission | 7.x | Roles y permisos (admin, premium_user, free_user) |
-| Pest | 3.x | Testing (191 test cases) |
-| openai-php/client | 0.19 | Integracion OpenAI Whisper + Chat IA |
+| Pest | 3.x | Testing (156 test cases) |
+| openai-php/client | 0.19 | Integracion IA contextual (Groq/OpenAI) |
 | Laravel Wayfinder | 0.1.9 | Generacion de rutas tipadas para TypeScript |
 
 ### Frontend
@@ -198,7 +219,7 @@ Despues de `php artisan migrate:fresh --seed`:
 | React | 19 | UI interactiva |
 | TypeScript | 5.7 | Tipado estatico |
 | Inertia.js | 2.3 | Puente Laravel-React (SPA monolitica sin API REST) |
-| shadcn/ui | -- | 28 componentes UI (Radix UI + Tailwind) |
+| shadcn/ui | — | Componentes UI (Radix UI + Tailwind) |
 | Tailwind CSS | 4.0 | Estilos utility-first con tokens custom |
 | Lucide React | 0.475 | Iconos |
 | Vite | 7 | Bundler con React Compiler |
@@ -214,9 +235,8 @@ Despues de `php artisan migrate:fresh --seed`:
 
 | Servicio | Uso | Plan gratuito |
 |---------|-----|---------------|
-| Groq (recomendado) | Chat IA — Llama 3.3 70B | 14.400 req/dia |
-| OpenAI Whisper | Transcripcion de voz | De pago |
-| OpenAI GPT | Chat IA alternativo | De pago |
+| Groq (recomendado) | IA contextual — Llama 3.3 70B | 14.400 req/dia |
+| OpenAI GPT | IA contextual alternativa | De pago |
 
 ---
 
@@ -237,11 +257,11 @@ Flowly sigue el patron **SPA monolitica** con Inertia.js: el backend Laravel ren
 ```
 
 ### Decisiones clave
-- **Hard delete** en Task e Idea (SoftDeletes eliminado en sesion 2; columna `deleted_at` existe pero Eloquent no la usa)
+- **Clientes = Projects**: internamente el modelo se llama `Project`, las URLs usan `/clients` y la UI dice "Clientes"
+- **Hard delete** en Task e Idea (SoftDeletes eliminado)
 - **Limite de tareas free**: `User::canAddTask()` cuenta tareas con `status='pending'`
 - **Pago simulado**: `Payment::process()` con 80% exito, almacena solo ultimos 4 digitos de tarjeta
-- **IA context-aware**: el system prompt incluye tareas pendientes, ideas activas y estadisticas del usuario
-- **AiConversation** usa `$timestamps = false` (solo `created_at`)
+- **IA contextual**: 3 endpoints que leen tareas, notas y recursos del cliente para generar respuestas utiles
 - **Ruta home**: `inertia('welcome')` sin redirect a login (requerido por tests)
 
 ---
@@ -252,69 +272,65 @@ Flowly sigue el patron **SPA monolitica** con Inertia.js: el backend Laravel ren
 flowly/
 ├── app/
 │   ├── Http/
-│   │   ├── Controllers/          ← 20 controllers
+│   │   ├── Controllers/
 │   │   │   ├── TaskController.php
 │   │   │   ├── IdeaController.php
-│   │   │   ├── ProjectController.php
-│   │   │   ├── BoxController.php
-│   │   │   ├── ResourceController.php
+│   │   │   ├── ProjectController.php         ← Fichas de cliente
+│   │   │   ├── ResourceController.php        ← Recursos por cliente
+│   │   │   ├── AiController.php              ← IA contextual (3 acciones)
+│   │   │   ├── DashboardController.php       ← Panel Hoy
 │   │   │   ├── SubscriptionController.php
 │   │   │   ├── CheckoutController.php
-│   │   │   ├── VoiceRecordingController.php   ← Whisper API
-│   │   │   ├── AiChatController.php           ← Chat IA (Groq/OpenAI)
-│   │   │   ├── TutorialController.php         ← Tour guiado
+│   │   │   ├── TutorialController.php
 │   │   │   └── Admin/
 │   │   │       ├── AdminDashboardController.php
 │   │   │       ├── AdminUserController.php
 │   │   │       ├── AdminPaymentController.php
 │   │   │       └── AdminSubscriptionController.php
-│   │   └── Requests/                          ← 17 Form Requests
-│   ├── Models/                                ← 10 modelos
+│   │   └── Requests/                          ← Form Requests
+│   ├── Models/
 │   │   ├── User.php           ← canAddTask(), getDashboardData(), roles
 │   │   ├── Task.php           ← scopes, prioridades, hard delete
 │   │   ├── Idea.php           ← resolve/reactivate, convertToTask()
-│   │   ├── Project.php        ← getProgressPercentage()
-│   │   ├── Box.php / Resource.php
+│   │   ├── Project.php        ← getProgressPercentage(), "cliente"
+│   │   ├── Resource.php       ← Recursos vinculados a cliente
 │   │   ├── Subscription.php   ← upgradeToPremium(), hasExpired()
 │   │   ├── Payment.php        ← process() simula 80%/20%
-│   │   ├── AiConversation.php ← $timestamps = false
-│   │   └── VoiceRecording.php
-│   └── Policies/                              ← 5 policies (ownership)
+│   │   └── AiLog.php          ← Registro de uso de IA
+│   └── Policies/              ← 4 policies (ownership)
 ├── database/
-│   ├── migrations/            ← 16 migraciones
-│   └── seeders/               ← RoleSeeder + UserSeeder (3 usuarios)
+│   ├── migrations/
+│   └── seeders/               ← RoleSeeder + UserSeeder (3 usuarios con datos demo)
 ├── resources/
 │   ├── css/app.css            ← Design system Flowly (tokens, animaciones)
-│   ├── views/app.blade.php    ← Entrada HTML (fuentes bunny.net)
 │   └── js/
-│       ├── pages/             ← 36 paginas React
-│       │   ├── welcome.tsx         ← Landing page (1100+ lineas)
-│       │   ├── dashboard.tsx       ← Dashboard condicional free/premium
+│       ├── pages/
+│       │   ├── welcome.tsx         ← Landing page
+│       │   ├── dashboard.tsx       ← Panel Hoy condicional free/premium
 │       │   ├── tasks/              ← index, create, edit
-│       │   ├── ideas/              ← index, create, edit
-│       │   ├── projects/           ← index, show, create, edit
-│       │   ├── boxes/              ← index, show, create, edit
+│       │   ├── ideas/              ← index, create, edit (notas)
+│       │   ├── projects/           ← index, show, create, edit (clientes)
 │       │   ├── resources/          ← create, edit
-│       │   ├── ai-chats/           ← Chat IA
 │       │   ├── subscription/       ← Planes
 │       │   ├── checkout/           ← Pago
 │       │   ├── admin/              ← Panel admin (4 vistas)
 │       │   ├── auth/               ← Login, registro, 2FA, etc.
 │       │   └── settings/           ← Perfil, contrasena, apariencia, 2FA
 │       ├── components/
-│       │   ├── ui/                 ← 28 componentes shadcn/ui
-│       │   ├── tutorial-chatbot.tsx ← Tour con spotlight
-│       │   └── voice-recorder.tsx   ← MediaRecorder + Whisper
-│       ├── types/                  ← TypeScript types (models, pages, admin)
-│       ├── hooks/                  ← 7 custom hooks
+│       │   ├── ui/                 ← Componentes shadcn/ui
+│       │   └── tutorial-chatbot.tsx ← Tour con spotlight
+│       ├── types/                  ← TypeScript types
+│       ├── hooks/                  ← Custom hooks
 │       └── layouts/                ← App (sidebar) + Auth (centered)
 ├── routes/
 │   ├── web.php                ← Todas las rutas
 │   └── settings.php           ← Rutas de configuracion
-├── tests/Feature/             ← 27 archivos, 191 test cases
+├── tests/Feature/             ← 156 test cases
 ├── docs/
 │   ├── manual-usuario.md
-│   └── decisiones-tecnicas.md
+│   ├── decisiones-tecnicas.md
+│   ├── necesidad-y-justificacion.md
+│   └── guia-estilos.md
 ├── Dockerfile                 ← Multi-stage build (Node + PHP)
 ├── docker-compose.yml
 └── docker-entrypoint.sh       ← Migraciones + seed automaticos
@@ -366,14 +382,13 @@ composer lint              # Laravel Pint
 
 **`admin`** — Solo panel de administracion
 - /admin/dashboard, /admin/users, /admin/payments, /admin/subscriptions
-- NO accede a /projects, /boxes, /resources, /ai-chats
 
-**`premium_user`** — Acceso completo de usuario
-- Tareas ilimitadas, proyectos, cajas, voz, IA
+**`premium_user`** — Acceso completo (plan Solo)
+- Clientes ilimitados, tareas ilimitadas, recursos, IA contextual
 
 **`free_user`** — Acceso limitado
-- Ideas ilimitadas, maximo 5 tareas pendientes simultaneas
-- Sin proyectos, voz ni IA
+- 1 cliente, maximo 5 tareas pendientes, notas ilimitadas
+- Sin recursos ni IA contextual
 
 ### Capas de proteccion
 
@@ -397,24 +412,24 @@ GET  /register  Registro
 
 ### Autenticadas (todos los roles)
 ```
-GET/POST/PUT/DELETE  /tasks           Gestion de tareas
+GET/POST/PUT/DELETE  /clients         Fichas de cliente (CRUD)
+PATCH                /clients/{id}/complete
+GET/POST/PUT/DELETE  /tasks           Tareas vinculadas a cliente
 PATCH                /tasks/{id}/complete | /reopen
-GET/POST/PUT/DELETE  /ideas           Gestion de ideas
-PATCH                /ideas/{id}/resolve | /reactivate
+GET/POST/PUT/DELETE  /notes           Notas e ideas
+PATCH                /notes/{id}/resolve | /reactivate
 GET                  /subscription    Ver suscripcion
 GET/POST             /checkout        Pago simulado
 POST                 /tutorial/complete  Marcar tutorial completado
 ```
 
-### Premium (solo `premium_user`)
+### Solo / Premium (solo `premium_user`)
 ```
-GET/POST/PUT/DELETE  /projects                    Proyectos
-PATCH                /projects/{id}/complete
-GET/POST/PUT/DELETE  /boxes                       Cajas
-GET/POST             /boxes/{box}/resources       Recursos en cajas
-GET/PUT/DELETE       /resources/{resource}        Editar/eliminar recurso
-POST                 /voice/transcribe            Transcripcion Whisper
-GET/POST/DELETE      /ai-chats                    Chat con IA
+POST  /ai/plan-day                    Planificar el dia con IA
+POST  /ai/client-summary/{project}    Resumen de cliente con IA
+POST  /ai/client-update/{project}     Email de seguimiento con IA
+GET/POST      /clients/{project}/resources    Recursos del cliente
+PUT/DELETE    /resources/{resource}            Editar/eliminar recurso
 ```
 
 ### Admin (solo `admin`)
@@ -434,18 +449,17 @@ GET         /admin/subscriptions
 php artisan test
 ```
 
-**191 test cases — 100% pasando**
+**156 test cases — 100% pasando**
 
 | Area | Cobertura |
 |------|-----------|
 | Auth | Registro, login, verificacion email, reset password, 2FA |
 | Tasks | CRUD, completar/reabrir, limite free, autorizacion |
-| Ideas | CRUD, resolver/reactivar, autorizacion |
-| Projects | CRUD, completar, ownership |
-| Boxes/Resources | CRUD anidado, autorizacion |
+| Notes | CRUD, resolver/reactivar, autorizacion |
+| Clients | CRUD, completar, ownership |
+| Resources | CRUD anidado bajo cliente, autorizacion |
 | Checkout | Flujo exito/fallo, validacion tarjeta |
-| Voice | Transcripcion, errores |
-| AI Chat | Store, destroy, historial, control de roles |
+| IA contextual | plan-day, client-summary, client-update, control de roles |
 | Admin | Dashboard, usuarios, pagos, suscripciones |
 | Settings | Perfil, contrasena, 2FA |
 
@@ -489,7 +503,7 @@ DB_CONNECTION=sqlite
 # Sesion
 SESSION_DRIVER=file
 
-# IA (Groq gratuito, recomendado)
+# IA contextual (Groq gratuito, recomendado)
 OPENAI_API_KEY=gsk_xxxxxxxxxxxxxxxx
 OPENAI_BASE_URL=https://api.groq.com/openai/v1
 OPENAI_MODEL=llama-3.3-70b-versatile
@@ -506,7 +520,6 @@ OPENAI_MODEL=llama-3.3-70b-versatile
 | RoleDoesNotExist | `php artisan migrate:fresh --seed` |
 | database.sqlite no existe | `touch database/database.sqlite && php artisan migrate --seed` |
 | Frontend no actualiza | Reiniciar `npm run dev` o Ctrl+Shift+R |
-| Rate limit en chat IA | Verificar creditos de API key o usar Groq |
 
 ---
 
@@ -518,6 +531,7 @@ OPENAI_MODEL=llama-3.3-70b-versatile
 | [docs/decisiones-tecnicas.md](docs/decisiones-tecnicas.md) | Justificacion tecnica de cada decision |
 | [docs/contexto-proyecto.md](docs/contexto-proyecto.md) | Contexto completo y estado del proyecto |
 | [docs/guia-estilos.md](docs/guia-estilos.md) | Guia de estilos y design system |
+| [docs/necesidad-y-justificacion.md](docs/necesidad-y-justificacion.md) | Necesidad y justificacion del proyecto |
 
 ---
 

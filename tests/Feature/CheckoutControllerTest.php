@@ -93,7 +93,7 @@ it('successful payment upgrades user subscription', function () {
     $payment = Payment::create([
         'user_id' => $user->id,
         'plan' => 'premium_monthly',
-        'amount' => 9.99,
+        'amount' => 11.99,
         'status' => 'pending',
         'payment_method' => 'card',
         'transaction_id' => Payment::generateTransactionId(),

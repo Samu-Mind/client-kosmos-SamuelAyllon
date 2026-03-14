@@ -6,15 +6,15 @@
 
 ## 1. Que es Flowly
 
-Flowly es una **plataforma web de productividad personal freemium** desarrollada como **Proyecto Intermodular de 2o DAM** por Samuel Ayllon. Actua como un centro de mando integrado donde el usuario gestiona tareas, ideas, proyectos, recursos y recibe asistencia de IA, todo desde una unica interfaz.
+Flowly es una **plataforma web freemium de gestion multi-cliente para freelancers** desarrollada como **Proyecto Intermodular de 2o DAM** por Samuel Ayllon. Actua como la memoria operativa del freelancer: cada cliente tiene su ficha con tareas, notas y recursos, y la IA contextual ayuda a priorizar y resumir el estado de cada proyecto.
 
 ### Publico objetivo
-- Estudiantes universitarios y de FP que necesitan organizar su carga academica
-- Profesionales jovenes que quieren un hub de productividad sencillo y accesible
-- Usuarios que prefieren una herramienta todo-en-uno frente a multiples apps separadas
+- Freelancers y autonomos que gestionan varios clientes simultaneamente
+- Profesionales creativos (diseno, desarrollo, consultoria) que necesitan organizar entregables por cliente
+- Cualquier profesional independiente que quiera centralizar su gestion de clientes en una sola herramienta
 
 ### Propuesta de valor
-Una plataforma que unifica gestion de tareas, captura de ideas, organizacion de recursos y asistencia IA en un solo lugar, con un modelo freemium que permite empezar gratis y escalar a premium cuando se necesite.
+Una plataforma que organiza toda la gestion del freelancer por cliente: fichas de cliente, tareas asociadas, notas, recursos y asistencia IA contextual, con un modelo freemium que permite empezar gratis (1 cliente) y escalar a Solo (ilimitado) cuando se necesite.
 
 ---
 
@@ -22,7 +22,7 @@ Una plataforma que unifica gestion de tareas, captura de ideas, organizacion de 
 
 ### Resumen
 - **Estado**: Proyecto completado y funcional
-- **Tests**: 191 test cases — 100% pasando
+- **Tests**: 156 test cases — 100% pasando
 - **Features**: Todas las features planificadas estan implementadas
 - **Despliegue**: Docker multi-stage build listo para produccion con TiDB Cloud
 
@@ -31,17 +31,16 @@ Una plataforma que unifica gestion de tareas, captura de ideas, organizacion de 
 | Feature | Estado | Plan |
 |---------|--------|------|
 | Autenticacion (login, registro, 2FA, verificacion email) | Completo | Todos |
-| Gestion de tareas (CRUD + completar/reabrir) | Completo | Todos (5 max free) |
-| Gestion de ideas (CRUD + resolver/reactivar) | Completo | Todos |
-| Dashboard personal condicional | Completo | Todos |
+| Fichas de cliente (CRUD + completar) | Completo | Todos (1 max free) |
+| Gestion de tareas por cliente (CRUD + completar/reabrir) | Completo | Todos (5 max free) |
+| Gestion de notas (CRUD + resolver/reactivar) | Completo | Todos |
+| Dashboard personal condicional (Panel Hoy) | Completo | Todos |
 | Tutorial interactivo (spotlight + chatbot) | Completo | Todos |
 | Landing page | Completo | Publico |
 | Checkout simulado (80/20) | Completo | Todos |
 | Modo oscuro/claro | Completo | Todos |
-| Proyectos con barra de progreso | Completo | Premium |
-| Cajas de recursos | Completo | Premium |
-| Transcripcion de voz (Whisper) | Completo | Premium |
-| Asistente IA conversacional | Completo | Premium |
+| Recursos por cliente | Completo | Solo |
+| IA contextual (planificar dia, resumen cliente, parte semanal) | Completo | Solo |
 | Panel de administracion | Completo | Admin |
 
 ---
@@ -64,22 +63,20 @@ Flowly usa **Inertia.js** como puente entre Laravel y React. No hay API REST: La
 - Validacion (Form Requests con errores automaticos en el frontend)
 - Navegacion (sin router de cliente, Inertia maneja las transiciones)
 
-### Modelos de datos (10)
+### Modelos de datos (8)
 - **User**: Hub central con relaciones a todo. Roles via Spatie. Metodos: `canAddTask()`, `getDashboardData()`, `isFreeUser()`, `isPremiumUser()`, `isAdmin()`
-- **Task**: Prioridades (low/medium/high), status (pending/completed), due_date obligatoria, asignacion opcional a proyecto. Hard delete.
-- **Idea**: Captura rapida. Status (active/resolved), source (manual/voice/ai_suggestion). Hard delete.
-- **Project**: Agrupa tareas. Status (active/inactive/completed). Color personalizable. `getProgressPercentage()`.
-- **Box**: Contenedor de recursos. Categoria opcional.
-- **Resource**: Dentro de una Box. Tipos: link/document/video/image/other.
-- **Subscription**: Plan del usuario (free/premium_monthly/premium_yearly). Control de expiracion.
+- **Task**: Prioridades (low/medium/high), status (pending/completed), due_date obligatoria, asignacion a cliente (project_id). Hard delete.
+- **Idea**: Notas rapidas. Status (active/resolved), source (manual). Hard delete.
+- **Project**: Ficha de cliente. Status (active/inactive/completed). Color personalizable. `getProgressPercentage()`.
+- **Resource**: Recurso asociado a un cliente (project_id). Tipos: link/document/video/image/other.
+- **Subscription**: Plan del usuario (free/solo_monthly/solo_yearly). Control de expiracion.
 - **Payment**: Transacciones simuladas. Solo almacena ultimos 4 digitos de tarjeta.
-- **AiConversation**: Historial de chat IA. Role (user/assistant). Metadata con tokens usados.
-- **VoiceRecording**: Grabaciones de voz. Ciclo: pending -> processing -> completed/failed.
+- **AiLog**: Registro de acciones IA. action_type (plan_day/client_summary/client_update). Guarda input_context y output_text.
 
 ### Seguridad (4 capas)
 1. **Middleware de rutas**: `role:premium_user` y `role:admin` (Spatie)
-2. **Policies**: TaskPolicy, IdeaPolicy, ProjectPolicy, BoxPolicy, ResourcePolicy — solo el owner puede modificar
-3. **Form Requests**: 17 clases de validacion para toda entrada de usuario
+2. **Policies**: TaskPolicy, IdeaPolicy, ProjectPolicy, ResourcePolicy — solo el owner puede modificar
+3. **Form Requests**: Clases de validacion para toda entrada de usuario
 4. **Logica de negocio**: `canAddTask()` para limite free, bloqueo login sin rol asignado
 
 ---
@@ -105,12 +102,12 @@ Se usa `router.delete(url)` de `@inertiajs/react` que genera un HTTP DELETE real
 `Payment::process()` simula un gateway con 80% exito. Solo almacena ultimos 4 digitos (PCI-DSS). Transaction ID formato: `TXN_` + 16 caracteres aleatorios.
 
 ### IA context-aware
-El system prompt del chat IA se genera dinamicamente con:
-- Tareas pendientes del usuario
-- Ideas activas
-- Proyectos activos
-- Estadisticas mensuales
-Esto hace que la IA de respuestas personalizadas y relevantes.
+El `AiController` expone 3 endpoints de IA contextual (no es un chat conversacional):
+- **planDay**: Recoge tareas pendientes del usuario y genera un plan del dia con 3-5 acciones priorizadas.
+- **clientSummary**: Genera un resumen de 3-4 lineas del estado de un cliente (tareas pendientes, completadas, notas).
+- **clientUpdate**: Genera un parte semanal detallado del cliente (progreso, bloqueos, proximos pasos).
+
+El system prompt se genera dinamicamente con datos reales del usuario/cliente.
 
 ### Groq como alternativa gratuita
 La integracion IA soporta tanto OpenAI como Groq (14.400 req/dia gratis). El cambio es transparente: solo se cambian las variables `OPENAI_BASE_URL` y `OPENAI_API_KEY` en `.env`.
@@ -127,13 +124,12 @@ Referencia rapida de todos los valores enum validos:
 | Task | priority | `low`, `medium`, `high` |
 | Project | status | `active`, `inactive`, `completed` |
 | Idea | status | `active`, `resolved` |
-| Idea | source | `manual`, `voice`, `ai_suggestion` |
+| Idea | source | `manual` |
 | Idea | priority | `low`, `medium`, `high` |
-| Subscription | plan | `free`, `premium_monthly`, `premium_yearly` |
+| Subscription | plan | `free`, `solo_monthly`, `solo_yearly` |
 | Resource | type | `link`, `document`, `video`, `image`, `other` |
 | Payment | status | `pending`, `completed`, `failed` |
-| VoiceRecording | status | `pending`, `processing`, `completed`, `failed` |
-| AiConversation | role | `user`, `assistant` |
+| AiLog | action_type | `plan_day`, `client_summary`, `client_update` |
 
 ---
 
@@ -143,7 +139,7 @@ Referencia rapida de todos los valores enum validos:
 - **Motor**: SQLite
 - **Archivo**: `database/database.sqlite`
 - **Migraciones**: 16 archivos
-- **Seeders**: RoleSeeder (3 roles) + UserSeeder (3 usuarios de prueba)
+- **Seeders**: RoleSeeder (3 roles) + UserSeeder (3 usuarios de prueba con datos demo: clientes, tareas, notas, recursos)
 
 ### Produccion
 - **Motor**: TiDB Cloud Serverless (MySQL-compatible)
@@ -157,13 +153,11 @@ Referencia rapida de todos los valores enum validos:
 2. permission_tables (Spatie roles/permissions)
 3. subscriptions (plan, status, started_at, expires_at)
 4. payments (plan, amount, status, payment_method, transaction_id)
-5. projects (name, description, status, color)
+5. projects (name, description, status, color) — fichas de cliente
 6. tasks (name, priority, status, due_date, completed_at, project_id, deleted_at)
-7. ideas (name, priority, status, source)
-8. boxes (name, description, category)
-9. resources (name, url, type, box_id)
-10. ai_conversations (role, message, metadata, created_at)
-11. voice_recordings (file_path, transcription, status, duration, error_message)
+7. ideas (name, priority, status, source) — notas
+8. resources (name, url, type, project_id) — recursos por cliente
+9. ai_logs (action_type, input_context, output_text, project_id) — registros IA
 
 ---
 
@@ -176,11 +170,11 @@ Pest 3 con plugin Laravel. Cada test usa `RefreshDatabase` y helpers custom:
 - `createFreeUser()`: Usuario free con suscripcion gratuita
 - `ensureRolesExist()`: Garantiza que los roles Spatie existen
 
-### Estructura (27 archivos, 191 test cases)
+### Estructura (156 test cases)
 - **Auth**: Login, registro, verificacion email, reset password, 2FA, confirmacion
-- **CRUD**: Tasks, Ideas, Projects, Boxes, Resources
+- **CRUD**: Tasks, Ideas (notas), Projects (clientes), Resources
 - **Autorizacion**: Roles, ownership, limites free
-- **Funcionalidades**: Checkout, voz, IA, tutorial
+- **Funcionalidades**: Checkout, IA contextual, tutorial
 - **Admin**: Dashboard, usuarios, pagos, suscripciones
 - **Settings**: Perfil, contrasena, 2FA
 
@@ -223,7 +217,7 @@ Multi-stage build:
 | `routes/web.php` | Todas las rutas con middleware |
 | `config/services.php` | Configuracion OpenAI/Groq |
 | `app/Models/User.php` | Logica central de roles, limites y dashboard |
-| `app/Http/Controllers/AiChatController.php` | Integracion IA con context-aware prompts |
+| `app/Http/Controllers/AiController.php` | IA contextual (3 endpoints: planDay, clientSummary, clientUpdate) |
 | `docker-entrypoint.sh` | Script de inicializacion del contenedor |
 | `storage/app/tidb-ca.pem` | Cert SSL TiDB (NO commitear) |
 
@@ -231,13 +225,16 @@ Multi-stage build:
 
 ## 10. Cronologia del Desarrollo
 
-El proyecto se desarrollo iterativamente en sesiones, cada una anadiendo capas de funcionalidad:
+El proyecto se desarrollo iterativamente en fases, cada una anadiendo capas de funcionalidad:
 
-1. **Sesion 1**: Setup inicial, modelos base, autenticacion Fortify, roles Spatie
-2. **Sesion 2**: CRUD de tareas e ideas, eliminacion de SoftDeletes, limite free
-3. **Sesion 3**: Proyectos, cajas de recursos, checkout simulado
-4. **Sesion 4**: Transcripcion de voz (Whisper), asistente IA conversacional
-5. **Sesion 5**: Dashboard condicional, tutorial interactivo, landing page
-6. **Sesion 6**: Panel admin, design system Flowly, dark mode
-7. **Sesion 7**: Testing exhaustivo (191 test cases), Docker, documentacion
-8. **Sesion 8**: Pulido final, correccion de imports, configuracion MySQL/TiDB
+### Fase 1 — Esqueleto y autenticacion
+Setup inicial, modelos base (User, Task, Idea, Subscription, Payment), autenticacion Fortify, roles Spatie, CRUD de tareas e ideas, checkout simulado, dashboard condicional, tutorial interactivo, landing page, panel admin, design system, dark mode, Docker.
+
+### Fase 2 — Pivote a multi-cliente
+Transformacion de la arquitectura: "Proyectos" pasan a ser "Clientes" (fichas de cliente). Ideas renombradas a "Notas". Eliminacion de Cajas (Box) y Voz (VoiceRecording). Recursos asociados directamente al cliente. Chat IA conversacional reemplazado por IA contextual con 3 endpoints (planDay, clientSummary, clientUpdate). Modelo AiConversation eliminado, reemplazado por AiLog.
+
+### Fase 3 — Testing exhaustivo
+Reescritura completa de los tests para reflejar la nueva arquitectura. 156 test cases y 615 assertions pasando al 100%. Tests cubren: auth, CRUD de clientes/tareas/notas/recursos, IA contextual, checkout, admin, settings.
+
+### Fase 4 — Pulido y landing
+Landing page reescrita para freelancers multi-cliente. Precios actualizados: 0€/11.99€/119€. Planes renombrados a "Gratuito"/"Solo Mensual"/"Solo Anual". UserSeeder con datos demo realistas (3 clientes con tareas, notas y recursos). README y documentacion actualizados.

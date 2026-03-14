@@ -27,15 +27,15 @@ class CheckoutController extends Controller
             'plans' => [
                 [
                     'key' => 'premium_monthly',
-                    'name' => 'Premium Mensual',
-                    'price' => 9.99,
+                    'name' => 'Solo Mensual',
+                    'price' => 11.99,
                     'description' => 'Facturado mensualmente',
                 ],
                 [
                     'key' => 'premium_yearly',
-                    'name' => 'Premium Anual',
-                    'price' => 99.99,
-                    'description' => 'Facturado anualmente — ahorra 2 meses',
+                    'name' => 'Solo Anual',
+                    'price' => 119,
+                    'description' => 'Facturado anualmente — ahorra ~2 meses',
                 ],
             ],
         ]);
@@ -47,8 +47,8 @@ class CheckoutController extends Controller
         $data = $request->validated();
 
         $prices = [
-            'premium_monthly' => 9.99,
-            'premium_yearly' => 99.99,
+            'premium_monthly' => 11.99,
+            'premium_yearly' => 119,
         ];
 
         $payment = Payment::create([

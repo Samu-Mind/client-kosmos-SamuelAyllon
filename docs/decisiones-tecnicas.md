@@ -22,14 +22,14 @@
 
 ---
 
-### 1.2 Inertia.js 2 + React 18 (Frontend)
+### 1.2 Inertia.js 2 + React 19 (Frontend)
 
 **Decisión:** usar Inertia.js como puente entre Laravel y React, en lugar de una API REST tradicional.
 
 **Justificación:**
 - Inertia.js permite construir SPAs monolíticas sin necesidad de una API REST separada, eliminando toda la capa de serialización/deserialización JSON y autenticación de tokens.
 - El resultado es código más sencillo: el controlador Laravel devuelve directamente `Inertia::render('pagina', $datos)` en lugar de `response()->json(...)` + fetch en el frontend.
-- React 18 fue elegido sobre Vue/Svelte por ser el framework más demandado en el mercado y por la riqueza de su ecosistema (shadcn/ui, Radix UI, etc.).
+- React 19 fue elegido por ser el framework más demandado en el mercado y por la riqueza de su ecosistema (shadcn/ui, Radix UI, etc.).
 
 **Alternativas descartadas:** API REST + React independiente (mayor complejidad, requiere gestión de tokens JWT, CORS, etc.); Livewire (menos control sobre el frontend y menor transferibilidad de conocimientos).
 
@@ -93,9 +93,9 @@
 **Justificación:**
 - Es el paquete de autorización más descargado del ecosistema Laravel (>20M descargas en Packagist).
 - Permite asignar roles (`admin`, `premium_user`, `free_user`) y aplicarlos como middleware directamente en rutas: `role:premium_user`, `role:admin`.
-- Las Policies de Laravel complementan a Spatie para la autorización a nivel de recurso (solo el propietario puede modificar su tarea).
+- Las Policies de Laravel complementan a Spatie para la autorización a nivel de recurso (solo el propietario puede modificar su cliente/tarea/nota).
 - La combinación Middleware + Policy cubre todos los niveles de autorización sin redundancias.
-- **Aislamiento de roles:** el rol `admin` tiene acceso exclusivo al panel de administración (`/admin/*`) y no a las rutas premium (`/projects`, `/boxes`, `/resources`). Esta separación garantiza que la gestión de la plataforma y el uso de funcionalidades de usuario son responsabilidades completamente distintas.
+- **Aislamiento de roles:** el rol `admin` tiene acceso exclusivo al panel de administración (`/admin/*`) y no a las rutas premium (IA contextual, recursos). Esta separación garantiza que la gestión de la plataforma y el uso de funcionalidades de usuario son responsabilidades completamente distintas.
 
 ---
 
@@ -129,7 +129,7 @@
 - Pest proporciona una API más expresiva y legible que PHPUnit, con funciones globales como `it()`, `test()`, `beforeEach()`.
 - Es totalmente compatible con PHPUnit (corre sobre él), por lo que no sacrifica funcionalidad.
 - El trait `RefreshDatabase` garantiza que cada test parte de una base de datos limpia, haciendo los tests independientes entre sí.
-- **Resultado:** 156 tests / 590 assertions pasando al 100%.
+- **Resultado:** 156 tests / 615 assertions pasando al 100%.
 
 ---
 
@@ -156,35 +156,41 @@
 
 ---
 
-## 9. Integración de voz — OpenAI Whisper
+## 9. Arquitectura multi-cliente
 
-**Decisión:** integrar la API de OpenAI Whisper (`whisper-1`) para transcripción de audio a texto, permitiendo crear tareas e ideas por voz.
+**Decisión:** pivotar de una app de productividad genérica a una plataforma de gestión multi-cliente para freelancers. El modelo `Project` pasa a representar una **ficha de cliente** (no un proyecto genérico). Ideas pasan a llamarse **Notas**. Los recursos se asocian directamente al cliente (sin el intermediario de "Cajas").
 
 **Justificación:**
-- OpenAI Whisper es el modelo de speech-to-text más preciso disponible como API, con soporte nativo para español y más de 50 idiomas.
-- Usar la API en lugar de ejecutar Whisper localmente (Python + ffmpeg) elimina la dependencia de un entorno Python, simplifica el despliegue Docker y evita la necesidad de GPU para la inferencia.
-- La respuesta es lo suficientemente rápida (1-5 segundos para grabaciones cortas) como para no necesitar procesamiento asíncrono con colas, reduciendo la complejidad arquitectónica.
-- El componente frontend usa la API nativa `MediaRecorder` del navegador, sin dependencias de npm adicionales para la captura de audio.
-- La funcionalidad está restringida al rol `premium_user`, coherente con el modelo freemium del proyecto.
+- El mercado de productividad genérica está saturado (Todoist, Notion, TickTick). Los freelancers tienen una necesidad específica desatendida: gestionar múltiples clientes con sus tareas, notas y recursos asociados, todo en un solo lugar.
+- La estructura "cliente → tareas + notas + recursos" es más natural para el público objetivo que la estructura "proyectos genéricos + cajas sueltas".
+- Eliminar las "Cajas" (modelo Box) simplifica la arquitectura: los recursos se asocian directamente al cliente via `project_id`, reduciendo una indirección innecesaria.
+- El modelo freemium se vuelve más claro: free = 1 cliente, Solo = clientes ilimitados + IA + recursos.
 
-**Paquete:** `openai-php/client` v0.19 — cliente PHP oficial para la API de OpenAI, instalado via Composer.
-
-**Alternativas descartadas:**
-- Whisper local (Python): requiere Python, ffmpeg y opcionalmente GPU; innecesariamente complejo para un proyecto académico.
-- Google Cloud Speech-to-Text: requiere cuenta GCP con facturación activa.
-- Web Speech API del navegador: solo funciona en Chrome, precisión inferior y no permite almacenar las grabaciones.
+**Cambios técnicos:**
+- Eliminada la tabla `boxes` y el modelo `Box` / `BoxPolicy`
+- Eliminada la tabla `voice_recordings` y el modelo `VoiceRecording`
+- Eliminada la tabla `ai_conversations` y el modelo `AiConversation`
+- Recursos pasan de `box_id` a `project_id` (Resources belong to Project/Client directly)
+- Nuevo modelo `AiLog` para registros de acciones IA
+- Rutas: `/projects` → `/clients`, `/ideas` → `/notes`
+- El `ProjectController` mantiene su nombre interno pero las rutas usan `/clients`
 
 ---
 
-## 10. Asistente IA — API OpenAI-compatible (Groq/GPT)
+## 10. IA contextual — API OpenAI-compatible (Groq/GPT)
 
-**Decisión:** integrar un asistente conversacional de productividad usando la API de OpenAI Chat Completions, con soporte configurable para distintos proveedores compatibles (OpenAI, Groq, Ollama, etc.).
+**Decisión:** integrar un sistema de IA contextual con 3 endpoints especializados en lugar de un chat conversacional genérico, usando la API de OpenAI Chat Completions con soporte configurable para distintos proveedores compatibles (OpenAI, Groq, Ollama, etc.).
 
 **Justificación:**
+- Un chat conversacional genérico (como el que tenía la versión anterior) ofrecía respuestas generalistas poco útiles. Los 3 endpoints contextuales resuelven necesidades concretas del freelancer.
 - La API OpenAI Chat Completions es un estándar de facto adoptado por múltiples proveedores (Groq, Mistral, Together AI, Ollama), lo que permite cambiar de proveedor simplemente con variables de entorno, sin modificar código.
-- **Groq** es el proveedor por defecto en el entorno de desarrollo: ofrece un plan gratuito generoso (14.400 req/día), latencia mínima (tokens/segundo muy superiores a OpenAI) e inferencia de Llama 3.3 70B, que supera a GPT-3.5-turbo en razonamiento.
-- El modelo es capaz de mantener contexto conversacional al recibir el historial de mensajes previos.
-- El sistema de prompts permite especializar al asistente en temas de productividad personal (organización, priorización, técnicas como Pomodoro/Eisenhower).
+- **Groq** es el proveedor por defecto en el entorno de desarrollo: ofrece un plan gratuito generoso (14.400 req/día) y latencia mínima.
+- Al no mantener historial de conversación, la arquitectura es más simple y cada llamada es independiente.
+
+**3 endpoints:**
+1. **`POST /ai/plan-day`** — Recoge las tareas pendientes del usuario (con prioridad, fecha de vencimiento y cliente) y genera un plan del día con 3-5 acciones priorizadas.
+2. **`POST /ai/client-summary/{project}`** — Genera un resumen de 3-4 líneas del estado de un cliente: tareas completadas, pendientes, notas activas.
+3. **`POST /ai/client-update/{project}`** — Genera un parte semanal detallado del cliente: progreso, bloqueos, próximos pasos.
 
 **Variables de entorno:**
 ```env
@@ -194,24 +200,21 @@ OPENAI_MODEL=llama-3.3-70b-versatile             # modelo a usar
 ```
 
 **Implementación técnica:**
-- Controller `AiChatController` construye el cliente con `OpenAI::factory()->withBaseUri(...)` para soporte de base URL personalizada
-- Form Request `StoreAiChatRequest` valida mensajes (max 2000 caracteres)
-- Modelo `AiConversation` almacena mensajes con rol `user` o `assistant`
-- Historial limitado a 20 mensajes más recientes para contexto (evita exceder tokens)
-- **System prompt contextual**: inyecta datos reales del usuario (tareas pendientes con prioridad y fecha de vencimiento, ideas activas, proyectos activos, tareas completadas este mes) para dar consejos personalizados
-- **Instrucciones de razonamiento**: el prompt incluye directrices de razonamiento paso a paso, respuestas estructuradas y referencias a datos reales del usuario
-- Parámetros de la API: `temperature: 0.4` (respuestas enfocadas), `max_tokens: 1500` (razonamiento detallado)
-- Rutas bajo middleware `role:premium_user` — funcionalidad exclusiva Premium
-- Frontend con React: chat UI completo, mensajes optimistas, sugerencias iniciales, auto-scroll
+- Controller `AiController` con método privado `callAi()` que construye el cliente con `OpenAI::factory()->withBaseUri(...)`
+- Cada endpoint genera un prompt específico con datos reales del usuario/cliente
+- Modelo `AiLog` registra cada acción IA con `action_type`, `input_context` (JSON) y `output_text`
+- No hay historial de conversación: cada llamada es stateless
+- Parámetros de la API: `temperature: 0.4` (respuestas enfocadas), `max_tokens: 1500`
+- Rutas bajo middleware `role:premium_user` — funcionalidad exclusiva Solo
+- Autorización adicional: cada endpoint que recibe un cliente verifica ownership via Policy
 - `config/services.php` expone `services.openai.key` y `services.openai.base_url`
 
-**Paquete:** `openai-php/client` — mismo paquete ya utilizado para Whisper. Compatible con cualquier API que implemente el protocolo OpenAI.
+**Paquete:** `openai-php/client` — cliente PHP oficial para la API de OpenAI, compatible con cualquier API que implemente el protocolo OpenAI.
 
 **Alternativas descartadas:**
+- Chat conversacional (diseño anterior): demasiado genérico, respuestas poco útiles para el flujo de trabajo del freelancer
 - GPT-4 de OpenAI: mayor calidad pero más costoso; innecesario para este caso de uso
-- Claude API: requiere cuenta de pago desde el inicio
 - Ollama local: requiere GPU significativa para respuestas rápidas
-- Chatbot basado en reglas: funcionalidad muy limitada comparada con un LLM
 
 ---
 

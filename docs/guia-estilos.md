@@ -109,7 +109,6 @@ Flowly utiliza **28 componentes** de shadcn/ui (basados en Radix UI + Tailwind C
 | Componente | Archivo | Proposito |
 |-----------|---------|-----------|
 | TutorialChatbot | `components/tutorial-chatbot.tsx` | Tour guiado con spotlight, mascara SVG y efecto typewriter |
-| VoiceRecorder | `components/voice-recorder.tsx` | Grabacion de audio con Web Audio API + envio a Whisper |
 | AppSidebar | `components/app-sidebar.tsx` | Sidebar principal con items condicionales por plan |
 | NavMain | `components/nav-main.tsx` | Items de navegacion con data-tutorial attributes |
 | Heading | `components/heading.tsx` | Encabezado reutilizable con descripcion |
@@ -222,8 +221,9 @@ El fondo del body se define inline en `app.blade.php` para evitar flash:
 ### Landing Page (welcome.tsx)
 - Hero con orbs animados de fondo
 - Header responsive con menu movil
-- Secciones: Hero, Features, Preview interactivo, Pricing, Footer
-- +1100 lineas de componente
+- Secciones: Hero, Features (bento grid), Como funciona, Testimonios, Pricing, CTA, Footer
+- Enfocada en freelancers multi-cliente con IA contextual
+- +1000 lineas de componente
 
 ---
 
@@ -236,7 +236,7 @@ Grid de 4 columnas con:
 - Valor numerico grande
 - Color condicional por estado
 
-### Listas de entidades (Tasks, Ideas, Projects)
+### Listas de entidades (Tasks, Notas, Clientes)
 - Tabla/lista con acciones inline (editar, eliminar)
 - Badge para estado/prioridad
 - AlertDialog para confirmacion de eliminacion
@@ -247,10 +247,10 @@ Grid de 4 columnas con:
 - Errores inline bajo cada campo (InputError component)
 - Botones con estados de carga (disabled + spinner)
 
-### Navegacion premium
-- Items premium visibles pero deshabilitados para free users
+### Navegacion Solo
+- Items Solo visibles pero deshabilitados para free users
 - CTA de upgrade en dashboard para free users
-- Badge "Premium" en sidebar
+- Badge "Solo" en sidebar
 
 ---
 
