@@ -7,11 +7,8 @@ import { Separator } from '@/components/ui/separator';
 import {
     CheckCircle2,
     Lightbulb,
-    FolderKanban,
     LayoutDashboard,
     BookMarked,
-    Mic,
-    Bot,
     Shield,
     Star,
     ArrowRight,
@@ -212,15 +209,15 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
                                     <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
                                 </div>
-                                Productividad personal reinventada
+                                Tu memoria operativa por cliente
                             </div>
                             
                             <h1 className="mb-6 text-4xl font-extrabold tracking-tight leading-[1.08] sm:text-5xl lg:text-6xl xl:text-7xl">
-                                <span className="animate-fade-in-up-delay-1">Organiza tu día,</span>
+                                <span className="animate-fade-in-up-delay-1">Cada cliente en su sitio,</span>
                                 <br />
                                 <span className="relative inline-block animate-fade-in-up-delay-2">
                                     <span className="gradient-text-animated">
-                                        transforma tu vida
+                                        nada se pierde
                                     </span>
                                     <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
                                         <path 
@@ -238,8 +235,8 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             </h1>
                             
                             <p className="mb-10 max-w-xl text-lg text-muted-foreground lg:text-xl animate-fade-in-up-delay-3 leading-relaxed">
-                                Flowly unifica tareas, ideas y proyectos en una experiencia fluida. 
-                                Con <span className="text-primary font-semibold">IA integrada</span> y <span className="text-primary font-semibold">captura por voz</span>, tu productividad no tiene límites.
+                                Flowly organiza tareas, notas y recursos de cada cliente en un solo lugar. 
+                                Con <span className="text-primary font-semibold">IA contextual</span> y un <span className="text-primary font-semibold">panel diario</span>, nada se queda atrás.
                             </p>
                             
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up-delay-4">
@@ -292,8 +289,8 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                                         <Target className="h-6 w-6 text-primary-foreground" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-base font-semibold">Tu día de hoy</p>
-                                                        <p className="text-xs text-muted-foreground">3 tareas · 2 completadas</p>
+                                                        <p className="text-base font-semibold">Panel de hoy</p>
+                                                        <p className="text-xs text-muted-foreground">3 clientes · 5 tareas pendientes</p>
                                                     </div>
                                                 </div>
                                                 <Badge className="bg-gradient-to-r from-primary to-primary/70 text-primary-foreground border-0 shadow-lg shadow-primary/20">
@@ -307,15 +304,15 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                             </div>
                                         </CardHeader>
                                         <CardContent className="space-y-3 relative">
-                                            <TaskPreviewItem priority="high" text="Finalizar presentación Q4" done />
-                                            <TaskPreviewItem priority="high" text="Llamar cliente importante" done />
-                                            <TaskPreviewItem priority="medium" text="Revisar propuesta" animate />
+                                            <TaskPreviewItem priority="high" text="Entregar diseño — Estudio Alma" done />
+                                            <TaskPreviewItem priority="high" text="Revisar contrato — LegalPro" done />
+                                            <TaskPreviewItem priority="medium" text="Mockups app — Carlos G." animate />
                                             <div className="pt-3 flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-transparent border border-primary/20">
                                                 <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
                                                     <Brain className="h-4 w-4 text-primary" />
                                                 </div>
                                                 <p className="text-sm text-muted-foreground flex-1">
-                                                    <span className="text-primary font-medium">IA:</span> "¡Vas genial! Solo queda la propuesta"
+                                                    <span className="text-primary font-medium">IA:</span> "Carlos G. tiene 2 tareas urgentes sin completar"
                                                 </p>
                                             </div>
                                         </CardContent>
@@ -325,12 +322,12 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 {/* Floating notification badges */}
                                 <div className="hidden lg:block absolute -right-4 top-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-bounce-subtle backdrop-blur-sm">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500/20 to-red-500/5 flex items-center justify-center">
-                                            <Mic className="h-5 w-5 text-red-500" />
+                                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center">
+                                            <Users className="h-5 w-5 text-blue-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-semibold">Dictado por voz</p>
-                                            <p className="text-xs text-muted-foreground">Transcribe ideas al vuelo</p>
+                                            <p className="text-xs font-semibold">Multi‑cliente</p>
+                                            <p className="text-xs text-muted-foreground">Todo separado por cliente</p>
                                         </div>
                                     </div>
                                 </div>
@@ -338,11 +335,11 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 <div className="hidden lg:block absolute -left-4 bottom-1/4 bg-card border-2 border-primary/30 rounded-2xl p-4 shadow-xl animate-float backdrop-blur-sm">
                                     <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 flex items-center justify-center">
-                                            <Bot className="h-5 w-5 text-indigo-500" />
+                                            <Brain className="h-5 w-5 text-indigo-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-semibold">Asistente IA</p>
-                                            <p className="text-xs text-muted-foreground">Organiza tu productividad</p>
+                                            <p className="text-xs font-semibold">IA contextual</p>
+                                            <p className="text-xs text-muted-foreground">Acciones inteligentes por cliente</p>
                                         </div>
                                     </div>
                                 </div>
@@ -373,29 +370,29 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 </span>
                             </h2>
                             <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
-                                Herramientas potentes pero intuitivas para gestionar tu día a día
+                                Herramientas potentes pero intuitivas para gestionar tus clientes
                                 sin fricción ni distracciones.
                             </p>
                         </div>
 
                         {/* Bento Grid Layout */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-                            {/* Feature grande - Tareas */}
+                            {/* Feature grande - Clientes */}
                             <BentoCard
                                 className="md:col-span-2 lg:col-span-2"
-                                icon={<CheckCircle2 className="h-8 w-8" />}
-                                title="Gestión de tareas inteligente"
-                                description="Crea, prioriza y organiza tus tareas con niveles de prioridad, fechas de vencimiento y seguimiento visual del progreso. La IA te sugiere el orden óptimo."
-                                badge="Gratis"
-                                gradient="from-green-500/20 via-emerald-500/10 to-transparent"
+                                icon={<Users className="h-8 w-8" />}
+                                title="Fichas de cliente"
+                                description="Cada cliente tiene su propio espacio con tareas, notas, recursos y contexto. Cambia de cliente y retoma justo donde lo dejaste."
+                                badge="Core"
+                                gradient="from-blue-500/20 via-cyan-500/10 to-transparent"
                                 featured
                                 delay={0}
                             >
                                 <div className="mt-5 flex flex-wrap gap-2">
                                     {[
-                                        { label: 'Alta prioridad', color: 'bg-red-500/15 text-red-600 ring-1 ring-red-500/20' },
-                                        { label: 'Media', color: 'bg-yellow-500/15 text-yellow-600 ring-1 ring-yellow-500/20' },
-                                        { label: 'Baja', color: 'bg-blue-500/15 text-blue-600 ring-1 ring-blue-500/20' },
+                                        { label: 'Estudio Alma', color: 'bg-violet-500/15 text-violet-600 ring-1 ring-violet-500/20' },
+                                        { label: 'Carlos G.', color: 'bg-emerald-500/15 text-emerald-600 ring-1 ring-emerald-500/20' },
+                                        { label: 'LegalPro', color: 'bg-amber-500/15 text-amber-600 ring-1 ring-amber-500/20' },
                                     ].map((p, i) => (
                                         <span key={i} className={`px-3 py-1.5 rounded-full text-xs font-semibold ${p.color}`}>
                                             {p.label}
@@ -404,45 +401,33 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 </div>
                             </BentoCard>
 
-                            {/* Ideas */}
+                            {/* Tareas */}
                             <BentoCard
-                                icon={<Lightbulb className="h-7 w-7" />}
-                                title="Captura de ideas"
-                                description="Guarda ideas al instante y organízalas cuando quieras."
+                                icon={<CheckCircle2 className="h-7 w-7" />}
+                                title="Tareas por cliente"
+                                description="Crea, prioriza y sigue tareas con fechas y niveles de prioridad, siempre vinculadas a un cliente."
                                 badge="Gratis"
-                                gradient="from-yellow-500/20 via-amber-500/10 to-transparent"
+                                gradient="from-green-500/20 via-emerald-500/10 to-transparent"
                                 delay={1}
                             />
 
-                            {/* Voz - destacado */}
+                            {/* Notas / Ideas */}
                             <BentoCard
-                                icon={<Mic className="h-7 w-7" />}
-                                title="Dictado por voz"
-                                description="Graba ideas con tu voz. Transcripción automática con IA de última generación."
-                                badge="Premium"
-                                gradient="from-red-500/20 via-rose-500/10 to-transparent"
-                                isPremium
+                                icon={<Lightbulb className="h-7 w-7" />}
+                                title="Notas e ideas"
+                                description="Captura ideas y notas al instante, vinculadas al cliente que las inspiró."
+                                badge="Gratis"
+                                gradient="from-yellow-500/20 via-amber-500/10 to-transparent"
                                 delay={2}
-                            >
-                                <div className="mt-4 flex items-center gap-3 p-2.5 rounded-xl bg-red-500/5 ring-1 ring-red-500/10">
-                                    <div className="flex items-end gap-[3px]">
-                                        {[1,2,3,4,5,4,3].map((v, i) => (
-                                            <div key={i} className="w-1 bg-red-500/80 rounded-full animate-pulse"
-                                                style={{ height: `${6 + v * 3}px`, animationDelay: `${i * 0.12}s` }}
-                                            />
-                                        ))}
-                                    </div>
-                                    <span className="text-xs font-medium text-red-600/80">Grabando...</span>
-                                </div>
-                            </BentoCard>
+                            />
 
-                            {/* IA - grande */}
+                            {/* IA contextual - grande */}
                             <BentoCard
                                 className="md:col-span-2 lg:col-span-1 lg:row-span-2"
-                                icon={<Bot className="h-8 w-8" />}
-                                title="Asistente IA"
-                                description="Chatea con un asistente inteligente que te ayuda a priorizar, organizar y optimizar tu productividad."
-                                badge="Premium"
+                                icon={<Brain className="h-8 w-8" />}
+                                title="IA contextual"
+                                description="Tres acciones inteligentes que leen el contexto de cada cliente: resumen, sugerencias y redacción de emails."
+                                badge="Solo"
                                 gradient="from-indigo-500/20 via-purple-500/10 to-transparent"
                                 isPremium
                                 featured
@@ -451,51 +436,50 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 <div className="mt-5 space-y-3">
                                     <div className="flex gap-2.5 items-start">
                                         <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center flex-shrink-0 ring-1 ring-primary/20">
-                                            <Bot className="h-3.5 w-3.5 text-primary" />
+                                            <Brain className="h-3.5 w-3.5 text-primary" />
                                         </div>
                                         <div className="bg-muted/60 rounded-2xl rounded-tl-sm px-3.5 py-2.5 flex-1 ring-1 ring-border/50">
                                             <p className="text-xs leading-relaxed">
-                                                "Te recomiendo empezar por la tarea de alta prioridad"
+                                                "Carlos tiene 2 tareas vencidas y una idea pendiente"
                                             </p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2.5 items-start justify-end">
                                         <div className="bg-primary/10 rounded-2xl rounded-tr-sm px-3.5 py-2.5 ring-1 ring-primary/20">
                                             <p className="text-xs leading-relaxed">
-                                                "¿Cuánto tiempo me tomará?"
+                                                "Redacta un email de seguimiento"
                                             </p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2.5 items-start">
                                         <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center flex-shrink-0 ring-1 ring-primary/20">
-                                            <Bot className="h-3.5 w-3.5 text-primary" />
+                                            <Brain className="h-3.5 w-3.5 text-primary" />
                                         </div>
                                         <div className="bg-muted/60 rounded-2xl rounded-tl-sm px-3.5 py-2.5 flex-1 ring-1 ring-border/50">
                                             <p className="text-xs leading-relaxed">
-                                                "Unos 45 min. ¿La agendamos ahora?"
+                                                "Listo. He incluido las tareas pendientes y próximos pasos."
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </BentoCard>
 
-                            {/* Proyectos */}
+                            {/* Panel Hoy */}
                             <BentoCard
-                                icon={<FolderKanban className="h-7 w-7" />}
-                                title="Proyectos"
-                                description="Agrupa tareas en proyectos con seguimiento de progreso y estados personalizables."
-                                badge="Premium"
-                                gradient="from-blue-500/20 via-cyan-500/10 to-transparent"
-                                isPremium
+                                icon={<LayoutDashboard className="h-7 w-7" />}
+                                title="Panel Hoy"
+                                description="Vista diaria con todas las tareas del día agrupadas por cliente y ordenadas por prioridad."
+                                badge="Gratis"
+                                gradient="from-teal-500/20 via-emerald-500/10 to-transparent"
                                 delay={4}
                             />
 
                             {/* Recursos */}
                             <BentoCard
                                 icon={<BookMarked className="h-7 w-7" />}
-                                title="Cajas de recursos"
-                                description="Organiza enlaces, documentos, vídeos e imágenes en cajas temáticas."
-                                badge="Premium"
+                                title="Recursos por cliente"
+                                description="Guarda enlaces, documentos y referencias organizados dentro de cada ficha de cliente."
+                                badge="Solo"
                                 gradient="from-purple-500/20 via-violet-500/10 to-transparent"
                                 isPremium
                                 delay={5}
@@ -538,14 +522,14 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             />
                             <StepCard 
                                 number={2}
-                                title="Organiza tu mundo"
-                                description="Añade tus tareas, ideas y proyectos. Usa la voz o escribe, tú decides cómo fluye."
+                                title="Añade tus clientes"
+                                description="Crea fichas de cliente con tareas, notas y recursos. Cada cliente tiene su propio espacio."
                                 icon={<Target className="h-6 w-6" />}
                             />
                             <StepCard 
                                 number={3}
                                 title="Conquista tu día"
-                                description="Sigue tu progreso, recibe insights de la IA y celebra cada tarea completada."
+                                description="Consulta tu panel diario, recibe insights de la IA contextual y no dejes ningún cliente sin atender."
                                 icon={<Rocket className="h-6 w-6" />}
                             />
                         </div>
@@ -577,24 +561,24 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
 
                         <div className="grid gap-6 md:grid-cols-3">
                             <TestimonialCard
-                                quote="Flowly ha simplificado mi rutina diaria. Antes usaba tres apps distintas, ahora todo está en un solo lugar."
+                                quote="Antes perdía el contexto al saltar de un cliente a otro. Con Flowly cada ficha tiene todo lo que necesito: tareas, notas y recursos."
                                 author="María García"
                                 role="Diseñadora freelance"
                                 avatar="M"
                                 rating={5}
                             />
                             <TestimonialCard
-                                quote="El dictado por voz es increíble. Capturo ideas mientras camino y cuando llego al ordenador ya están organizadas."
+                                quote="La IA contextual me ahorra tiempo real: resume el estado de un cliente en segundos y me redacta emails de seguimiento con un clic."
                                 author="Carlos López"
-                                role="Estudiante de Ingeniería"
+                                role="Consultor IT"
                                 avatar="C"
                                 rating={5}
                                 featured
                             />
                             <TestimonialCard
-                                quote="El asistente IA me ayuda a priorizar cuando tengo demasiadas tareas. Es como tener un coach de productividad."
+                                quote="El panel de hoy me muestra exactamente qué hacer y para qué cliente. Ya no se me escapa ninguna tarea urgente."
                                 author="Ana Martínez"
-                                role="Product Manager"
+                                role="Product Manager freelance"
                                 avatar="A"
                                 rating={5}
                             />
@@ -619,7 +603,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 </span>
                             </h2>
                             <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
-                                Empieza gratis y escala cuando tu productividad lo exija.
+                                Empieza gratis y escala cuando tu volumen de clientes lo pida.
                             </p>
                         </div>
 
@@ -632,7 +616,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                         <LayoutDashboard className="h-7 w-7 text-muted-foreground" />
                                     </div>
                                     <CardTitle className="text-2xl">Gratis</CardTitle>
-                                    <CardDescription className="text-base">Perfecto para empezar</CardDescription>
+                                    <CardDescription className="text-base">Para probar con un cliente</CardDescription>
                                     <div className="pt-6 pb-2">
                                         <span className="text-6xl font-bold">0 €</span>
                                         <span className="text-muted-foreground ml-2 text-lg">/ mes</span>
@@ -641,10 +625,10 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 </CardHeader>
                                 <CardContent className="relative flex flex-1 flex-col justify-between gap-8 pt-4">
                                     <ul className="space-y-4 text-sm">
+                                        <PricingFeature text="1 cliente" />
                                         <PricingFeature text="Hasta 5 tareas activas" />
-                                        <PricingFeature text="Ideas ilimitadas" />
-                                        <PricingFeature text="Dashboard personal" />
-                                        <PricingFeature text="Autenticación con 2FA" />
+                                        <PricingFeature text="Notas ilimitadas" />
+                                        <PricingFeature text="Panel Hoy" />
                                     </ul>
                                     {canRegister && (
                                         <Button variant="outline" size="lg" className="w-full group/btn border-2 hover:border-primary hover:bg-primary/5 transition-all duration-300" asChild>
@@ -671,22 +655,22 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                         <div className="mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-xl shadow-primary/30 transition-all duration-500 group-hover:scale-110">
                                             <Star className="h-7 w-7 text-primary-foreground" />
                                         </div>
-                                        <CardTitle className="text-2xl">Premium Mensual</CardTitle>
+                                        <CardTitle className="text-2xl">Solo Mensual</CardTitle>
                                         <CardDescription className="text-base">Acceso completo, sin ataduras</CardDescription>
                                         <div className="pt-6 pb-2">
-                                            <span className="text-6xl font-bold">9,99 €</span>
+                                            <span className="text-6xl font-bold">11,99 €</span>
                                             <span className="text-muted-foreground ml-2 text-lg">/ mes</span>
                                         </div>
                                         <p className="text-sm text-primary font-medium">Cancela cuando quieras</p>
                                     </CardHeader>
                                     <CardContent className="relative flex flex-1 flex-col justify-between gap-8 pt-4">
                                         <ul className="space-y-4 text-sm">
+                                            <PricingFeature text="Clientes ilimitados" highlight />
                                             <PricingFeature text="Tareas ilimitadas" highlight />
-                                            <PricingFeature text="Ideas ilimitadas" />
-                                            <PricingFeature text="Proyectos y seguimiento" highlight />
-                                            <PricingFeature text="Cajas de recursos" />
-                                            <PricingFeature text="Dictado por voz (IA)" highlight />
-                                            <PricingFeature text="Asistente IA integrado" highlight />
+                                            <PricingFeature text="Notas ilimitadas" />
+                                            <PricingFeature text="Recursos por cliente" />
+                                            <PricingFeature text="IA contextual (3 acciones)" highlight />
+                                            <PricingFeature text="Panel Hoy avanzado" />
                                         </ul>
                                         {canRegister && (
                                             <Button size="lg" className="w-full group/btn glow-primary text-base transition-all duration-300 hover:scale-[1.02]" asChild>
@@ -711,19 +695,19 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                     <div className="mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg">
                                         <Shield className="h-7 w-7 text-muted-foreground" />
                                     </div>
-                                    <CardTitle className="text-2xl">Premium Anual</CardTitle>
+                                    <CardTitle className="text-2xl">Solo Anual</CardTitle>
                                     <CardDescription className="text-base">La opción más inteligente</CardDescription>
                                     <div className="pt-6 pb-2">
-                                        <span className="text-6xl font-bold">99,99 €</span>
+                                        <span className="text-6xl font-bold">119 €</span>
                                         <span className="text-muted-foreground ml-2 text-lg">/ año</span>
                                     </div>
                                     <p className="text-sm text-primary font-semibold">
-                                        ≈ 8,33 €/mes — Ahorro de 19,89 €
+                                        ≈ 9,92 €/mes — Ahorro de 24,88 €
                                     </p>
                                 </CardHeader>
                                 <CardContent className="relative flex flex-1 flex-col justify-between gap-8 pt-4">
                                     <ul className="space-y-4 text-sm">
-                                        <PricingFeature text="Todo lo de Premium Mensual" highlight />
+                                        <PricingFeature text="Todo lo de Solo Mensual" highlight />
                                         <PricingFeature text="Facturación anual" />
                                         <PricingFeature text="Soporte prioritario" highlight />
                                         <PricingFeature text="Acceso anticipado a novedades" />
@@ -760,14 +744,14 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             ¿Listo para empezar?
                         </div>
                         <h2 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                            Tu mejor versión productiva{' '}
+                            Tu memoria operativa por cliente{' '}
                             <br className="hidden sm:block" />
                             <span className="gradient-text-animated">
                                 comienza hoy
                             </span>
                         </h2>
                         <p className="mx-auto mb-12 max-w-xl text-lg text-muted-foreground leading-relaxed">
-                            Únete a personas que ya han transformado su forma de trabajar.
+                            Únete a freelancers que ya gestionan sus clientes sin perder contexto.
                             El plan gratuito es para siempre.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -819,8 +803,8 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                     </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-                                    Productividad personal que fluye como la naturaleza.
-                                    Tareas, ideas y proyectos con inteligencia artificial.
+                                    Tu memoria operativa por cliente.
+                                    Tareas, notas y recursos con inteligencia artificial contextual.
                                 </p>
                             </div>
                             
@@ -850,7 +834,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between text-sm text-muted-foreground">
                             <p>© {new Date().getFullYear()} Flowly · Proyecto Intermodular 2º DAM</p>
                             <p className="flex items-center gap-1.5">
-                                Hecho con <span className="text-red-500 animate-pulse">❤</span> para estudiantes productivos
+                                Hecho con <span className="text-red-500 animate-pulse">❤</span> para freelancers organizados
                             </p>
                         </div>
                     </div>

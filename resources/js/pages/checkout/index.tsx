@@ -57,7 +57,7 @@ export default function CheckoutIndex({ alreadyPremium, plans, subscription }: C
             <div className="flex flex-col gap-6 p-6">
 
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Actualizar a Premium</h1>
+                    <h1 className="text-2xl font-bold">Actualizar a Solo</h1>
                     <Link href="/subscription">
                         <Button variant="outline">← Volver</Button>
                     </Link>
@@ -91,7 +91,7 @@ export default function CheckoutIndex({ alreadyPremium, plans, subscription }: C
                                     >
                                         {plans?.map(plan => (
                                             <option key={plan.key} value={plan.key}>
-                                                {plan.name} — ${plan.price.toFixed(2)} ({plan.description})
+                                                {plan.name} — {plan.price.toFixed(2)} € ({plan.description})
                                             </option>
                                         ))}
                                     </select>
@@ -176,7 +176,7 @@ export default function CheckoutIndex({ alreadyPremium, plans, subscription }: C
                                         <p className="font-semibold">{plan.name}</p>
                                         <p className="text-sm text-muted-foreground">{plan.description}</p>
                                     </div>
-                                    <p className="text-xl font-bold">${plan.price.toFixed(2)}</p>
+                                    <p className="text-xl font-bold">{plan.price.toFixed(2)} €</p>
                                 </CardContent>
                             </Card>
                         ))}

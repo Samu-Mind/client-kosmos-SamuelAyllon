@@ -35,13 +35,13 @@
 
 ## Fase 3 — IA contextual (3 botones)
 
-- [ ] Leer `FASE3_IA_CONTEXTUAL.md`
-- [ ] Crear `AiController` con `planDay`, `clientSummary`, `clientUpdate`
-- [ ] Crear modelo `AiLog` (si no se creó en Fase 1)
-- [ ] Implementar endpoints `/ai/*` y guardado en `ai_logs`
-- [ ] Integrar botones IA en dashboard y ficha de cliente
-- [ ] Crear/actualizar tests de IA (`AiControllerTest`)
-- [ ] Ejecutar `php artisan test`
+- [x] Leer `FASE3_IA_CONTEXTUAL.md`
+- [x] Crear `AiController` con `planDay`, `clientSummary`, `clientUpdate`
+- [x] Crear modelo `AiLog` (si no se creó en Fase 1)
+- [x] Implementar endpoints `/ai/*` y guardado en `ai_logs`
+- [x] Integrar botones IA en dashboard y ficha de cliente
+- [x] Crear/actualizar tests de IA (`AiControllerTest`)
+- [x] Ejecutar `php artisan test`
 
 ## Fase 4 — Pulido, landing y datos demo
 

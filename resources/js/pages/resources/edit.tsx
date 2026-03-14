@@ -12,8 +12,8 @@ interface Props {
 
 export default function ResourceEdit({ resource }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Cajas', href: '/boxes' },
-        ...(resource.box ? [{ title: resource.box.name, href: `/boxes/${resource.box_id}` }] : []),
+        { title: 'Clientes', href: '/clients' },
+        ...(resource.project ? [{ title: resource.project.name, href: `/clients/${resource.project_id}` }] : []),
         { title: 'Editar recurso', href: '#' },
     ];
 
@@ -38,11 +38,11 @@ export default function ResourceEdit({ resource }: Props) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">Editar recurso</h1>
-                        {resource.box && (
-                            <p className="text-sm text-muted-foreground">En la caja: <span className="font-medium">{resource.box.name}</span></p>
+                        {resource.project && (
+                            <p className="text-sm text-muted-foreground">Cliente: <span className="font-medium">{resource.project.name}</span></p>
                         )}
                     </div>
-                    <Link href={`/boxes/${resource.box_id}`}>
+                    <Link href={`/clients/${resource.project_id}`}>
                         <Button variant="outline">← Volver</Button>
                     </Link>
                 </div>
@@ -115,7 +115,7 @@ export default function ResourceEdit({ resource }: Props) {
                                 <Button type="submit" disabled={processing}>
                                     {processing ? 'Guardando...' : 'Guardar cambios'}
                                 </Button>
-                                <Link href={`/boxes/${resource.box_id}`}>
+                                <Link href={`/clients/${resource.project_id}`}>
                                     <Button type="button" variant="outline">Cancelar</Button>
                                 </Link>
                             </div>

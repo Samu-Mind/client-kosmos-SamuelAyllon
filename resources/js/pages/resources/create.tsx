@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Box } from '@/types';
+import type { BreadcrumbItem, Project } from '@/types';
 import { ArrowLeft, LinkIcon, FileText, Image, Video, File, HelpCircle, Sparkles, ExternalLink } from 'lucide-react';
 
 interface Props {
-    box: Box;
+    project: Project;
 }
 
 const resourceTypeIcons = {
@@ -29,10 +29,10 @@ const resourceTypeLabels = {
     other: 'Otro',
 };
 
-export default function ResourceCreate({ box }: Props) {
+export default function ResourceCreate({ project }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Cajas', href: '/boxes' },
-        { title: box.name, href: `/boxes/${box.id}` },
+        { title: 'Clientes', href: '/clients' },
+        { title: project.name, href: `/clients/${project.id}` },
         { title: 'Nuevo recurso', href: '#' },
     ];
 
@@ -45,7 +45,7 @@ export default function ResourceCreate({ box }: Props) {
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        post(`/boxes/${box.id}/resources`);
+        post(`/clients/${project.id}/resources`);
     }
 
     const TypeIcon = resourceTypeIcons[data.type];
@@ -64,11 +64,11 @@ export default function ResourceCreate({ box }: Props) {
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight">Nuevo recurso</h1>
                             <p className="text-sm text-muted-foreground">
-                                Añadir a: <span className="font-medium text-foreground">{box.name}</span>
+                                Añadir a: <span className="font-medium text-foreground">{project.name}</span>
                             </p>
                         </div>
                     </div>
-                    <Link href={`/boxes/${box.id}`}>
+                    <Link href={`/clients/${project.id}`}>
                         <Button variant="outline" size="sm" className="gap-2">
                             <ArrowLeft className="h-4 w-4" />
                             Volver
@@ -241,7 +241,7 @@ export default function ResourceCreate({ box }: Props) {
                                         'Añadir recurso'
                                     )}
                                 </Button>
-                                <Link href={`/boxes/${box.id}`}>
+                                <Link href={`/clients/${project.id}`}>
                                     <Button type="button" variant="ghost">
                                         Cancelar
                                     </Button>

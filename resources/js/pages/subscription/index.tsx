@@ -37,7 +37,7 @@ const planColors: Record<string, { bg: string; text: string; border: string; gra
 };
 
 const planLabels: Record<string, string> = {
-    free: 'Gratuito', premium_monthly: 'Premium Mensual', premium_yearly: 'Premium Anual',
+    free: 'Gratuito', premium_monthly: 'Solo Mensual', premium_yearly: 'Solo Anual',
 };
 
 const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; bg: string }> = {
@@ -76,7 +76,7 @@ export default function SubscriptionIndex({ subscription, plans }: SubscriptionP
                         {isPremium && (
                             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30">
                                 <Sparkles className="h-4 w-4" />
-                                <span className="font-semibold">Premium Activo</span>
+                                <span className="font-semibold">Solo Activo</span>
                             </div>
                         )}
                     </div>
@@ -152,7 +152,7 @@ export default function SubscriptionIndex({ subscription, plans }: SubscriptionP
                                     <Link href="/checkout">
                                         <Button className="w-full h-12 text-base font-semibold rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-500/30 transition-all hover:shadow-xl hover:shadow-violet-500/40">
                                             <Sparkles className="h-5 w-5 mr-2" />
-                                            Actualizar a Premium
+                                            Actualizar a Solo
                                             <ArrowRight className="h-5 w-5 ml-2" />
                                         </Button>
                                     </Link>

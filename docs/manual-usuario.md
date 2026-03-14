@@ -8,13 +8,12 @@
 
 ## ¿Qué es Flowly?
 
-Flowly es una plataforma de productividad personal que te ayuda a:
-- Organizar y gestionar tus **tareas** diarias
-- Capturar y gestionar tus **ideas**
-- Agrupar tareas en **proyectos** con seguimiento de progreso *(Premium)*
-- Organizar recursos (enlaces, documentos, vídeos) en **cajas** *(Premium)*
-- Grabar **notas de voz** *(Premium)*
-- Chatear con un **asistente de IA** para organizar tu día y priorizar tareas *(Premium)*
+Flowly es una plataforma de gestión multi-cliente para freelancers que te ayuda a:
+- Organizar tus **clientes** en fichas con color y estado *(1 gratis, ilimitados con Solo)*
+- Gestionar **tareas** por cliente con fechas y prioridades
+- Capturar **notas** rápidas
+- Organizar **recursos** (enlaces, documentos, vídeos) por cliente *(Solo)*
+- Usar **IA contextual** para planificar tu día, resumir clientes y generar partes semanales *(Solo)*
 
 ---
 
@@ -22,17 +21,16 @@ Flowly es una plataforma de productividad personal que te ayuda a:
 
 1. [Registro e inicio de sesión](#1-registro-e-inicio-de-sesión)
 2. [Tutorial inicial](#2-tutorial-inicial)
-3. [Dashboard](#3-dashboard)
-4. [Gestión de tareas](#4-gestión-de-tareas)
-5. [Gestión de ideas](#5-gestión-de-ideas)
-6. [Creación por voz (Premium)](#6-creación-por-voz-premium)
-7. [Proyectos (Premium)](#7-proyectos-premium)
-8. [Cajas de recursos (Premium)](#8-cajas-de-recursos-premium)
-9. [Asistente IA (Premium)](#9-asistente-ia-premium)
-10. [Suscripción y planes](#10-suscripción-y-planes)
-11. [Configuración de cuenta](#11-configuración-de-cuenta)
-12. [Panel de administración (Admin)](#12-panel-de-administración-admin)
-13. [Preguntas frecuentes](#13-preguntas-frecuentes)
+3. [Dashboard (Panel Hoy)](#3-dashboard-panel-hoy)
+4. [Gestión de clientes](#4-gestión-de-clientes)
+5. [Gestión de tareas](#5-gestión-de-tareas)
+6. [Gestión de notas](#6-gestión-de-notas)
+7. [Recursos por cliente (Solo)](#7-recursos-por-cliente-solo)
+8. [IA contextual (Solo)](#8-ia-contextual-solo)
+9. [Suscripción y planes](#9-suscripción-y-planes)
+10. [Configuración de cuenta](#10-configuración-de-cuenta)
+11. [Panel de administración (Admin)](#11-panel-de-administración-admin)
+12. [Preguntas frecuentes](#12-preguntas-frecuentes)
 
 ---
 
@@ -85,17 +83,19 @@ La primera vez que accedas a Flowly después de registrarte, aparecerá un **tou
 Flowy es el asistente virtual de Flowly. Te guiará por la aplicación resaltando cada sección mientras te explica su función. El contenido del tutorial varía según tu tipo de cuenta:
 
 **Si tienes plan gratuito**, Flowy te mostrará:
-1. **Dashboard** — Tu centro de control con tareas e ideas
-2. **Tareas** — Cómo crear y gestionar (máx. 5 pendientes)
-3. **Ideas** — Cómo capturar inspiración sin límites
-4. **Suscripción** — Qué incluye Premium: tareas ilimitadas, proyectos, cajas y dictado por voz
+1. **Dashboard** — Tu centro de control con tareas y notas
+2. **Clientes** — Cómo crear fichas de clientes (máx. 1 en plan gratuito)
+3. **Tareas** — Cómo crear y gestionar (máx. 5 pendientes)
+4. **Notas** — Cómo capturar anotaciones rápidas sin límites
+5. **Suscripción** — Qué incluye Solo: clientes ilimitados, tareas ilimitadas, IA contextual y recursos
 
-**Si tienes plan Premium**, Flowy te mostrará:
-1. **Dashboard** — Tu centro de control completo
-2. **Tareas** — Crear tareas sin límites + dictado por voz
-3. **Ideas** — Capturar ideas + dictado por voz
-4. **Proyectos** — Agrupar tareas en proyectos con progreso
-5. **Cajas** — Organizar recursos (enlaces, documentos, vídeos)
+**Si tienes plan Solo**, Flowy te mostrará:
+1. **Dashboard** — Tu centro de control completo (Panel Hoy)
+2. **Clientes** — Crear fichas de cliente sin límites
+3. **Tareas** — Crear tareas sin límites, asociadas a clientes
+4. **Notas** — Capturar notas rápidas
+5. **Recursos** — Organizar recursos (enlaces, documentos, vídeos) por cliente
+6. **IA** — Planificar tu día, resumir clientes y generar partes semanales
 
 ### Cómo funciona el tour
 
@@ -118,7 +118,7 @@ El tutorial solo aparece una vez, la primera vez que inicias sesión. Una vez co
 
 ---
 
-## 3. Dashboard
+## 3. Dashboard (Panel Hoy)
 
 El dashboard es tu página principal al iniciar sesión. Muestra un resumen de tu actividad:
 
@@ -126,14 +126,55 @@ El dashboard es tu página principal al iniciar sesión. Muestra un resumen de t
 |----------|-------------|
 | **Tareas activas** | Número de tareas en estado "pendiente" |
 | **Completadas este mes** | Tareas que has terminado en el mes actual |
-| **Ideas activas** | Ideas que aún no has resuelto |
-| **Proyectos activos** | Proyectos en marcha *(solo Premium)* |
+| **Notas activas** | Notas que aún no has resuelto |
+| **Clientes activos** | Clientes en marcha |
 
-El sidebar izquierdo te da acceso a todas las secciones de la aplicación. Las secciones Premium aparecen bloqueadas si tienes el plan gratuito.
+El sidebar izquierdo te da acceso a todas las secciones de la aplicación. Las secciones Solo aparecen bloqueadas si tienes el plan gratuito.
 
 ---
 
-## 4. Gestión de tareas
+## 4. Gestión de clientes
+
+Los clientes son fichas que representan a cada persona o empresa para la que trabajas. Cada cliente agrupa sus tareas, notas y recursos.
+
+### Ver tus clientes
+
+Accede desde el sidebar a **"Clientes"**. Verás una cuadrícula con todos tus clientes, su estado, color identificativo y el número de tareas asociadas.
+
+---
+
+### Crear un cliente
+
+1. Haz clic en **"Nuevo cliente"**.
+2. Rellena:
+   - **Nombre** *(obligatorio)*
+   - **Descripción** *(opcional)*
+   - **Color**: elige un color identificativo
+   - **Estado**: Inactivo / Activo / Completado
+3. Haz clic en **"Crear cliente"**.
+
+> **Límite en plan gratuito:** puedes tener un máximo de **1 cliente**. Para crear más, actualiza a Solo.
+
+---
+
+### Ver el detalle de un cliente
+
+Haz clic sobre el nombre del cliente para ver:
+- Estadísticas de progreso (% de tareas completadas)
+- Barra de progreso visual
+- Lista de tareas separadas por estado
+- Recursos asociados *(Solo)*
+- Acciones IA: resumen del cliente y parte semanal *(Solo)*
+
+---
+
+### Completar un cliente
+
+Cuando hayas terminado el trabajo con un cliente, puedes marcarlo como completado desde el botón **"Completar"** en la vista de detalle.
+
+---
+
+## 5. Gestión de tareas
 
 ### Ver tus tareas
 
@@ -141,7 +182,7 @@ Accede desde el sidebar a **"Tareas"**. Verás la lista ordenada por:
 1. Primero las **pendientes** (ordenadas de mayor a menor prioridad)
 2. Luego las **completadas**
 
-Cada tarea muestra su nombre, prioridad (🔴 Alta / 🟡 Media / 🟢 Baja), fecha de vencimiento y proyecto asociado (si lo tiene).
+Cada tarea muestra su nombre, prioridad (🔴 Alta / 🟡 Media / 🟢 Baja), fecha de vencimiento y cliente asociado (si lo tiene).
 
 ---
 
@@ -149,11 +190,11 @@ Cada tarea muestra su nombre, prioridad (🔴 Alta / 🟡 Media / 🟢 Baja), fe
 
 1. Haz clic en el botón **"Nueva tarea"**.
 2. Rellena el formulario:
-   - **Nombre** *(obligatorio)*: descripción breve de la tarea. Si eres Premium, puedes usar el botón **"Dictar"** para rellenar este campo con tu voz.
+   - **Nombre** *(obligatorio)*: descripción breve de la tarea.
    - **Descripción** *(opcional)*: detalles adicionales
    - **Prioridad**: Baja / Media / Alta (por defecto: Baja)
    - **Fecha de vencimiento** *(opcional)*: cuándo debe estar terminada
-   - **Proyecto** *(solo Premium)*: asigna la tarea a un proyecto
+   - **Cliente**: asigna la tarea a un cliente
 3. Haz clic en **"Crear tarea"**.
 
 > **Límite en plan gratuito:** puedes tener un máximo de **5 tareas pendientes** al mismo tiempo. Para crear más, debes completar alguna existente o actualizar a Premium.
@@ -184,200 +225,98 @@ Si necesitas volver a trabajar en una tarea completada:
 
 ---
 
-## 5. Gestión de ideas
+## 6. Gestión de notas
 
-Las ideas son anotaciones rápidas para capturar pensamientos que quieres recordar.
+Las notas son anotaciones rápidas para capturar pensamientos que quieres recordar.
 
-### Ver tus ideas
+### Ver tus notas
 
-Accede desde el sidebar a **"Ideas"**. Se muestran primero las **activas** y luego las **resueltas**.
+Accede desde el sidebar a **"Notas"**. Se muestran primero las **activas** y luego las **resueltas**.
 
 ---
 
-### Crear una idea
+### Crear una nota
 
-1. Haz clic en **"Nueva idea"**.
+1. Haz clic en **"Nueva nota"**.
 2. Rellena:
-   - **Nombre** *(obligatorio)*: si eres Premium, puedes usar el botón **"Dictar"** para rellenar este campo con tu voz.
+   - **Nombre** *(obligatorio)*
    - **Descripción** *(opcional)*
    - **Prioridad**: Baja / Media / Alta
-3. Haz clic en **"Guardar idea"**.
+3. Haz clic en **"Guardar nota"**.
 
-No hay límite en el número de ideas para ningún plan.
+No hay límite en el número de notas para ningún plan.
 
 ---
 
-### Resolver o reactivar una idea
+### Resolver o reactivar una nota
 
-- **Resolver**: cuando hayas actuado sobre la idea, márcala como resuelta con el botón **"Resolver"**. Pasará a la sección de resueltas.
+- **Resolver**: cuando hayas actuado sobre la nota, márcala como resuelta con el botón **"Resolver"**. Pasará a la sección de resueltas.
 - **Reactivar**: si quieres volver a trabajarla, haz clic en **"Reactivar"**.
 
 ---
 
-### Editar o eliminar una idea
+### Editar o eliminar una nota
 
-Igual que con las tareas, usa los iconos de lápiz y papelera junto a cada idea.
-
----
-
-## 6. Creación por voz *(Premium)*
-
-Los usuarios Premium pueden crear tareas e ideas utilizando su voz, gracias a la integración con OpenAI Whisper.
-
-### Crear rápido por voz desde el listado
-
-1. En la página de **Tareas** o **Ideas**, busca el botón **"Dictar"** junto al botón de crear.
-2. Haz clic en **"Dictar"**. Tu navegador te pedirá permiso para acceder al micrófono.
-3. Habla claramente. El botón cambiará a rojo pulsante indicando que está grabando.
-4. Haz clic en **"Detener"** cuando termines.
-5. El audio se enviará automáticamente al servidor para su transcripción.
-6. Se creará la tarea o idea con el texto transcrito como nombre y prioridad media por defecto.
-
-> Las ideas creadas por voz se marcan automáticamente con origen **"Voz"**.
+Igual que con las tareas, usa los iconos de lápiz y papelera junto a cada nota.
 
 ---
 
-### Dictar el nombre en un formulario
+## 7. Recursos por cliente *(Solo)*
 
-1. En el formulario de **nueva tarea** o **nueva idea**, junto al campo "Nombre", verás el botón **"Dictar"**.
-2. Haz clic para grabar y luego para detener.
-3. El texto transcrito se rellenará automáticamente en el campo Nombre.
-4. Puedes editarlo antes de enviar el formulario.
+Los recursos permiten organizar enlaces, documentos, vídeos e imágenes asociados a cada cliente.
 
-> Se requiere un navegador compatible con la API `MediaRecorder` (Chrome, Firefox, Edge, Safari 14.5+).
+### Ver recursos de un cliente
 
----
-
-## 7. Proyectos *(Premium)*
-
-Los proyectos permiten agrupar tareas relacionadas bajo un mismo objetivo.
-
-### Ver tus proyectos
-
-Accede desde el sidebar a **"Proyectos"**. Verás una cuadrícula con todos tus proyectos, su estado y el número de tareas que contienen.
+1. Accede al detalle de un **cliente** haciendo clic sobre él.
+2. Los recursos aparecen en la sección inferior de la ficha del cliente.
 
 ---
 
-### Crear un proyecto
+### Añadir un recurso
 
-1. Haz clic en **"Nuevo proyecto"**.
+1. En la ficha del cliente, haz clic en **"Añadir recurso"**.
 2. Rellena:
-   - **Nombre** *(obligatorio)*
-   - **Descripción** *(opcional)*
-   - **Color**: elige un color identificativo
-   - **Estado**: Inactivo / Activo / Completado
-3. Haz clic en **"Crear proyecto"**.
-
----
-
-### Ver el detalle de un proyecto
-
-Haz clic sobre el nombre del proyecto para ver:
-- Estadísticas de progreso (% de tareas completadas)
-- Barra de progreso visual
-- Lista de todas las tareas del proyecto separadas por estado
-
----
-
-### Asignar tareas a un proyecto
-
-Al crear o editar una tarea (en el formulario de tareas), aparece un selector de proyecto. Selecciona el proyecto al que pertenece la tarea.
-
----
-
-## 8. Cajas de recursos *(Premium)*
-
-Las cajas son colecciones de recursos organizados por tema (enlaces, documentos, vídeos, imágenes, etc.).
-
-### Ver tus cajas
-
-Accede desde el sidebar a **"Cajas"**. Verás todas tus cajas con su categoría y el número de recursos que contienen.
-
----
-
-### Crear una caja
-
-1. Haz clic en **"Nueva caja"**.
-2. Introduce:
-   - **Nombre** *(obligatorio)*
-   - **Categoría** *(opcional)*
-   - **Descripción** *(opcional)*
-3. Haz clic en **"Crear caja"**.
-
----
-
-### Añadir recursos a una caja
-
-1. Accede al detalle de la caja haciendo clic sobre ella.
-2. Haz clic en **"Añadir recurso"**.
-3. Rellena:
    - **Nombre** *(obligatorio)*
    - **Tipo**: Enlace / Documento / Vídeo / Imagen / Otro
    - **URL** *(obligatorio)*: dirección del recurso
    - **Descripción** *(opcional)*
-4. Haz clic en **"Guardar recurso"**.
+3. Haz clic en **"Guardar recurso"**.
 
 Los recursos de tipo **Enlace** son clicables directamente desde la lista.
 
 ---
 
-## 9. Asistente IA *(Premium)*
+## 8. IA contextual *(Solo)*
 
-El Asistente IA de Flowly es tu copiloto de productividad. Puedes chatear con él para obtener sugerencias sobre cómo organizar tu día, priorizar tareas o mejorar tu productividad.
+La IA contextual de Flowly te ayuda a gestionar tus clientes de forma más eficiente con 3 acciones específicas.
 
-### Acceder al asistente
+### Planificar mi día
 
-Accede desde el sidebar a **"Asistente IA"** (icono de estrellas). Verás una pantalla de chat donde puedes escribir tus preguntas o peticiones.
-
----
-
-### Iniciar una conversación
-
-1. Escribe tu mensaje en el campo de texto de la parte inferior.
-2. Pulsa **Enter** o haz clic en el botón de enviar.
-3. El asistente procesará tu mensaje y te responderá en segundos.
-
-> Puedes usar **Shift + Enter** para escribir mensajes de varias líneas.
+1. Desde el **Dashboard**, haz clic en **"Planificar mi día"**.
+2. La IA analizará todas tus tareas pendientes (con su prioridad, fecha de vencimiento y cliente asociado).
+3. Te devolverá un plan con 3-5 acciones concretas priorizadas para tu jornada.
 
 ---
 
-### ¿Qué puedes preguntarle?
+### Resumen de cliente
 
-El asistente está especializado en productividad personal:
-
-- **"¿Cómo priorizo mis tareas?"** — Te explicará técnicas como la matriz de Eisenhower.
-- **"Ayúdame a organizar mi día"** — Te dará consejos para planificar tu jornada.
-- **"¿Qué es la técnica Pomodoro?"** — Te explicará técnicas de productividad.
-- **"Tengo muchas ideas pero no sé por dónde empezar"** — Te ayudará a estructurarlas.
-- **"Cómo evitar la procrastinación"** — Consejos prácticos para ser más productivo.
+1. Accede al detalle de un **cliente**.
+2. Haz clic en **"Resumen IA"**.
+3. La IA generará un resumen de 3-4 líneas con el estado actual del cliente: tareas completadas, pendientes y notas activas.
 
 ---
 
-### Sugerencias rápidas
+### Parte semanal del cliente
 
-Si no sabes por dónde empezar, la pantalla inicial muestra tres sugerencias que puedes usar haciendo clic en ellas:
-- "¿Cómo priorizo mis tareas?"
-- "Ayúdame a organizar mi día"
-- "Técnicas de productividad"
+1. Accede al detalle de un **cliente**.
+2. Haz clic en **"Parte semanal"**.
+3. La IA generará un informe detallado con: progreso general, bloqueos detectados y próximos pasos recomendados.
 
----
-
-### Historial de conversación
-
-Tu historial de chat se guarda automáticamente. Cada vez que accedas al asistente verás tus conversaciones anteriores.
+> Todas las acciones IA quedan registradas en el sistema para tu referencia.
 
 ---
 
-### Limpiar historial
-
-Si deseas empezar de cero:
-1. Haz clic en el botón **"Limpiar"** en la esquina superior derecha del chat.
-2. Confirma que deseas eliminar todo el historial.
-3. La conversación se borrará permanentemente.
-
----
-
-## 10. Suscripción y planes
+## 9. Suscripción y planes
 
 ### Ver tu plan actual
 
@@ -388,23 +327,23 @@ Accede desde el sidebar a **"Suscripción"**. Verás:
 
 ---
 
-### Actualizar a Premium
+### Actualizar a Solo
 
-1. Ve a **"Suscripción"** y haz clic en **"Actualizar a Premium"** o accede directamente a **"Checkout"**.
+1. Ve a **"Suscripción"** y haz clic en **"Actualizar a Solo"** o accede directamente a **"Checkout"**.
 2. Selecciona el plan:
-   - **Premium Mensual**: 9,99 € / mes
-   - **Premium Anual**: 99,99 € / año (equivale a 8,33 € / mes)
+   - **Solo Mensual**: 11,99 € / mes
+   - **Solo Anual**: 119 € / año (equivale a ≈9,92 € / mes)
 3. Introduce los datos de tu tarjeta (simulados en esta versión):
    - Número de tarjeta (16 dígitos)
    - Fecha de expiración
    - CVV
 4. Haz clic en **"Pagar"**.
 
-> El sistema procesará el pago de forma simulada. Si el pago se aprueba, tu cuenta se actualizará a Premium inmediatamente y tendrás acceso a todas las funcionalidades.
+> El sistema procesará el pago de forma simulada. Si el pago se aprueba, tu cuenta se actualizará a Solo inmediatamente y tendrás acceso a todas las funcionalidades.
 
 ---
 
-## 11. Configuración de cuenta
+## 10. Configuración de cuenta
 
 Accede desde el menú de usuario (esquina superior derecha) o desde el sidebar → **"Configuración"**.
 
@@ -433,7 +372,7 @@ En **"Apariencia"** puedes alternar entre el **tema claro** y el **tema oscuro**
 
 ---
 
-## 12. Panel de administración *(Admin)*
+## 11. Panel de administración *(Admin)*
 
 Los usuarios con rol de administrador tienen acceso a un panel de gestión en `/admin`.
 
@@ -472,15 +411,20 @@ En **"Suscripciones"** el administrador puede ver:
 
 ---
 
-## 13. Preguntas frecuentes
+## 12. Preguntas frecuentes
 
 **¿Puedo tener más de 5 tareas en el plan gratuito?**
-No. El plan gratuito tiene un límite de 5 tareas en estado "pendiente" simultáneamente. Puedes completar tareas existentes para liberar espacio, o actualizar a Premium para tener tareas ilimitadas.
+No. El plan gratuito tiene un límite de 5 tareas en estado "pendiente" simultáneamente. Puedes completar tareas existentes para liberar espacio, o actualizar a Solo para tener tareas ilimitadas.
 
 ---
 
-**¿Qué pasa con mis datos si cancelo Premium?**
-Tus datos se conservan. Sin embargo, perderás acceso a las funcionalidades Premium (proyectos, cajas, voz, IA). Tus tareas y ideas seguirán accesibles.
+**¿Puedo tener más de 1 cliente en el plan gratuito?**
+No. El plan gratuito permite 1 cliente. Para gestionar clientes ilimitados, actualiza a Solo.
+
+---
+
+**¿Qué pasa con mis datos si cancelo Solo?**
+Tus datos se conservan. Sin embargo, perderás acceso a las funcionalidades Solo (clientes ilimitados, recursos, IA contextual). Tus tareas y notas seguirán accesibles.
 
 ---
 

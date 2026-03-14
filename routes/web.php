@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminPaymentController;
 use App\Http\Controllers\Admin\AdminSubscriptionController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\AiController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\IdeaController;
 use App\Http\Controllers\ProjectController;
@@ -46,6 +47,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // ==================== RUTAS PREMIUM (premium_user) — IA + Recursos ====================
 Route::middleware(['auth', 'verified', 'role:premium_user'])->group(function () {
+    // IA contextual
+    Route::post('ai/plan-day', [AiController::class, 'planDay'])->name('ai.plan-day');
+    Route::post('ai/client-summary/{project}', [AiController::class, 'clientSummary'])->name('ai.client-summary');
+    Route::post('ai/client-update/{project}', [AiController::class, 'clientUpdate'])->name('ai.client-update');
+
     // Recursos anidados bajo clientes
     Route::get('clients/{project}/resources/create', [ResourceController::class, 'create'])->name('resources.create');
     Route::post('clients/{project}/resources', [ResourceController::class, 'store'])->name('resources.store');

@@ -14,11 +14,9 @@ const getTutorialId = (href: NavItem['href']): string | undefined => {
     const hrefString = typeof href === 'string' ? href : href.url;
     const mapping: Record<string, string> = {
         '/dashboard': 'dashboard',
+        '/clients': 'clients',
         '/tasks': 'tasks',
-        '/ideas': 'ideas',
-        '/projects': 'projects',
-        '/boxes': 'boxes',
-        '/ai-chats': 'ai-chats',
+        '/notes': 'notes',
         '/subscription': 'subscription',
     };
     return mapping[hrefString];
