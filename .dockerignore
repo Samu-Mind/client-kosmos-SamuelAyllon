@@ -21,7 +21,7 @@ bootstrap/cache/
 public/build/
 public/hot
 
-# Base de datos local (se crea en el volumen Docker)
+# Base de datos local
 *.sqlite
 database/database.sqlite
 
@@ -29,9 +29,15 @@ database/database.sqlite
 tests/
 
 # Documentación y configuración de IDE
-*.md
+docs/
+README.md
 .editorconfig
 .prettierrc
 .prettierignore
 eslint.config.js
 pint.json
+phpunit.xml
+
+# Docker (evitar recursión innecesaria)
+docker-compose.yml
+.dockerignore

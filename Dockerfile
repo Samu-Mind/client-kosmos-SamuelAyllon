@@ -6,11 +6,11 @@ FROM node:20-alpine AS frontend
 WORKDIR /app
 
 # Instalar dependencias npm primero (aprovecha cache de Docker)
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
 # Copiar código fuente necesario para el build
-COPY vite.config.ts tsconfig.json ./
+COPY vite.config.ts tsconfig.json components.json ./
 COPY resources/ resources/
 COPY public/ public/
 # Vite necesita APP_NAME del entorno; usamos el ejemplo
@@ -21,7 +21,7 @@ RUN npm run build
 # ============================================================
 # Stage 2: Aplicación PHP (servidor final)
 # ============================================================
-FROM php:8.2-cli-alpine
+FROM php:8.4-cli-alpine
 
 # Dependencias del sistema (incluye librerías para pdo_mysql)
 RUN apk add --no-cache \
@@ -33,9 +33,10 @@ RUN apk add --no-cache \
     libxml2-dev \
     libzip-dev \
     icu-dev \
-    openssl-dev
+    openssl-dev \
+    mysql-client
 
-# Extensiones PHP necesarias para Laravel + MySQL/TiDB
+# Extensiones PHP necesarias para Laravel + MySQL
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
