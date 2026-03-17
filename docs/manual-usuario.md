@@ -11,7 +11,7 @@
 Flowly es una plataforma de gestión multi-cliente para freelancers que te ayuda a:
 - Organizar tus **clientes** en fichas con color y estado *(1 gratis, ilimitados con Solo)*
 - Gestionar **tareas** por cliente con fechas y prioridades
-- Capturar **notas** rápidas
+- Capturar **ideas** rápidas
 - Organizar **recursos** (enlaces, documentos, vídeos) por cliente *(Solo)*
 - Usar **IA contextual** para planificar tu día, resumir clientes y generar partes semanales *(Solo)*
 
@@ -24,7 +24,7 @@ Flowly es una plataforma de gestión multi-cliente para freelancers que te ayuda
 3. [Dashboard (Panel Hoy)](#3-dashboard-panel-hoy)
 4. [Gestión de clientes](#4-gestión-de-clientes)
 5. [Gestión de tareas](#5-gestión-de-tareas)
-6. [Gestión de notas](#6-gestión-de-notas)
+6. [Gestión de ideas](#6-gestión-de-ideas)
 7. [Recursos por cliente (Solo)](#7-recursos-por-cliente-solo)
 8. [IA contextual (Solo)](#8-ia-contextual-solo)
 9. [Suscripción y planes](#9-suscripción-y-planes)
@@ -83,17 +83,17 @@ La primera vez que accedas a Flowly después de registrarte, aparecerá un **tou
 Flowy es el asistente virtual de Flowly. Te guiará por la aplicación resaltando cada sección mientras te explica su función. El contenido del tutorial varía según tu tipo de cuenta:
 
 **Si tienes plan gratuito**, Flowy te mostrará:
-1. **Dashboard** — Tu centro de control con tareas y notas
+1. **Dashboard** — Tu centro de control con tareas e ideas
 2. **Clientes** — Cómo crear fichas de clientes (máx. 1 en plan gratuito)
 3. **Tareas** — Cómo crear y gestionar (máx. 5 pendientes)
-4. **Notas** — Cómo capturar anotaciones rápidas sin límites
+4. **Ideas** — Cómo capturar anotaciones rápidas sin límites
 5. **Suscripción** — Qué incluye Solo: clientes ilimitados, tareas ilimitadas, IA contextual y recursos
 
 **Si tienes plan Solo**, Flowy te mostrará:
 1. **Dashboard** — Tu centro de control completo (Panel Hoy)
 2. **Clientes** — Crear fichas de cliente sin límites
 3. **Tareas** — Crear tareas sin límites, asociadas a clientes
-4. **Notas** — Capturar notas rápidas
+4. **Ideas** — Capturar ideas rápidas
 5. **Recursos** — Organizar recursos (enlaces, documentos, vídeos) por cliente
 6. **IA** — Planificar tu día, resumir clientes y generar partes semanales
 
@@ -126,7 +126,7 @@ El dashboard es tu página principal al iniciar sesión. Muestra un resumen de t
 |----------|-------------|
 | **Tareas activas** | Número de tareas en estado "pendiente" |
 | **Completadas este mes** | Tareas que has terminado en el mes actual |
-| **Notas activas** | Notas que aún no has resuelto |
+| **Ideas activas** | Ideas que aún no has resuelto |
 | **Clientes activos** | Clientes en marcha |
 
 El sidebar izquierdo te da acceso a todas las secciones de la aplicación. Las secciones Solo aparecen bloqueadas si tienes el plan gratuito.
@@ -135,7 +135,7 @@ El sidebar izquierdo te da acceso a todas las secciones de la aplicación. Las s
 
 ## 4. Gestión de clientes
 
-Los clientes son fichas que representan a cada persona o empresa para la que trabajas. Cada cliente agrupa sus tareas, notas y recursos.
+Los clientes son fichas que representan a cada persona o empresa para la que trabajas. Cada cliente agrupa sus tareas, ideas y recursos.
 
 ### Ver tus clientes
 
@@ -225,39 +225,39 @@ Si necesitas volver a trabajar en una tarea completada:
 
 ---
 
-## 6. Gestión de notas
+## 6. Gestión de ideas
 
-Las notas son anotaciones rápidas para capturar pensamientos que quieres recordar.
+Las ideas son anotaciones rápidas para capturar pensamientos que quieres recordar.
 
-### Ver tus notas
+### Ver tus ideas
 
-Accede desde el sidebar a **"Notas"**. Se muestran primero las **activas** y luego las **resueltas**.
+Accede desde el sidebar a **"Ideas"**. Se muestran primero las **activas** y luego las **resueltas**.
 
 ---
 
-### Crear una nota
+### Crear una idea
 
-1. Haz clic en **"Nueva nota"**.
+1. Haz clic en **"Nueva idea"**.
 2. Rellena:
    - **Nombre** *(obligatorio)*
    - **Descripción** *(opcional)*
    - **Prioridad**: Baja / Media / Alta
-3. Haz clic en **"Guardar nota"**.
+3. Haz clic en **"Guardar idea"**.
 
-No hay límite en el número de notas para ningún plan.
+No hay límite en el número de ideas para ningún plan.
 
 ---
 
-### Resolver o reactivar una nota
+### Resolver o reactivar una idea
 
-- **Resolver**: cuando hayas actuado sobre la nota, márcala como resuelta con el botón **"Resolver"**. Pasará a la sección de resueltas.
+- **Resolver**: cuando hayas actuado sobre la idea, márcala como resuelta con el botón **"Resolver"**. Pasará a la sección de resueltas.
 - **Reactivar**: si quieres volver a trabajarla, haz clic en **"Reactivar"**.
 
 ---
 
-### Editar o eliminar una nota
+### Editar o eliminar una idea
 
-Igual que con las tareas, usa los iconos de lápiz y papelera junto a cada nota.
+Igual que con las tareas, usa los iconos de lápiz y papelera junto a cada idea.
 
 ---
 
@@ -302,7 +302,7 @@ La IA contextual de Flowly te ayuda a gestionar tus clientes de forma más efici
 
 1. Accede al detalle de un **cliente**.
 2. Haz clic en **"Resumen IA"**.
-3. La IA generará un resumen de 3-4 líneas con el estado actual del cliente: tareas completadas, pendientes y notas activas.
+3. La IA generará un resumen de 3-4 líneas con el estado actual del cliente: tareas completadas, pendientes e ideas activas.
 
 ---
 
@@ -424,7 +424,7 @@ No. El plan gratuito permite 1 cliente. Para gestionar clientes ilimitados, actu
 ---
 
 **¿Qué pasa con mis datos si cancelo Solo?**
-Tus datos se conservan. Sin embargo, perderás acceso a las funcionalidades Solo (clientes ilimitados, recursos, IA contextual). Tus tareas y notas seguirán accesibles.
+Tus datos se conservan. Sin embargo, perderás acceso a las funcionalidades Solo (clientes ilimitados, recursos, IA contextual). Tus tareas e ideas seguirán accesibles.
 
 ---
 

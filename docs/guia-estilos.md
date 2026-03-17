@@ -31,7 +31,7 @@ Flowly habla como un **compañero competente y tranquilo**: no es un coach motiv
 | Empty state (sin clientes) | "No hay datos" | "Aquí vivirán tus clientes. Añade el primero y Flowly recordará todo por ti." |
 | Botón de IA | "Generar" | "Preparar update" |
 | Tarea completada | "Completada" | "Hecho ✓" |
-| Panel Hoy vacío | "Sin tareas para hoy" | "Día limpio. Buen momento para revisar notas o descansar." |
+| Panel Hoy vacío | "Sin tareas para hoy" | "Día limpio. Buen momento para revisar ideas o descansar." |
 | Error de formulario | "Campo requerido" | "¿Cómo se llama tu cliente?" |
 | Upgrade modal (2º cliente) | "Mejora tu plan" | "Para gestionar varios clientes a la vez, pasa a Solo." |
 | Upgrade modal (IA) | "Feature premium" | "La IA freelancer está en el plan Solo." |
@@ -107,7 +107,7 @@ El sidebar hereda de la paleta principal pero se puede ajustar independientement
 - ❌ NO para formularios
 
 **Destructive:**
-- ✅ Solo para eliminar entidades (cliente, tarea, nota)
+- ✅ Solo para eliminar entidades (cliente, tarea, idea)
 - ❌ NO para warnings ni urgencias (usar Warning)
 - ❌ NO para texto informativo
 
@@ -131,7 +131,7 @@ El sidebar hereda de la paleta principal pero se puede ajustar independientement
 | **Display** | Nunito | 800 | 2rem (32px) | 1.2 | Títulos de pantalla: "Hoy", "Mis Clientes" |
 | **H2** | Nunito | 700 | 1.5rem (24px) | 1.3 | Secciones: "Tareas críticas", "Clientes en riesgo" |
 | **H3** | Nunito | 600 | 1.25rem (20px) | 1.4 | Subsecciones: nombre de cliente en lista |
-| **Body** | Inter | 400 | 1rem (16px) | 1.6 | Descripciones, resúmenes IA, notas |
+| **Body** | Inter | 400 | 1rem (16px) | 1.6 | Descripciones, resúmenes IA, ideas |
 | **Body strong** | Inter | 600 | 1rem (16px) | 1.6 | Énfasis en texto, labels activos |
 | **UI** | Inter | 500 | 0.875rem (14px) | 1.5 | Botones, badges, metadatos de tarjeta |
 | **Caption** | Inter | 400 | 0.75rem (12px) | 1.4 | Fechas, contadores, texto secundario |
@@ -330,7 +330,7 @@ Hoy deberías hacer esto:
 - Timeline: últimas 5 tareas + próximos 3 hitos
 - Tareas pendientes
 - Recursos (links, briefs)
-- Notas vinculadas
+- Ideas vinculadas
 
 **Nivel 3 — Edición (2 clics):**
 - Tono de marca, scope del servicio, links clave, notas generales
@@ -347,7 +347,7 @@ Cada empty state responde 3 preguntas:
 |----------|---------|-----|
 | Sin clientes | "Aquí vivirán tus clientes. Añade el primero y Flowly recordará todo por ti." | "+ Añadir cliente" |
 | Sin tareas | "Ninguna tarea pendiente. ¿Buen momento para planificar la semana?" | "+ Nueva tarea" |
-| Sin notas | "Las notas rápidas van aquí. Vincula cada una a un cliente para no perder contexto." | "+ Nueva nota" |
+| Sin ideas | "Las ideas rápidas van aquí. Vincula cada una a un cliente para no perder contexto." | "+ Nueva idea" |
 | Dashboard sin datos | "Tu día empieza cuando añadas tu primer cliente y sus tareas." | "Ir a Clientes →" |
 
 ### Formularios
@@ -502,7 +502,7 @@ Todo componente nuevo **debe** verificarse en ambos modos antes de merge. Checkl
 | - Hoy            | Content Area                     |
 | - Clientes       | (max-width: 1024px, centrado)    |
 | - Tareas         |                                  |
-| - Notas          |                                  |
+| - Ideas          |                                  |
 | ──────────       |                                  |
 | - Ajustes        |                                  |
 | - Plan           |                                  |

@@ -35,12 +35,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
     Route::patch('tasks/{task}/reopen', [TaskController::class, 'reopen'])->name('tasks.reopen');
 
-    // Notes (antes Ideas) — SIN show
-    Route::resource('notes', IdeaController::class)
-        ->parameters(['notes' => 'idea'])
+    // Ideas — SIN show
+    Route::resource('ideas', IdeaController::class)
+        ->parameters(['ideas' => 'idea'])
         ->except(['show']);
-    Route::patch('notes/{idea}/resolve', [IdeaController::class, 'resolve'])->name('notes.resolve');
-    Route::patch('notes/{idea}/reactivate', [IdeaController::class, 'reactivate'])->name('notes.reactivate');
+    Route::patch('ideas/{idea}/resolve', [IdeaController::class, 'resolve'])->name('ideas.resolve');
+    Route::patch('ideas/{idea}/reactivate', [IdeaController::class, 'reactivate'])->name('ideas.reactivate');
 
     // Suscripción y checkout
     Route::get('subscription', [SubscriptionController::class, 'index'])->name('subscription.index');

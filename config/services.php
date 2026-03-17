@@ -35,11 +35,11 @@ return [
         ],
     ],
 
-    'openai' => [
-        'key' => env('OPENAI_API_KEY', ''),
-        'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
-        'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
-        'ca_bundle' => env('OPENAI_CA_BUNDLE'),
+    'groq' => [
+        'api_key'   => env('GROQ_API_KEY'),
+        'base_url'  => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
+        'model'     => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'ca_bundle' => env('GROQ_CA_BUNDLE'),
     ],
 
 ];

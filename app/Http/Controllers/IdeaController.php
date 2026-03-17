@@ -41,7 +41,7 @@ class IdeaController extends Controller
             'user_modified_at' => now(),
         ]);
 
-        return redirect()->route('notes.index')->with('success', 'Idea creada correctamente.');
+        return redirect()->route('ideas.index')->with('success', 'Idea creada correctamente.');
     }
 
     public function edit(Idea $idea): Response
@@ -62,7 +62,7 @@ class IdeaController extends Controller
             'user_modified_at' => now(),
         ]);
 
-        return redirect()->route('notes.index')->with('success', 'Idea actualizada correctamente.');
+        return redirect()->route('ideas.index')->with('success', 'Idea actualizada correctamente.');
     }
 
     public function destroy(Idea $idea): RedirectResponse
@@ -71,7 +71,7 @@ class IdeaController extends Controller
 
         $idea->delete();
 
-        return redirect()->route('notes.index')->with('success', 'Idea eliminada correctamente.');
+        return redirect()->route('ideas.index')->with('success', 'Idea eliminada correctamente.');
     }
 
     public function resolve(Idea $idea): RedirectResponse

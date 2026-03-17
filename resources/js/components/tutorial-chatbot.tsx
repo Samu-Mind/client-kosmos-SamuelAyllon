@@ -84,8 +84,8 @@ const premiumUserSteps: TutorialStep[] = [
     },
     {
         id: 5,
-        botMessage: 'Las Notas son perfectas para capturar ideas y recordatorios sobre tus clientes. Vincúlalas para tener todo a mano.',
-        target: 'notes',
+        botMessage: 'Las Ideas son perfectas para capturar ideas y recordatorios sobre tus clientes. Vincúlalas para tener todo a mano.',
+        target: 'ideas',
         icon: '💡',
         position: 'right',
     },

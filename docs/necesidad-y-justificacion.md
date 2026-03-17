@@ -56,9 +56,9 @@ Flowly organiza toda la gestion del freelancer **por cliente**, con IA contextua
 
 | Necesidad | Herramientas actuales | Solucion Flowly |
 |-----------|----------------------|-----------------|
-| Gestionar clientes con sus entregables | Hojas de calculo, Notion | Fichas de cliente con tareas, notas y recursos asociados |
+| Gestionar clientes con sus entregables | Hojas de calculo, Notion | Fichas de cliente con tareas, ideas y recursos asociados |
 | Tareas con fechas y prioridades por cliente | Todoist, To Do | Gestor de tareas con due_date, prioridad y asignacion a cliente |
-| Capturar notas rapidas | Google Keep, notas | Notas con captura rapida y clasificacion |
+| Capturar notas rapidas | Google Keep, notas | Ideas con captura rapida y clasificacion |
 | Organizar recursos por cliente | Google Drive, marcadores | Recursos por cliente con tipos (link/doc/video/imagen) |
 | Saber el estado de cada cliente | Revision manual | IA contextual: resumen de cliente, parte semanal |
 | Planificar el dia con multiples clientes | Revision manual | IA contextual: planificacion del dia con tareas priorizadas |
@@ -66,7 +66,7 @@ Flowly organiza toda la gestion del freelancer **por cliente**, con IA contextua
 ### Diferenciadores clave
 
 **1. Todo organizado por cliente**
-Cada cliente tiene su ficha con color, estado, tareas asociadas, notas y recursos. No hay informacion suelta: todo esta vinculado a un cliente.
+Cada cliente tiene su ficha con color, estado, tareas asociadas, ideas y recursos. No hay informacion suelta: todo esta vinculado a un cliente.
 
 **2. IA con contexto real de tus clientes**
 A diferencia de ChatGPT generico, la IA de Flowly recibe automaticamente los datos de tus clientes y tareas. Esto permite 3 acciones concretas:
@@ -75,9 +75,9 @@ A diferencia de ChatGPT generico, la IA de Flowly recibe automaticamente los dat
 - **Parte semanal**: genera un informe detallado para enviar al cliente o para tu referencia
 
 **3. Modelo freemium accesible**
-- Plan gratuito funcional (1 cliente + 5 tareas + notas ilimitadas, suficiente para probar)
+- Plan gratuito funcional (1 cliente + 5 tareas + ideas ilimitadas, suficiente para probar)
 - Solo a 11,99 EUR/mes (menos que Todoist Business + Notion + ChatGPT Plus por separado)
-- Sin limites artificiales frustrantes (notas ilimitadas en free)
+- Sin limites artificiales frustrantes (ideas ilimitadas en free)
 
 **4. Simplicidad deliberada**
 Flowly no intenta ser Notion (demasiado flexible) ni un CRM complejo. Es un gestor personal de clientes con exactamente las funcionalidades necesarias para un freelancer, sin mas.
@@ -91,7 +91,7 @@ Flowly no intenta ser Notion (demasiado flexible) ni un CRM complejo. Es un gest
 **Plan Free — Enganche**
 - 1 cliente (suficiente para probar)
 - 5 tareas pendientes simultaneas
-- Notas ilimitadas (la captura rapida no debe tener limite)
+- Ideas ilimitadas (la captura rapida no debe tener limite)
 - Dashboard basico (Panel Hoy)
 
 El limite de 1 cliente es deliberado: suficiente para validar la herramienta, pero que genera friccion natural cuando el freelancer empieza a gestionar mas clientes.
@@ -158,7 +158,7 @@ Carlos tiene 3 clientes activos de desarrollo. Usa Flowly para:
 ### Caso 3: Consultora que empieza
 Maria acaba de empezar como consultora y tiene su primer cliente. Usa Flowly free para:
 - 1 cliente con sus tareas asociadas (maximo 5 pendientes)
-- Notas ilimitadas para anotar ideas de cada sesion
+- Ideas ilimitadas para anotar ideas de cada sesion
 - Cuando consiga mas clientes, actualizara a Solo
 
 ---
@@ -181,6 +181,6 @@ Maria acaba de empezar como consultora y tiene su primer cliente. Usa Flowly fre
 
 ## 7. Conclusion
 
-Flowly existe porque **un freelancer no deberia necesitar 5 apps para gestionar sus clientes**. Al organizar toda la gestion por cliente — tareas, notas, recursos e IA contextual — en una unica plataforma con un modelo freemium accesible, Flowly reduce la friccion y permite al freelancer centrarse en lo que importa: entregar buen trabajo a sus clientes.
+Flowly existe porque **un freelancer no deberia necesitar 5 apps para gestionar sus clientes**. Al organizar toda la gestion por cliente — tareas, ideas, recursos e IA contextual — en una unica plataforma con un modelo freemium accesible, Flowly reduce la friccion y permite al freelancer centrarse en lo que importa: entregar buen trabajo a sus clientes.
 
 El proyecto demuestra que es viable construir una plataforma de gestion multi-cliente completa con tecnologias modernas (Laravel 12 + React 19 + IA) en el marco de un proyecto academico, manteniendo estandares profesionales de testing, seguridad y diseno.

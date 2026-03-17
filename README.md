@@ -37,29 +37,29 @@
 
 ## Acerca de
 
-**Flowly** es una plataforma web freemium pensada para **freelancers que gestionan varios clientes a la vez**. Cada cliente tiene su propia ficha con tareas, notas, recursos y contexto, de modo que al cambiar de cliente retomas justo donde lo dejaste.
+**Flowly** es una plataforma web freemium pensada para **freelancers que gestionan varios clientes a la vez**. Cada cliente tiene su propia ficha con tareas, ideas, recursos y contexto, de modo que al cambiar de cliente retomas justo donde lo dejaste.
 
 ### Que problema resuelve
 
-La fragmentacion de herramientas (una app para tareas, otra para notas, otra para enlaces) genera:
+La fragmentacion de herramientas (una app para tareas, otra para ideas, otra para enlaces) genera:
 - **Perdida de contexto**: al saltar de un cliente a otro se pierden detalles cruciales.
-- **Informacion dispersa**: notas sueltas, enlaces en marcadores, tareas sin vincular a quien pertenecen.
+- **Informacion dispersa**: ideas sueltas, enlaces en marcadores, tareas sin vincular a quien pertenecen.
 - **Falta de vision diaria**: no hay un lugar que muestre "que tengo que hacer hoy y para quien".
 
 Flowly unifica estas necesidades en fichas de cliente con:
 
-- **Clientes** como unidad central: cada cliente agrupa tareas, notas e ideas, y recursos
+- **Clientes** como unidad central: cada cliente agrupa tareas, ideas y recursos
 - **Tareas** con prioridades, fechas de vencimiento y vinculacion a cliente
-- **Notas e ideas** para captura rapida, ligadas a un cliente
-- **Recursos** (enlaces, documentos, videos) organizados dentro de cada ficha *(Solo)*
-- **IA contextual** con 3 acciones inteligentes: resumen de cliente, sugerencia de siguientes pasos y redaccion de emails *(Solo)*
+- **Ideas** para captura rapida, ligadas a un cliente
+- **Recursos** (enlaces, documentos, videos) organizados dentro de cada ficha *(Solo Premium)*
+- **IA contextual** con 3 acciones inteligentes: resumen de cliente, sugerencia de siguientes pasos y redaccion de emails *(Solo Premium)*
 - **Panel Hoy** que muestra todas las tareas del dia agrupadas por cliente
 
 ---
 
 ## Modelo Freemium
 
-| Plan | Precio | Clientes | Tareas | Notas | Recursos | IA |
+| Plan | Precio | Clientes | Tareas | Ideas | Recursos | IA |
 |------|--------|----------|--------|-------|----------|-----|
 | **Gratuito** | 0 € | 1 | 5 max pendientes | Ilimitadas | — | — |
 | **Solo Mensual** | 11,99 €/mes | Ilimitados | Ilimitadas | Ilimitadas | Si | 3 acciones |
@@ -73,7 +73,7 @@ Flowly unifica estas necesidades en fichas de cliente con:
 - Autenticacion completa: registro, login, recuperacion de contrasena, verificacion email, 2FA (Fortify)
 - Fichas de cliente con nombre, descripcion, color y estado (activo/inactivo/completado)
 - Gestor de tareas vinculadas a cliente con limite free (5 pendientes max) — CRUD + completar/reabrir
-- Gestor de notas/ideas sin limite — CRUD + resolver/reactivar
+- Gestor de ideas sin limite — CRUD + resolver/reactivar
 - Panel Hoy con tareas del dia agrupadas por cliente
 - Checkout y suscripcion simulada (80% exito / 20% fallo)
 - Dashboard personal con datos reales condicional por plan
@@ -104,10 +104,10 @@ El proyecto se desarrollo en 4 fases incrementales:
 
 | Fase | Descripcion | Estado |
 |------|-------------|--------|
-| **Fase 1** | Restructuracion backend: "Proyectos" → "Clientes", eliminacion de Cajas/Voz/Chat, limpieza de rutas y modelos | ✅ |
-| **Fase 2** | Ficha de cliente completa (tareas + notas + recursos en una sola vista) y dashboard "Panel Hoy" | ✅ |
-| **Fase 3** | IA contextual con 3 endpoints: plan-day, client-summary, client-update (Groq/OpenAI) | ✅ |
-| **Fase 4** | Pulido, landing page, precios actualizados (11,99/119 €), datos demo en seeders, README | ✅ |
+| **Fase 1** | Restructuracion backend: "Proyectos" → "Clientes", eliminacion de Cajas/Voz/Chat, limpieza de rutas y modelos | Completada |
+| **Fase 2** | Ficha de cliente completa (tareas + ideas + recursos en una sola vista) y dashboard "Panel Hoy" | Completada |
+| **Fase 3** | IA contextual con 3 endpoints: plan-day, client-summary, client-update (Groq) | Completada |
+| **Fase 4** | Pulido, landing page, precios actualizados (11,99/119 €), datos demo en seeders, README | Completada |
 
 ---
 
@@ -119,12 +119,17 @@ Composer 2.x
 Node.js 18+
 npm
 Git
-SQLite (incluido con PHP) — para desarrollo local
 ```
 
-**Opcional:**
+**Para la base de datos (TiDB Cloud):**
 ```
-Groq API Key (gratuita) o OpenAI API Key — para IA contextual
+Certificado SSL ISRG Root X1 (Let's Encrypt)
+```
+
+**Para la IA contextual (Groq):**
+```
+Cuenta gratuita en Groq (https://console.groq.com)
+Certificado CA bundle de Mozilla (para Windows)
 ```
 
 ---
@@ -143,32 +148,62 @@ composer install
 npm install
 ```
 
-### 3. Configurar entorno
+### 3. Configurar certificados SSL (Windows)
+
+> **IMPORTANTE:** En Windows, PHP/cURL no incluye certificados SSL por defecto. Necesitas descargarlos manualmente para que funcione tanto la conexion a la base de datos (TiDB Cloud) como la IA contextual (Groq).
+
+Abre **PowerShell como administrador** y ejecuta:
+
+```powershell
+# Crear directorio de certificados
+mkdir C:\certs
+
+# Descargar certificado ISRG Root X1 (necesario para TiDB Cloud)
+Invoke-WebRequest -Uri "https://letsencrypt.org/certs/isrgrootx1.pem" -OutFile "C:\certs\isrgrootx1.pem"
+
+# Descargar CA bundle de Mozilla (necesario para Groq/IA contextual)
+Invoke-WebRequest -Uri "https://curl.se/ca/cacert.pem" -OutFile "C:\certs\cacert.pem"
+```
+
+Esto descarga:
+- `C:\certs\isrgrootx1.pem` — Certificado raiz de Let's Encrypt, requerido para la conexion SSL a TiDB Cloud Serverless.
+- `C:\certs\cacert.pem` — Bundle completo de autoridades certificadoras de Mozilla, requerido para que cURL/PHP pueda verificar el certificado SSL de la API de Groq (y cualquier otro servicio HTTPS).
+
+> **Linux/macOS:** Estos sistemas ya incluyen los certificados CA del sistema. No es necesario descargarlos manualmente.
+
+### 4. Configurar entorno
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-### 4. Base de datos (SQLite para desarrollo)
+Edita el archivo `.env` con tus credenciales:
+
+```env
+# ── Base de datos (TiDB Cloud) ─────────────────────────────────
+DB_CONNECTION=mysql
+DB_HOST=gateway01.eu-central-1.prod.aws.tidbcloud.com
+DB_PORT=4000
+DB_DATABASE=test
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_password
+DB_SSL_CA=C:\certs\isrgrootx1.pem
+
+# ── IA contextual (Groq — gratuito) ────────────────────────────
+GROQ_API_KEY=gsk_tu_clave_aqui
+GROQ_BASE_URL=https://api.groq.com/openai/v1
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_CA_BUNDLE=C:/certs/cacert.pem
+```
+
+> **Obtener la API key de Groq:** Registrate gratis en [console.groq.com](https://console.groq.com), ve a "API Keys" y genera una nueva clave. El plan gratuito permite 14.400 peticiones/dia.
+
+### 5. Migrar base de datos con datos de prueba
 ```bash
-touch database/database.sqlite
 php artisan migrate:fresh --seed
 ```
 
-Esto crea 3 usuarios de prueba con datos demo: clientes, tareas, notas y recursos.
-
-### 5. Variables de entorno opcionales (IA contextual)
-```env
-# Groq (gratuito, recomendado)
-OPENAI_API_KEY=gsk_xxxxxxxxxxxxxxxx
-OPENAI_BASE_URL=https://api.groq.com/openai/v1
-OPENAI_MODEL=llama-3.3-70b-versatile
-
-# O con OpenAI directamente
-OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
-OPENAI_BASE_URL=https://api.openai.com/v1
-OPENAI_MODEL=gpt-3.5-turbo
-```
+Esto crea 3 usuarios de prueba con datos demo: clientes, tareas, ideas y recursos.
 
 ### 6. Iniciar servidor
 ```bash
@@ -193,8 +228,8 @@ Despues de `php artisan migrate:fresh --seed`:
 | Rol | Email | Password | Datos demo |
 |-----|-------|----------|------------|
 | Admin | admin@flowly.test | password | — |
-| Premium (Solo) | premium@flowly.test | password | 3 clientes, tareas, notas, recursos |
-| Free | free@flowly.test | password | 1 cliente, 3 tareas, 1 nota |
+| Premium (Solo) | premium@flowly.test | password | 3 clientes, tareas, ideas, recursos |
+| Free | free@flowly.test | password | 1 cliente, 3 tareas, 1 idea |
 
 ---
 
@@ -209,7 +244,7 @@ Despues de `php artisan migrate:fresh --seed`:
 | Laravel Fortify | 1.x | Autenticacion (login, registro, 2FA, verificacion) |
 | Spatie Permission | 7.x | Roles y permisos (admin, premium_user, free_user) |
 | Pest | 3.x | Testing (156 test cases) |
-| openai-php/client | 0.19 | Integracion IA contextual (Groq/OpenAI) |
+| openai-php/client | 0.19 | Cliente SDK para IA (Groq via API OpenAI-compatible) |
 | Laravel Wayfinder | 0.1.9 | Generacion de rutas tipadas para TypeScript |
 
 ### Frontend
@@ -226,17 +261,17 @@ Despues de `php artisan migrate:fresh --seed`:
 
 ### Base de Datos
 
-| Entorno | Motor |
-|---------|-------|
-| Desarrollo / Tests | SQLite (cero configuracion) |
-| Produccion | TiDB Cloud Serverless (MySQL-compatible, port 4000, SSL) |
+| Entorno | Motor | Conexion |
+|---------|-------|----------|
+| Produccion / Desarrollo | TiDB Cloud Serverless (MySQL-compatible) | Puerto 4000, SSL obligatorio (ISRG Root X1) |
+| Tests | SQLite (in-memory) | Cero configuracion |
 
 ### Integraciones IA
 
-| Servicio | Uso | Plan gratuito |
-|---------|-----|---------------|
-| Groq (recomendado) | IA contextual — Llama 3.3 70B | 14.400 req/dia |
-| OpenAI GPT | IA contextual alternativa | De pago |
+| Servicio | Uso | Plan gratuito | Configuracion |
+|---------|-----|---------------|---------------|
+| **Groq** (usado) | IA contextual — Llama 3.3 70B | 14.400 req/dia | `GROQ_API_KEY` + `GROQ_CA_BUNDLE` |
+| OpenAI GPT | Alternativa compatible | De pago | Cambiar `GROQ_BASE_URL` y `GROQ_API_KEY` |
 
 ---
 
@@ -248,20 +283,39 @@ Flowly sigue el patron **SPA monolitica** con Inertia.js: el backend Laravel ren
 ### Capas de la aplicacion
 
 ```
-[Browser] <--Inertia--> [Laravel Controllers] <--Eloquent--> [Database]
+[Browser] <--Inertia--> [Laravel Controllers] <--Eloquent--> [TiDB Cloud (MySQL)]
                               |
                          [Policies]     → Autorizacion por ownership
                          [Middleware]   → Roles (Spatie)
                          [FormRequests] → Validacion de entrada
                          [Models]       → Logica de negocio
+                              |
+                    [OpenAI PHP Client] → Groq API (IA contextual)
 ```
+
+### Integracion IA — Groq via OpenAI SDK
+
+El cliente de IA se registra como **singleton** en `AppServiceProvider`:
+
+```php
+$this->app->singleton(OpenAIClient::class, function () {
+    return OpenAI::factory()
+        ->withApiKey(config('services.groq.api_key'))
+        ->withBaseUri(config('services.groq.base_url'))
+        ->withHttpClient(new GuzzleClient(['verify' => config('services.groq.ca_bundle')]))
+        ->make();
+});
+```
+
+El `AiController` lo recibe por inyeccion de dependencias y lo usa para las 3 acciones contextuales. Toda la configuracion esta en `config/services.php` bajo la clave `groq`.
 
 ### Decisiones clave
 - **Clientes = Projects**: internamente el modelo se llama `Project`, las URLs usan `/clients` y la UI dice "Clientes"
+- **Ideas**: el modelo se llama `Idea`, las URLs usan `/ideas` y la UI dice "Ideas"
 - **Hard delete** en Task e Idea (SoftDeletes eliminado)
 - **Limite de tareas free**: `User::canAddTask()` cuenta tareas con `status='pending'`
 - **Pago simulado**: `Payment::process()` con 80% exito, almacena solo ultimos 4 digitos de tarjeta
-- **IA contextual**: 3 endpoints que leen tareas, notas y recursos del cliente para generar respuestas utiles
+- **IA contextual**: 3 endpoints que leen tareas, ideas y recursos del cliente para generar respuestas utiles
 - **Ruta home**: `inertia('welcome')` sin redirect a login (requerido por tests)
 
 ---
@@ -277,7 +331,7 @@ flowly/
 │   │   │   ├── IdeaController.php
 │   │   │   ├── ProjectController.php         ← Fichas de cliente
 │   │   │   ├── ResourceController.php        ← Recursos por cliente
-│   │   │   ├── AiController.php              ← IA contextual (3 acciones)
+│   │   │   ├── AiController.php              ← IA contextual (3 acciones, inyecta OpenAI\Client)
 │   │   │   ├── DashboardController.php       ← Panel Hoy
 │   │   │   ├── SubscriptionController.php
 │   │   │   ├── CheckoutController.php
@@ -297,7 +351,11 @@ flowly/
 │   │   ├── Subscription.php   ← upgradeToPremium(), hasExpired()
 │   │   ├── Payment.php        ← process() simula 80%/20%
 │   │   └── AiLog.php          ← Registro de uso de IA
+│   ├── Providers/
+│   │   └── AppServiceProvider.php ← Singleton OpenAI\Client (Groq)
 │   └── Policies/              ← 4 policies (ownership)
+├── config/
+│   └── services.php           ← Configuracion Groq (api_key, base_url, model, ca_bundle)
 ├── database/
 │   ├── migrations/
 │   └── seeders/               ← RoleSeeder + UserSeeder (3 usuarios con datos demo)
@@ -308,7 +366,7 @@ flowly/
 │       │   ├── welcome.tsx         ← Landing page
 │       │   ├── dashboard.tsx       ← Panel Hoy condicional free/premium
 │       │   ├── tasks/              ← index, create, edit
-│       │   ├── ideas/              ← index, create, edit (notas)
+│       │   ├── ideas/              ← index, create, edit
 │       │   ├── projects/           ← index, show, create, edit (clientes)
 │       │   ├── resources/          ← create, edit
 │       │   ├── subscription/       ← Planes
@@ -325,10 +383,11 @@ flowly/
 ├── routes/
 │   ├── web.php                ← Todas las rutas
 │   └── settings.php           ← Rutas de configuracion
-├── tests/Feature/             ← 156 test cases
+├── tests/Feature/             ← 156 test cases (Pest)
 ├── docs/
 │   ├── manual-usuario.md
 │   ├── decisiones-tecnicas.md
+│   ├── contexto-proyecto.md
 │   ├── necesidad-y-justificacion.md
 │   └── guia-estilos.md
 ├── Dockerfile                 ← Multi-stage build (Node + PHP)
@@ -365,6 +424,7 @@ composer test                                # Lint + tests
 ### Cache
 ```bash
 php artisan optimize:clear    # Limpia config, cache, vistas
+php artisan config:clear      # Solo limpia cache de configuracion
 ```
 
 ### Lint y formato
@@ -387,7 +447,7 @@ composer lint              # Laravel Pint
 - Clientes ilimitados, tareas ilimitadas, recursos, IA contextual
 
 **`free_user`** — Acceso limitado
-- 1 cliente, maximo 5 tareas pendientes, notas ilimitadas
+- 1 cliente, maximo 5 tareas pendientes, ideas ilimitadas
 - Sin recursos ni IA contextual
 
 ### Capas de proteccion
@@ -416,8 +476,8 @@ GET/POST/PUT/DELETE  /clients         Fichas de cliente (CRUD)
 PATCH                /clients/{id}/complete
 GET/POST/PUT/DELETE  /tasks           Tareas vinculadas a cliente
 PATCH                /tasks/{id}/complete | /reopen
-GET/POST/PUT/DELETE  /notes           Notas e ideas
-PATCH                /notes/{id}/resolve | /reactivate
+GET/POST/PUT/DELETE  /ideas           Ideas
+PATCH                /ideas/{id}/resolve | /reactivate
 GET                  /subscription    Ver suscripcion
 GET/POST             /checkout        Pago simulado
 POST                 /tutorial/complete  Marcar tutorial completado
@@ -449,13 +509,13 @@ GET         /admin/subscriptions
 php artisan test
 ```
 
-**156 test cases — 100% pasando**
+**156 test cases** distribuidos en:
 
 | Area | Cobertura |
 |------|-----------|
 | Auth | Registro, login, verificacion email, reset password, 2FA |
 | Tasks | CRUD, completar/reabrir, limite free, autorizacion |
-| Notes | CRUD, resolver/reactivar, autorizacion |
+| Ideas | CRUD, resolver/reactivar, autorizacion |
 | Clients | CRUD, completar, ownership |
 | Resources | CRUD anidado bajo cliente, autorizacion |
 | Checkout | Flujo exito/fallo, validacion tarjeta |
@@ -491,35 +551,56 @@ APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
 
-# Base de datos (SQLite para dev)
-DB_CONNECTION=sqlite
+# ── Base de datos (TiDB Cloud Serverless) ──────────────────────
+DB_CONNECTION=mysql
+DB_HOST=gateway01.eu-central-1.prod.aws.tidbcloud.com
+DB_PORT=4000
+DB_DATABASE=test
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_password
+DB_SSL_CA=C:\certs\isrgrootx1.pem
 
-# Produccion: TiDB Cloud
-# DB_CONNECTION=mysql
-# DB_HOST=gateway01.eu-central-1.prod.aws.tidbcloud.com
-# DB_PORT=4000
-# MYSQL_ATTR_SSL_CA=storage/app/tidb-ca.pem
+# ── Sesion ──────────────────────────────────────────────────────
+SESSION_DRIVER=database
 
-# Sesion
-SESSION_DRIVER=file
-
-# IA contextual (Groq gratuito, recomendado)
-OPENAI_API_KEY=gsk_xxxxxxxxxxxxxxxx
-OPENAI_BASE_URL=https://api.groq.com/openai/v1
-OPENAI_MODEL=llama-3.3-70b-versatile
+# ── IA contextual (Groq — gratuito, recomendado) ───────────────
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxx
+GROQ_BASE_URL=https://api.groq.com/openai/v1
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_CA_BUNDLE=C:/certs/cacert.pem
 ```
+
+### Configuracion de certificados SSL
+
+La aplicacion requiere certificados SSL para dos servicios externos:
+
+| Servicio | Certificado | Ruta por defecto | Variable de entorno |
+|----------|-------------|------------------|---------------------|
+| **TiDB Cloud** (BD) | ISRG Root X1 (Let's Encrypt) | `C:\certs\isrgrootx1.pem` | `DB_SSL_CA` |
+| **Groq** (IA) | CA bundle Mozilla | `C:\certs\cacert.pem` | `GROQ_CA_BUNDLE` |
+
+**Comandos para descargarlos (PowerShell):**
+```powershell
+mkdir C:\certs
+Invoke-WebRequest -Uri "https://letsencrypt.org/certs/isrgrootx1.pem" -OutFile "C:\certs\isrgrootx1.pem"
+Invoke-WebRequest -Uri "https://curl.se/ca/cacert.pem" -OutFile "C:\certs\cacert.pem"
+```
+
+**En Linux/macOS** estos certificados ya vienen preinstalados en el sistema. Solo necesitas asegurarte de que `php` tenga acceso a ellos (normalmente via `openssl.cafile` en `php.ini`) y puedes omitir `GROQ_CA_BUNDLE` del `.env`.
 
 ---
 
 ## Troubleshooting
 
-| Problema | Solucion |
-|----------|----------|
-| Error 419 en formularios | `php artisan config:clear` + borrar cookies |
-| SSL en OpenAI/Groq (Windows) | Configurar `curl.cainfo` y `openssl.cafile` en php.ini |
-| RoleDoesNotExist | `php artisan migrate:fresh --seed` |
-| database.sqlite no existe | `touch database/database.sqlite && php artisan migrate --seed` |
-| Frontend no actualiza | Reiniciar `npm run dev` o Ctrl+Shift+R |
+| Problema | Causa | Solucion |
+|----------|-------|----------|
+| `cURL error 60: SSL peer certificate...` en IA | PHP/cURL no encuentra certificados CA (comun en Windows) | Descargar `cacert.pem` y configurar `GROQ_CA_BUNDLE` en `.env` (ver seccion Configuracion) |
+| `cURL error 60` en base de datos | Falta el certificado ISRG Root X1 para TiDB Cloud | Descargar `isrgrootx1.pem` y configurar `DB_SSL_CA` en `.env` |
+| Error 419 en formularios | Token CSRF expirado | `php artisan config:clear` + borrar cookies del navegador |
+| RoleDoesNotExist | Seeders no ejecutados | `php artisan migrate:fresh --seed` |
+| Frontend no actualiza | Cache de Vite | Reiniciar `npm run dev` o Ctrl+Shift+R en el navegador |
+| `SQLSTATE[HY000]` en conexion BD | Credenciales incorrectas o cert SSL faltante | Verificar `DB_HOST`, `DB_USERNAME`, `DB_PASSWORD` y que `DB_SSL_CA` apunte al certificado correcto |
+| IA no responde / timeout | API key invalida o servicio caido | Verificar `GROQ_API_KEY` en `.env` y que Groq este operativo en [status.groq.com](https://status.groq.com) |
 
 ---
 

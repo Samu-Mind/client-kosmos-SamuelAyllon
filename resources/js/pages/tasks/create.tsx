@@ -192,14 +192,14 @@ export default function TaskCreate({ projects, defaultProjectId }: Props) {
                                         Proyecto
                                     </Label>
                                     <Select
-                                        value={data.project_id}
-                                        onValueChange={(value) => setData('project_id', value)}
+                                        value={data.project_id || 'none'}
+                                        onValueChange={(value) => setData('project_id', value === 'none' ? '' : value)}
                                     >
                                         <SelectTrigger id="project_id" className="w-full">
                                             <SelectValue placeholder="Sin proyecto" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="">Sin proyecto</SelectItem>
+                                            <SelectItem value="none">Sin proyecto</SelectItem>
                                             {projects.map(p => (
                                                 <SelectItem key={p.id} value={String(p.id)}>
                                                     {p.name}

@@ -93,7 +93,7 @@
 **Justificación:**
 - Es el paquete de autorización más descargado del ecosistema Laravel (>20M descargas en Packagist).
 - Permite asignar roles (`admin`, `premium_user`, `free_user`) y aplicarlos como middleware directamente en rutas: `role:premium_user`, `role:admin`.
-- Las Policies de Laravel complementan a Spatie para la autorización a nivel de recurso (solo el propietario puede modificar su cliente/tarea/nota).
+- Las Policies de Laravel complementan a Spatie para la autorización a nivel de recurso (solo el propietario puede modificar su cliente/tarea/idea).
 - La combinación Middleware + Policy cubre todos los niveles de autorización sin redundancias.
 - **Aislamiento de roles:** el rol `admin` tiene acceso exclusivo al panel de administración (`/admin/*`) y no a las rutas premium (IA contextual, recursos). Esta separación garantiza que la gestión de la plataforma y el uso de funcionalidades de usuario son responsabilidades completamente distintas.
 
@@ -158,11 +158,11 @@
 
 ## 9. Arquitectura multi-cliente
 
-**Decisión:** pivotar de una app de productividad genérica a una plataforma de gestión multi-cliente para freelancers. El modelo `Project` pasa a representar una **ficha de cliente** (no un proyecto genérico). Ideas pasan a llamarse **Notas**. Los recursos se asocian directamente al cliente (sin el intermediario de "Cajas").
+**Decisión:** pivotar de una app de productividad genérica a una plataforma de gestión multi-cliente para freelancers. El modelo `Project` pasa a representar una **ficha de cliente** (no un proyecto genérico). Las notas pasan a llamarse **Ideas**. Los recursos se asocian directamente al cliente (sin el intermediario de "Cajas").
 
 **Justificación:**
-- El mercado de productividad genérica está saturado (Todoist, Notion, TickTick). Los freelancers tienen una necesidad específica desatendida: gestionar múltiples clientes con sus tareas, notas y recursos asociados, todo en un solo lugar.
-- La estructura "cliente → tareas + notas + recursos" es más natural para el público objetivo que la estructura "proyectos genéricos + cajas sueltas".
+- El mercado de productividad genérica está saturado (Todoist, Notion, TickTick). Los freelancers tienen una necesidad específica desatendida: gestionar múltiples clientes con sus tareas, ideas y recursos asociados, todo en un solo lugar.
+- La estructura "cliente → tareas + ideas + recursos" es más natural para el público objetivo que la estructura "proyectos genéricos + cajas sueltas".
 - Eliminar las "Cajas" (modelo Box) simplifica la arquitectura: los recursos se asocian directamente al cliente via `project_id`, reduciendo una indirección innecesaria.
 - El modelo freemium se vuelve más claro: free = 1 cliente, Solo = clientes ilimitados + IA + recursos.
 
@@ -172,7 +172,7 @@
 - Eliminada la tabla `ai_conversations` y el modelo `AiConversation`
 - Recursos pasan de `box_id` a `project_id` (Resources belong to Project/Client directly)
 - Nuevo modelo `AiLog` para registros de acciones IA
-- Rutas: `/projects` → `/clients`, `/ideas` → `/notes`
+- Rutas: `/projects` → `/clients`, rutas de ideas usan `/ideas`
 - El `ProjectController` mantiene su nombre interno pero las rutas usan `/clients`
 
 ---
@@ -189,25 +189,29 @@
 
 **3 endpoints:**
 1. **`POST /ai/plan-day`** — Recoge las tareas pendientes del usuario (con prioridad, fecha de vencimiento y cliente) y genera un plan del día con 3-5 acciones priorizadas.
-2. **`POST /ai/client-summary/{project}`** — Genera un resumen de 3-4 líneas del estado de un cliente: tareas completadas, pendientes, notas activas.
+2. **`POST /ai/client-summary/{project}`** — Genera un resumen de 3-4 líneas del estado de un cliente: tareas completadas, pendientes, ideas activas.
 3. **`POST /ai/client-update/{project}`** — Genera un parte semanal detallado del cliente: progreso, bloqueos, próximos pasos.
 
 **Variables de entorno:**
 ```env
-OPENAI_API_KEY=gsk_...          # clave del proveedor (Groq, OpenAI, etc.)
-OPENAI_BASE_URL=https://api.groq.com/openai/v1   # endpoint (default: OpenAI)
-OPENAI_MODEL=llama-3.3-70b-versatile             # modelo a usar
+GROQ_API_KEY=gsk_...                               # clave del proveedor (Groq)
+GROQ_BASE_URL=https://api.groq.com/openai/v1      # endpoint API OpenAI-compatible
+GROQ_MODEL=llama-3.3-70b-versatile                 # modelo a usar
+GROQ_CA_BUNDLE=C:/certs/cacert.pem                 # CA bundle para SSL (Windows)
 ```
 
 **Implementación técnica:**
-- Controller `AiController` con método privado `callAi()` que construye el cliente con `OpenAI::factory()->withBaseUri(...)`
+- `OpenAI\Client` registrado como **singleton** en `AppServiceProvider` con `OpenAI::factory()`, apuntando a Groq via `config('services.groq.*')`
+- `AiController` recibe el cliente por inyección de dependencias en el constructor
+- Método privado `callAi()` usa el SDK tipado (`$this->client->chat()->create(...)`)
 - Cada endpoint genera un prompt específico con datos reales del usuario/cliente
 - Modelo `AiLog` registra cada acción IA con `action_type`, `input_context` (JSON) y `output_text`
 - No hay historial de conversación: cada llamada es stateless
-- Parámetros de la API: `temperature: 0.4` (respuestas enfocadas), `max_tokens: 1500`
+- Parámetros de la API: `temperature: 0.7`, `max_tokens: 500`
 - Rutas bajo middleware `role:premium_user` — funcionalidad exclusiva Solo
 - Autorización adicional: cada endpoint que recibe un cliente verifica ownership via Policy
-- `config/services.php` expone `services.openai.key` y `services.openai.base_url`
+- `config/services.php` expone `services.groq.api_key`, `services.groq.base_url`, `services.groq.model` y `services.groq.ca_bundle`
+- En Windows, se configura un `GuzzleClient` con `verify` apuntando al CA bundle de Mozilla para resolver errores SSL de cURL
 
 **Paquete:** `openai-php/client` — cliente PHP oficial para la API de OpenAI, compatible con cualquier API que implemente el protocolo OpenAI.
 

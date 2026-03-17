@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use GuzzleHttp\Client as GuzzleClient;
+use OpenAI;
+use OpenAI\Client as OpenAIClient;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,23 @@ class AppServiceProvider extends ServiceProvider
     {
         // Usar nuestro LoginResponse personalizado (redirección por rol)
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+
+        // Cliente OpenAI apuntando a Groq
+        $this->app->singleton(OpenAIClient::class, function () {
+            $factory = OpenAI::factory()
+                ->withApiKey(config('services.groq.api_key') ?? '')
+                ->withBaseUri(config('services.groq.base_url'));
+
+            // En Windows, cURL no trae CA bundle — usar el descargado
+            $caBundle = config('services.groq.ca_bundle');
+            if ($caBundle && file_exists($caBundle)) {
+                $factory = $factory->withHttpClient(
+                    new GuzzleClient(['verify' => $caBundle])
+                );
+            }
+
+            return $factory->make();
+        });
     }
 
     /**

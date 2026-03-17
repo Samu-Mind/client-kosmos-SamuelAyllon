@@ -6,11 +6,13 @@ use App\Models\AiLog;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use OpenAI\Client as OpenAIClient;
 
 class AiController extends Controller
 {
+    public function __construct(private OpenAIClient $client) {}
+
     /**
      * Planifica el día: recoge tareas pendientes y genera 3-5 acciones priorizadas.
      */
@@ -153,7 +155,7 @@ class AiController extends Controller
             ->limit(5)
             ->get(['name', 'priority', 'due_date']);
 
-        $recentNotes = $project->ideas()
+        $recentIdeas = $project->ideas()
             ->orderByDesc('created_at')
             ->limit(3)
             ->get(['name', 'description']);
@@ -170,9 +172,9 @@ class AiController extends Controller
             $prompt .= "Próximas tareas:\n{$pendingList}\n\n";
         }
 
-        if ($recentNotes->isNotEmpty()) {
-            $notesList = $recentNotes->map(fn($n) => "- {$n->name}")->implode("\n");
-            $prompt .= "Notas recientes:\n{$notesList}\n\n";
+        if ($recentIdeas->isNotEmpty()) {
+            $ideasList = $recentIdeas->map(fn($n) => "- {$n->name}")->implode("\n");
+            $prompt .= "Ideas recientes:\n{$ideasList}\n\n";
         }
 
         $prompt .= "Genera un texto breve (máx. 150 palabras), profesional y cercano, en español. Incluye saludo y despedida. No pongas asunto de email.";
@@ -197,65 +199,37 @@ class AiController extends Controller
     }
 
     /**
-     * Llama a la API de OpenAI y devuelve el texto generado.
+     * Llama a la API de IA (Groq) y devuelve el texto generado.
      */
     private function callAi(string $prompt): string
     {
-        $config = config('services.openai');
-
-        // Validar que la API key esté configurada
-        if (empty($config['key'])) {
-            Log::warning('AI: OPENAI_API_KEY no está configurada en .env');
+        if (empty(config('services.groq.api_key'))) {
+            Log::warning('AI: GROQ_API_KEY no está configurada en .env');
             return 'La IA no está disponible: falta configurar la API key. Contacta al administrador.';
         }
 
-        if (empty($config['base_url'])) {
-            Log::warning('AI: OPENAI_BASE_URL no está configurada en .env');
-            return 'La IA no está disponible: falta configurar el endpoint. Contacta al administrador.';
-        }
-
-        $httpOptions = [];
-        if (!empty($config['ca_bundle'])) {
-            $httpOptions['verify'] = $config['ca_bundle'];
-        }
-
         try {
-            $response = Http::withOptions($httpOptions)
-                ->withToken($config['key'])
-                ->timeout(30)
-                ->post(rtrim($config['base_url'], '/') . '/chat/completions', [
-                    'model'    => config('services.openai.model', 'gpt-3.5-turbo'),
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'Eres un asistente conciso y profesional para freelancers que gestionan clientes. Respondes siempre en español.'],
-                        ['role' => 'user', 'content' => $prompt],
-                    ],
-                    'max_tokens'  => 500,
-                    'temperature' => 0.7,
-                ]);
+            $response = $this->client->chat()->create([
+                'model'       => config('services.groq.model', 'llama-3.3-70b-versatile'),
+                'messages'    => [
+                    ['role' => 'system', 'content' => 'Eres un asistente conciso y profesional para freelancers que gestionan clientes. Respondes siempre en español.'],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+                'max_tokens'  => 500,
+                'temperature' => 0.7,
+            ]);
 
-            if ($response->failed()) {
-                Log::error('AI API call failed', [
-                    'status' => $response->status(),
-                    'body'   => $response->body(),
-                    'url'    => rtrim($config['base_url'], '/') . '/chat/completions',
-                ]);
+            return $response->choices[0]->message->content ?? 'No se ha podido generar una respuesta.';
+        } catch (\Exception $e) {
+            Log::error('AI API exception: ' . $e->getMessage());
 
-                $status = $response->status();
-                if ($status === 401) {
-                    return 'Error de autenticación con la IA: verifica que la API key sea válida.';
-                }
-                if ($status === 429) {
-                    return 'Se ha superado el límite de peticiones a la IA. Inténtalo en unos minutos.';
-                }
-
-                return 'Lo siento, no he podido generar la respuesta en este momento. Inténtalo de nuevo más tarde.';
+            if (str_contains($e->getMessage(), '401')) {
+                return 'Error de autenticación con la IA: verifica que la API key sea válida.';
+            }
+            if (str_contains($e->getMessage(), '429')) {
+                return 'Se ha superado el límite de peticiones a la IA. Inténtalo en unos minutos.';
             }
 
-            return $response->json('choices.0.message.content', 'No se ha podido generar una respuesta.');
-        } catch (\Exception $e) {
-            Log::error('AI API exception: ' . $e->getMessage(), [
-                'url' => rtrim($config['base_url'], '/') . '/chat/completions',
-            ]);
             return 'Error de conexión con la IA: ' . (app()->isLocal() ? $e->getMessage() : 'inténtalo de nuevo más tarde.');
         }
     }

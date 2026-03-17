@@ -48,7 +48,7 @@ export function AppSidebar() {
         },
         {
             title: 'Ideas',
-            href: '/notes',
+            href: '/ideas',
             icon: Lightbulb,
         },
         {
