@@ -58,7 +58,7 @@ export default function Dashboard({ todayTasks, activeProjects, atRiskProjects, 
     });
     const dismissNudge = useCallback(() => {
         setNudgeDismissed(true);
-        try { localStorage.setItem(nudgeDismissKey, '1'); } catch {}
+        try { localStorage.setItem(nudgeDismissKey, '1'); } catch { /* ignore */ }
     }, [nudgeDismissKey]);
 
     const handlePlanDay = () => {

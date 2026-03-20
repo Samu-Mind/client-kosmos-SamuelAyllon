@@ -100,7 +100,7 @@ export default function ProjectShow({ project, recentCompleted, upcomingPending,
     });
     const dismissNudge = useCallback(() => {
         setNudgeDismissed(true);
-        try { localStorage.setItem(nudgeDismissKey, '1'); } catch {}
+        try { localStorage.setItem(nudgeDismissKey, '1'); } catch { /* ignore */ }
     }, [nudgeDismissKey]);
 
     const csrfToken = () =>
