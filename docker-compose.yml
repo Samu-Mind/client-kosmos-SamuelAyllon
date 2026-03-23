@@ -1,65 +1,144 @@
+# ==============================================================================
+# Docker Compose — ClientKosmos (despliegue local)
+# ==============================================================================
+#
+# Este archivo orquesta dos servicios (contenedores) que trabajan juntos:
+#   1. db  — Base de datos MySQL 8.0
+#   2. app — Aplicación Laravel + React
+#
+# CÓMO USAR:
+#   1. Clona el repositorio
+#   2. (Opcional) Crea un archivo .env en la raíz con tu GROQ_API_KEY si quieres IA
+#   3. Ejecuta:  docker compose up --build
+#   4. Abre:     http://localhost:8000
+#
+# Credenciales de prueba (creadas por los seeders):
+#   admin@clientkosmos.test    / password  (admin)
+#   premium@clientkosmos.test  / password  (premium)
+#   free@clientkosmos.test     / password  (free)
+#
+# COMANDOS ÚTILES:
+#   docker compose up --build     → Construir y arrancar (primera vez o tras cambios)
+#   docker compose up -d          → Arrancar en segundo plano (detached)
+#   docker compose down           → Parar y eliminar contenedores
+#   docker compose down -v        → Parar y BORRAR también los datos (volúmenes)
+#   docker compose logs -f app    → Ver logs de la aplicación en tiempo real
+#   docker compose exec app bash  → Abrir terminal dentro del contenedor
+# ==============================================================================
+
 services:
-  # ── Base de datos MySQL local ──────────────────────────────
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # SERVICIO: db — Base de datos MySQL 8.0
+  # ────────────────────────────────────────────────────────────────────────────
+  # MySQL almacena todos los datos de la aplicación: usuarios, proyectos,
+  # tareas, sesiones, caché, y trabajos de cola (queue).
   db:
+    # Imagen oficial de MySQL versión 8.0 desde Docker Hub
     image: mysql:8.0
+    # Nombre fijo del contenedor (facilita identificarlo con docker ps)
     container_name: clientkosmos_db
+    # Mapeo de puertos: puerto_host:puerto_contenedor
+    # Permite conectarse desde el host (ej: MySQL Workbench) en localhost:3306
     ports:
       - "3306:3306"
+    # Variables de entorno que MySQL usa para inicializarse la PRIMERA vez:
+    #   - Crea el usuario root con la contraseña indicada
+    #   - Crea automáticamente la base de datos "clientkosmos"
+    #   - Crea un usuario no-root "clientkosmos" con su contraseña
     environment:
       MYSQL_ROOT_PASSWORD: clientkosmos_root
       MYSQL_DATABASE: clientkosmos
       MYSQL_USER: clientkosmos
       MYSQL_PASSWORD: clientkosmos_secret
+    # Volumen persistente: los datos de MySQL se guardan fuera del contenedor.
+    # Si haces "docker compose down" los datos se mantienen.
+    # Para borrarlos: "docker compose down -v"
     volumes:
       - clientkosmos_dbdata:/var/lib/mysql
+    # Health check: Docker comprueba periódicamente si MySQL está operativa.
+    # El servicio "app" espera a que este check pase antes de arrancar
+    # (ver depends_on → condition: service_healthy más abajo).
+    #   - test: ejecuta mysqladmin ping para verificar que MySQL responde
+    #   - interval: cada 5 segundos comprueba
+    #   - timeout: si no responde en 5 segundos, se considera fallido
+    #   - retries: tras 10 fallos seguidos, se marca como "unhealthy"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uclientkosmos", "-pclientkosmos_secret"]
       interval: 5s
       timeout: 5s
       retries: 10
+    # Política de reinicio: si el contenedor se cae, Docker lo reinicia
+    # automáticamente, EXCEPTO si fue parado manualmente (docker compose stop).
     restart: unless-stopped
 
-  # ── Aplicación Laravel + React ─────────────────────────────
+  # ────────────────────────────────────────────────────────────────────────────
+  # SERVICIO: app — Aplicación Laravel + React (ClientKosmos)
+  # ────────────────────────────────────────────────────────────────────────────
+  # Construye la imagen usando el Dockerfile del proyecto y ejecuta
+  # el servidor de Laravel en el puerto 8000.
   app:
+    # Configuración del build:
+    #   - context: directorio base para el build (raíz del proyecto)
+    #   - dockerfile: archivo Dockerfile a usar
     build:
       context: .
       dockerfile: Dockerfile
     container_name: clientkosmos_app
+    # Mapeo de puertos: accede a la app en http://localhost:8000
     ports:
       - "8000:8000"
+    # depends_on con condition: el contenedor "app" NO arrancará hasta que
+    # el health check de "db" pase exitosamente.
+    # Esto evita errores de conexión a la BD al iniciar.
     depends_on:
       db:
         condition: service_healthy
+    # Volúmenes para persistir archivos subidos por los usuarios.
+    # Sin este volumen, los archivos se perderían al recrear el contenedor.
     volumes:
-      # Persistir archivos subidos por el usuario
       - clientkosmos_storage:/app/storage/app/public
+    # Variables de entorno que sobreescriben la configuración de Laravel.
+    # El script docker-entrypoint.sh las inyecta en el .env del contenedor.
     environment:
+      # ── Configuración general de Laravel ──
       APP_NAME: ClientKosmos
-      APP_ENV: production
-      APP_DEBUG: "false"
-      APP_KEY: "${APP_KEY:-}"
-      APP_URL: http://localhost:8000
+      APP_ENV: production            # Modo producción (oculta errores detallados)
+      APP_DEBUG: "false"             # No mostrar stack traces al usuario
+      APP_KEY: "${APP_KEY:-}"        # Clave de cifrado. Si no se define, el entrypoint genera una automáticamente
+      APP_URL: http://localhost:8000 # URL base de la aplicación
 
-      # Base de datos — apunta al servicio 'db' de este compose
+      # ── Conexión a la base de datos ──
+      # "db" es el nombre del servicio MySQL definido arriba.
+      # Docker Compose crea una red interna donde los servicios se descubren por nombre.
       DB_CONNECTION: mysql
-      DB_HOST: db
+      DB_HOST: db                    # Nombre del servicio (Docker resuelve la IP internamente)
       DB_PORT: "3306"
-      DB_DATABASE: clientkosmos
-      DB_USERNAME: clientkosmos
-      DB_PASSWORD: clientkosmos_secret
+      DB_DATABASE: clientkosmos      # Debe coincidir con MYSQL_DATABASE del servicio db
+      DB_USERNAME: clientkosmos      # Debe coincidir con MYSQL_USER del servicio db
+      DB_PASSWORD: clientkosmos_secret # Debe coincidir con MYSQL_PASSWORD del servicio db
 
-      # Drivers
-      SESSION_DRIVER: database
-      CACHE_STORE: database
-      QUEUE_CONNECTION: database
-      LOG_CHANNEL: stderr
+      # ── Drivers de Laravel ──
+      # Todos usan "database" para que funcionen sin servicios adicionales (Redis, Memcached, etc.)
+      SESSION_DRIVER: database       # Sesiones de usuario almacenadas en MySQL
+      CACHE_STORE: database          # Caché de la aplicación almacenada en MySQL
+      QUEUE_CONNECTION: database     # Trabajos en cola almacenados en MySQL
+      LOG_CHANNEL: stderr            # Logs van a stderr (visibles con docker compose logs)
 
-      # IA (Groq compatible con OpenAI SDK)
+      # ── IA (Groq — compatible con OpenAI SDK) ──
+      # Estas variables son opcionales. Sin GROQ_API_KEY la app funciona,
+      # pero las funcionalidades de IA estarán deshabilitadas.
+      # Para obtener una clave: https://console.groq.com/keys
       GROQ_API_KEY: "${GROQ_API_KEY:-}"
       GROQ_BASE_URL: "${GROQ_BASE_URL:-https://api.groq.com/openai/v1}"
       GROQ_MODEL: "${GROQ_MODEL:-llama-3.3-70b-versatile}"
     restart: unless-stopped
 
+# ──────────────────────────────────────────────────────────────────────────────
+# VOLÚMENES PERSISTENTES
+# ──────────────────────────────────────────────────────────────────────────────
+# Docker gestiona estos volúmenes de forma independiente a los contenedores.
+# Persisten aunque hagas "docker compose down" (para borrarlos: -v).
 volumes:
-  clientkosmos_dbdata:
-  clientkosmos_storage:
+  clientkosmos_dbdata:    # Datos de MySQL (tablas, índices, etc.)
+  clientkosmos_storage:   # Archivos subidos por usuarios
