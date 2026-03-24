@@ -14,6 +14,12 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Evitar duplicados si el seeder se ejecuta más de una vez
+        if (User::where('email', 'admin@clientkosmos.test')->exists()) {
+            $this->command->info('Users already seeded. Skipping.');
+            return;
+        }
+
         // ── Admin ──────────────────────────────────────────────
         $admin = User::factory()->create([
             'name'  => 'Admin ClientKosmos',

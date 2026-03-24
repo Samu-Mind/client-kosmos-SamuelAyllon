@@ -119,9 +119,9 @@ echo "==> Ejecutando migraciones..."
 php /app/artisan migrate --force
 
 # Ejecutamos los seeders (datos de prueba) solo si la base de datos está vacía.
-# Si ya hay usuarios, los seeders fallarían por duplicados.
-USER_COUNT=$(mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USERNAME" -p"$DB_PASSWORD" \
-    --ssl=0 "$DB_DATABASE" -se "SELECT COUNT(*) FROM users;" 2>/dev/null || echo "0")
+# Usamos el cliente mysql directamente para evitar que tinker falle en producción.
+USER_COUNT=$(mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USERNAME" -p"$DB_PASSWORD" --ssl=0 -sN -e "SELECT COUNT(*) FROM users;" "$DB_DATABASE" 2>/dev/null || echo "0")
+USER_COUNT="${USER_COUNT:-0}"
 if [ "${USER_COUNT}" = "0" ]; then
     echo "==> Primera instalación. Ejecutando seeders..."
     php /app/artisan db:seed --force

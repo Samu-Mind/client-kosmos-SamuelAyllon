@@ -135,12 +135,14 @@
 
 ## 7. Contenedorización — Docker multi-stage
 
-**Decisión:** usar un Dockerfile multi-stage en lugar de un único stage.
+**Decisión:** usar un Dockerfile con 3 stages (`deps`, `frontend`, `final`) y un `docker-compose.yml` con 3 servicios (`app`, `db`, `mailpit`).
 
 **Justificación:**
-- El stage `builder` (Node.js) compila los assets de frontend (Vite/React) y los descarta del stage final, reduciendo el tamaño de la imagen de producción.
-- El stage final solo contiene PHP-FPM, Nginx y los archivos de la aplicación compilados.
-- El `docker-entrypoint.sh` ejecuta automáticamente `migrate --force` y `db:seed` al arrancar, garantizando que la BD esté siempre en el estado correcto sin intervención manual.
+- El stage `deps` (`php:8.4-cli-alpine`) instala dependencias PHP via Composer con `--no-scripts`, aislando este paso del resto del build.
+- El stage `frontend` (`node:20-alpine`) compila los assets con Vite/React. El resultado (solo los archivos de `public/build/`) se copia al stage final, manteniendo la imagen de producción libre de Node.js y node_modules.
+- El stage `final` (`php:8.4-fpm-alpine`) solo contiene PHP, la aplicación compilada y el vendor; imagen mínima para producción.
+- El servicio `mailpit` captura todos los emails enviados por Laravel sin necesidad de una cuenta de correo real, facilitando las pruebas de verificación de email y reset de contraseña.
+- El `docker-entrypoint.sh` verifica si la base de datos ya tiene datos (consulta MySQL directamente, evitando que `artisan tinker` falle en `APP_ENV=production`) antes de ejecutar los seeders, garantizando idempotencia en reinicios.
 
 ---
 
@@ -156,7 +158,18 @@
 
 ---
 
-## 9. Arquitectura multi-cliente
+## 11. Patrón Single-Action Controllers
+
+**Decisión:** cada controlador es una clase con un único método `__invoke`, organizado en carpetas por módulo (e.g. `Task/IndexAction.php`, `Task/CompleteAction.php`).
+
+**Justificación:**
+- **Una clase = una responsabilidad**: cada archivo tiene exactamente una razón para cambiar.
+- **Navegación por nombre de archivo**: para encontrar la lógica de "completar tarea" basta abrir `Task/CompleteAction.php` en lugar de buscar un método dentro de `TaskController.php`.
+- **Testing más preciso**: cada test puede apuntar a una acción específica sin riesgo de efectos secundarios de otros métodos del controlador.
+- **Clases más pequeñas**: evita controladores de 300+ líneas con múltiples responsabilidades mixtas.
+- **Inyección de dependencias limpia**: cada acción declara solo las dependencias que realmente necesita en su `__invoke`.
+
+**Alternativa descartada:** controladores RESTful clásicos (7 métodos por controlador). Aunque son el estándar de Laravel, para recursos con acciones no-CRUD (como `complete`, `reopen`, `resolve`, `plan-day`) generan métodos con nombres poco intuitivos o fuerzan crear controladores adicionales ad-hoc.
 
 **Decisión:** pivotar de una app de productividad genérica a una plataforma de gestión multi-cliente para freelancers. El modelo `Project` pasa a representar una **ficha de cliente** (no un proyecto genérico). Las notas pasan a llamarse **Ideas**. Los recursos se asocian directamente al cliente (sin el intermediario de "Cajas").
 

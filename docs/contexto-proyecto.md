@@ -59,7 +59,7 @@ Una plataforma que organiza toda la gestion del freelancer por cliente: fichas d
 - **Build**: Vite 7 con React Compiler
 - **Auth**: Laravel Fortify + Spatie Permission
 - **IA**: openai-php/client (compatible con Groq y OpenAI)
-- **BD**: SQLite (dev) / TiDB Cloud Serverless (prod)
+- **BD**: MySQL 8.0 (Docker) / TiDB Cloud Serverless (produccion externa)
 
 ### Patron SPA monolitica
 ClientKosmos usa **Inertia.js** como puente entre Laravel y React. No hay API REST: Laravel renderiza paginas React directamente. Esto simplifica:
@@ -67,11 +67,23 @@ ClientKosmos usa **Inertia.js** como puente entre Laravel y React. No hay API RE
 - Validacion (Form Requests con errores automaticos en el frontend)
 - Navegacion (sin router de cliente, Inertia maneja las transiciones)
 
+### Patron Single-Action Controllers
+Todos los controladores son **clases invocables de una sola accion** (`__invoke`), organizados en carpetas por modulo:
+```
+app/Http/Controllers/
+  Dashboard/IndexAction.php
+  Project/IndexAction.php, ShowAction.php, StoreAction.php...
+  Task/IndexAction.php, CompleteAction.php, ReopenAction.php...
+  Ai/PlanDayAction.php, ClientSummaryAction.php, ClientUpdateAction.php
+  Admin/AdminDashboard/IndexAction.php...
+```
+Cada archivo tiene una unica responsabilidad, facilitando la lectura, el testing y la navegacion por el codigo.
+
 ### Modelos de datos (8)
 - **User**: Hub central con relaciones a todo. Roles via Spatie. Metodos: `canAddTask()`, `getDashboardData()`, `isFreeUser()`, `isPremiumUser()`, `isAdmin()`
-- **Task**: Prioridades (low/medium/high), status (pending/completed), due_date obligatoria, asignacion a cliente (project_id). Hard delete.
+- **Task**: Prioridades (low/medium/high), status (pending/completed), due_date obligatoria, asignacion a cliente (project_id). `markAsCompleted()`, `markAsPending()`. Hard delete.
 - **Idea**: Ideas rapidas. Status (active/resolved), source (manual). Hard delete.
-- **Project**: Ficha de cliente. Status (active/inactive/completed). Color personalizable. `getProgressPercentage()`.
+- **Project**: Ficha de cliente. Status (active/inactive/completed). Color personalizable (#3B82F6 default). `brand_tone`, `service_scope`, `key_links` (JSON), `client_notes`.
 - **Resource**: Recurso asociado a un cliente (project_id). Tipos: link/document/video/image/other.
 - **Subscription**: Plan del usuario (free/solo_monthly/solo_yearly). Control de expiracion.
 - **Payment**: Transacciones simuladas. Solo almacena ultimos 4 digitos de tarjeta.
@@ -99,14 +111,14 @@ Se usa `router.delete(url)` de `@inertiajs/react` que genera un HTTP DELETE real
 ### Ruta home sin redirect
 `GET /` renderiza `welcome` via Inertia, sin redirect a `/login`. Esto era necesario porque los tests de la landing page fallaban con redirect.
 
-### AiConversation sin timestamps
-`$timestamps = false` porque solo necesitamos `created_at` (se gestiona manualmente). No tiene `updated_at` porque los mensajes de chat son inmutables.
+### AiLog sin updated_at
+`$timestamps = false` en `AiLog` porque solo necesitamos `created_at` (gestionado manualmente). No tiene `updated_at` porque los registros de IA son inmutables.
 
 ### Pago simulado
 `Payment::process()` simula un gateway con 80% exito. Solo almacena ultimos 4 digitos (PCI-DSS). Transaction ID formato: `TXN_` + 16 caracteres aleatorios.
 
 ### IA context-aware
-El `AiController` expone 3 endpoints de IA contextual (no es un chat conversacional):
+Las clases `Ai\PlanDayAction`, `Ai\ClientSummaryAction` y `Ai\ClientUpdateAction` exponen 3 endpoints de IA contextual (no es un chat conversacional):
 - **planDay**: Recoge tareas pendientes del usuario y genera un plan del dia con 3-5 acciones priorizadas.
 - **clientSummary**: Genera un resumen de 3-4 lineas del estado de un cliente (tareas pendientes, completadas, ideas).
 - **clientUpdate**: Genera un parte semanal detallado del cliente (progreso, bloqueos, proximos pasos).
@@ -145,7 +157,7 @@ Referencia rapida de todos los valores enum validos:
 ### Desarrollo y tests
 - **Motor**: SQLite
 - **Archivo**: `database/database.sqlite`
-- **Migraciones**: 16 archivos
+- **Migraciones**: 14 archivos
 - **Seeders**: RoleSeeder (3 roles) + UserSeeder (3 usuarios de prueba con datos demo: clientes, tareas, ideas, recursos)
 
 ### Produccion
@@ -197,20 +209,25 @@ composer test                       # Lint + tests
 ## 8. Despliegue
 
 ### Docker
-Multi-stage build:
-1. **Stage 1 (Node 20)**: `npm ci && npm run build` — genera assets en `/app/public/build`
-2. **Stage 2 (PHP 8.2)**: Instala extensiones PHP, copia Composer deps y assets del Stage 1
+Multi-stage build (3 etapas):
+1. **Stage `deps`** (`php:8.4-cli-alpine`): instala dependencias Composer con `--no-scripts`
+2. **Stage `frontend`** (`node:20-alpine`): `npm ci && npm run build` — genera assets en `/app/public/build`
+3. **Stage `final`** (`php:8.4-fpm-alpine`): copia vendor + assets compilados; imagen de produccion minima
 
 `docker-entrypoint.sh`:
-- Copia `.env.example` si no existe `.env`
+- Copia `.env.example` si no existe `.env` y escribe variables del compose
 - Genera `APP_KEY` si esta vacio
-- Ejecuta `migrate --force` y `db:seed`
-- Imprime credenciales de prueba en consola
+- Espera a MySQL con `mysqladmin ping`
+- Limpia caches (config, route, app) y crea el symlink `storage:link`
+- Ejecuta `migrate --force`
+- Ejecuta `db:seed` **solo si la tabla `users` esta vacia** (verificado via cliente MySQL directamente, no via tinker que falla en production)
+- Cachea config/routes/vistas en `APP_ENV=production`
+- Arranca `php artisan serve`
 
-### Produccion
-- BD: TiDB Cloud Serverless con SSL
-- Cert: `storage/app/tidb-ca.pem` (no commiteado)
-- Variables sensibles: `OPENAI_API_KEY`, credenciales BD
+### Servicios Docker
+- `clientkosmos_app` (puerto 8000): aplicacion Laravel
+- `clientkosmos_db`: MySQL 8.0 con volumen persistente `clientkosmos_dbdata`
+- `clientkosmos_mailpit` (SMTP: 1025, UI: 8025): captura emails de prueba sin enviarlos
 
 ---
 
@@ -219,14 +236,16 @@ Multi-stage build:
 | Archivo | Proposito |
 |---------|-----------|
 | `resources/css/app.css` | Design system completo (tokens, animaciones, dark mode) |
-| `resources/views/app.blade.php` | Entry point HTML, carga fuentes desde bunny.net |
+| `resources/views/app.blade.php` | Entry point HTML (Inertia SPA root) |
 | `resources/js/assets/logo.png` | Logo oficial de ClientKosmos |
-| `routes/web.php` | Todas las rutas con middleware |
-| `config/services.php` | Configuracion OpenAI/Groq |
+| `routes/web.php` | Todas las rutas con middleware (publica, auth, premium, admin) |
+| `routes/settings.php` | Rutas de configuracion de cuenta |
+| `config/services.php` | Configuracion Groq (api_key, base_url, model, ca_bundle) |
 | `app/Models/User.php` | Logica central de roles, limites y dashboard |
-| `app/Http/Controllers/AiController.php` | IA contextual (3 endpoints: planDay, clientSummary, clientUpdate) |
+| `app/Http/Controllers/Ai/` | IA contextual: PlanDayAction, ClientSummaryAction, ClientUpdateAction |
+| `app/Providers/AppServiceProvider.php` | Singleton OpenAI\Client apuntando a Groq |
 | `docker-entrypoint.sh` | Script de inicializacion del contenedor |
-| `storage/app/tidb-ca.pem` | Cert SSL TiDB (NO commitear) |
+| `docs/clientkosmos-style-guide.md.md` | Guia de estilos y design system |
 
 ---
 

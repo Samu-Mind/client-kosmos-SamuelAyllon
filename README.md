@@ -313,16 +313,18 @@ $this->app->singleton(OpenAIClient::class, function () {
 });
 ```
 
-El `AiController` lo recibe por inyeccion de dependencias y lo usa para las 3 acciones contextuales. Toda la configuracion esta en `config/services.php` bajo la clave `groq`.
+Las acciones `Ai\PlanDayAction`, `Ai\ClientSummaryAction` y `Ai\ClientUpdateAction` reciben el cliente por inyeccion de dependencias. Toda la configuracion esta en `config/services.php` bajo la clave `groq`.
 
 ### Decisiones clave
+- **Patron Single-Action**: cada controlador tiene un unico metodo `__invoke`. Esto facilita la lectura, el testing y la navegacion → cada archivo = una responsabilidad
 - **Clientes = Projects**: internamente el modelo se llama `Project`, las URLs usan `/clients` y la UI dice "Clientes"
 - **Ideas**: el modelo se llama `Idea`, las URLs usan `/ideas` y la UI dice "Ideas"
-- **Hard delete** en Task e Idea (SoftDeletes eliminado)
-- **Limite de tareas free**: `User::canAddTask()` cuenta tareas con `status='pending'`
-- **Pago simulado**: `Payment::process()` con 80% exito, almacena solo ultimos 4 digitos de tarjeta
-- **IA contextual**: 3 endpoints que leen tareas, ideas y recursos del cliente para generar respuestas utiles
-- **Ruta home**: `inertia('welcome')` sin redirect a login (requerido por tests)
+- **Hard delete** en Task e Idea (SoftDeletes eliminado tras Fase 2; columna `deleted_at` permanece en BD pero Eloquent la ignora)
+- **Limite de tareas free**: `User::canAddTask()` cuenta tareas con `status='pending'` — se aplica tanto al crear como al reabrir
+- **Limite de clientes free**: `User::canAddProject()` — 1 cliente maximo en plan gratuito
+- **Pago simulado**: `Payment::process()` con 80% exito, almacena solo ultimos 4 digitos (PCI-DSS); transaction ID: `TXN_` + 16 chars aleatorios
+- **IA contextual**: 3 endpoints que inyectan datos reales (tareas, ideas, recursos) en el prompt de Groq
+- **Ruta home**: `inertia('welcome')` sin redirect a login (requerido por tests de landing page)
 
 ---
 
@@ -332,73 +334,72 @@ El `AiController` lo recibe por inyeccion de dependencias y lo usa para las 3 ac
 clientkosmos/
 ├── app/
 │   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── TaskController.php
-│   │   │   ├── IdeaController.php
-│   │   │   ├── ProjectController.php         ← Fichas de cliente
-│   │   │   ├── ResourceController.php        ← Recursos por cliente
-│   │   │   ├── AiController.php              ← IA contextual (3 acciones, inyecta OpenAI\Client)
-│   │   │   ├── DashboardController.php       ← Panel Hoy
-│   │   │   ├── SubscriptionController.php
-│   │   │   ├── CheckoutController.php
-│   │   │   ├── TutorialController.php
-│   │   │   └── Admin/
-│   │   │       ├── AdminDashboardController.php
-│   │   │       ├── AdminUserController.php
-│   │   │       ├── AdminPaymentController.php
-│   │   │       └── AdminSubscriptionController.php
-│   │   └── Requests/                          ← Form Requests
+│   │   ├── Controllers/          ← Patron Single-Action (una clase, un metodo __invoke)
+│   │   │   ├── Dashboard/
+│   │   │   │   └── IndexAction.php       ← Panel Hoy
+│   │   │   ├── Project/                  ← Fichas de cliente (Index, Show, Create, Store, Edit, Update, Destroy, Complete)
+│   │   │   ├── Task/                     ← Tareas (Index, Create, Store, Edit, Update, Destroy, Complete, Reopen)
+│   │   │   ├── Idea/                     ← Ideas (Index, Create, Store, Edit, Update, Destroy, Resolve, Reactivate)
+│   │   │   ├── Resource/                 ← Recursos por cliente (Create, Store, Update, Destroy)
+│   │   │   ├── Ai/                       ← IA contextual: PlanDayAction, ClientSummaryAction, ClientUpdateAction
+│   │   │   ├── Subscription/
+│   │   │   ├── Checkout/
+│   │   │   ├── Tutorial/
+│   │   │   └── Admin/                    ← AdminDashboard, AdminUser, AdminPayment, AdminSubscription
+│   │   └── Requests/                     ← Form Requests de validacion
 │   ├── Models/
-│   │   ├── User.php           ← canAddTask(), getDashboardData(), roles
-│   │   ├── Task.php           ← scopes, prioridades, hard delete
-│   │   ├── Idea.php           ← resolve/reactivate, convertToTask()
-│   │   ├── Project.php        ← getProgressPercentage(), "cliente"
-│   │   ├── Resource.php       ← Recursos vinculados a cliente
-│   │   ├── Subscription.php   ← upgradeToPremium(), hasExpired()
-│   │   ├── Payment.php        ← process() simula 80%/20%
-│   │   └── AiLog.php          ← Registro de uso de IA
+│   │   ├── User.php           ← canAddTask(), canAddProject(), getDashboardData(), roles
+│   │   ├── Task.php           ← scopes, prioridades, markAsCompleted(), hard delete
+│   │   ├── Idea.php           ← resolve/reactivate, status (active/resolved), hard delete
+│   │   ├── Project.php        ← scopes, color, brand_tone, ficha de "cliente"
+│   │   ├── Resource.php       ← Recursos vinculados a cliente (link/document/video/image/other)
+│   │   ├── Subscription.php   ← plan (free/premium_monthly/premium_yearly), getPrice()
+│   │   ├── Payment.php        ← process() simula 80%/20%, generateTransactionId()
+│   │   └── AiLog.php          ← Registro de uso de IA (plan_day/summary/update)
 │   ├── Providers/
-│   │   └── AppServiceProvider.php ← Singleton OpenAI\Client (Groq)
-│   └── Policies/              ← 4 policies (ownership)
+│   │   └── AppServiceProvider.php ← Singleton OpenAI\Client apuntando a Groq
+│   └── Policies/              ← 4 policies de ownership (Project, Task, Idea, Resource)
 ├── config/
 │   └── services.php           ← Configuracion Groq (api_key, base_url, model, ca_bundle)
 ├── database/
-│   ├── migrations/
-│   └── seeders/               ← RoleSeeder + UserSeeder (3 usuarios con datos demo)
+│   ├── migrations/            ← 14 migraciones
+│   └── seeders/               ← RoleSeeder (3 roles) + UserSeeder (3 usuarios con datos demo)
 ├── resources/
-│   ├── css/app.css            ← Design system ClientKosmos (tokens, animaciones)
+│   ├── css/app.css            ← Design system ClientKosmos (tokens, animaciones, dark mode)
 │   └── js/
 │       ├── pages/
-│       │   ├── welcome.tsx         ← Landing page
-│       │   ├── dashboard.tsx       ← Panel Hoy condicional free/premium
+│       │   ├── welcome.tsx         ← Landing page publica
+│       │   ├── dashboard.tsx       ← Panel Hoy con IA inline (Solo) y badges de riesgo
 │       │   ├── tasks/              ← index, create, edit
 │       │   ├── ideas/              ← index, create, edit
-│       │   ├── projects/           ← index, show, create, edit (clientes)
-│       │   ├── resources/          ← create, edit
-│       │   ├── subscription/       ← Planes
-│       │   ├── checkout/           ← Pago
-│       │   ├── admin/              ← Panel admin (4 vistas)
-│       │   ├── auth/               ← Login, registro, 2FA, etc.
+│       │   ├── projects/           ← index, show, create, edit (fichas de cliente)
+│       │   ├── resources/          ← create, edit (Solo)
+│       │   ├── subscription/       ← Comparativa de planes
+│       │   ├── checkout/           ← Formulario de pago simulado
+│       │   ├── admin/              ← Panel admin: dashboard, users, payments, subscriptions
+│       │   ├── auth/               ← Login, registro, 2FA, reset password, etc.
 │       │   └── settings/           ← Perfil, contrasena, apariencia, 2FA
 │       ├── components/
-│       │   ├── ui/                 ← Componentes shadcn/ui
-│       │   └── tutorial-chatbot.tsx ← Tour con spotlight
-│       ├── types/                  ← TypeScript types
-│       ├── hooks/                  ← Custom hooks
-│       └── layouts/                ← App (sidebar) + Auth (centered)
+│       │   ├── ui/                 ← 25+ componentes shadcn/ui (Button, Card, Dialog, …)
+│       │   ├── tutorial-chatbot.tsx ← Tour interactivo con spotlight y Kosmo
+│       │   └── ...                 ← App shell, sidebar, header, breadcrumbs, etc.
+│       ├── types/                  ← TypeScript types (models/, pages/, admin/, shared/)
+│       ├── hooks/                  ← Custom hooks (appearance, clipboard, 2FA, mobile…)
+│       ├── routes/                 ← Rutas tipadas generadas por Laravel Wayfinder
+│       └── layouts/                ← App (sidebar) + Auth (centrado)
 ├── routes/
-│   ├── web.php                ← Todas las rutas
-│   └── settings.php           ← Rutas de configuracion
+│   ├── web.php                ← Todas las rutas (publica + auth + premium + admin)
+│   └── settings.php           ← Rutas de configuracion de cuenta
 ├── tests/Feature/             ← 156 test cases (Pest)
 ├── docs/
 │   ├── manual-usuario.md
 │   ├── decisiones-tecnicas.md
 │   ├── contexto-proyecto.md
 │   ├── necesidad-y-justificacion.md
-│   └── guia-estilos.md
-├── Dockerfile                 ← Multi-stage build (Node + PHP)
-├── docker-compose.yml
-└── docker-entrypoint.sh       ← Migraciones + seed automaticos
+│   └── clientkosmos-style-guide.md.md
+├── Dockerfile                 ← Multi-stage build (deps + frontend + final)
+├── docker-compose.yml         ← 3 servicios: app, db (MySQL 8), mailpit
+└── docker-entrypoint.sh       ← Migraciones, seed y arranque automaticos
 ```
 
 ---
@@ -422,7 +423,7 @@ php artisan migrate                 # Aplicar nuevas migraciones
 ### Testing
 ```bash
 php artisan test                             # Todos los tests
-php artisan test --filter=TaskControllerTest # Test especifico
+php artisan test --filter=TaskIndex          # Test especifico (nombre de clase action)
 php artisan test --coverage                  # Con cobertura
 composer test                                # Lint + tests
 ```
@@ -536,18 +537,42 @@ Framework: **Pest 3** con helpers custom (`createAdmin()`, `createPremiumUser()`
 ## Docker
 
 ```bash
-docker compose build
-docker compose up
+docker compose up --build   # Primera vez (construye la imagen)
+docker compose up           # Arranque normal
 # Acceder en http://localhost:8000
+# Bandeja de correo (Mailpit) en http://localhost:8025
 ```
 
-- **Multi-stage build**: Node 20 (frontend) + PHP 8.4 (backend)
-- `docker-entrypoint.sh` ejecuta migraciones y seeders automaticamente
-- Contenedores: `clientkosmos_app` (puerto 8000) + `clientkosmos_db` (MySQL 8.0, puerto 3306)
-- Credenciales Docker por defecto: `clientkosmos` / `clientkosmos_secret`
-- Usuarios de prueba: `admin@clientkosmos.test`, `premium@clientkosmos.test`, `free@clientkosmos.test` (password: `password`)
-- Variable `APP_KEY` se genera automaticamente si no se proporciona
-- Para produccion con TiDB Cloud, sobreescribir las variables `DB_*` en el entorno
+### Contenedores
+
+| Contenedor | Imagen | Puerto(s) | Descripcion |
+|------------|--------|-----------|-------------|
+| `clientkosmos_app` | Custom (Dockerfile) | `8000` | Aplicacion Laravel |
+| `clientkosmos_db` | `mysql:8.0` | `3306` | Base de datos MySQL |
+| `clientkosmos_mailpit` | `axllent/mailpit` | `1025` (SMTP), `8025` (UI) | Servidor de correo de prueba |
+
+### Build multi-stage (Dockerfile)
+
+1. **Stage `deps`** (`php:8.4-cli-alpine`): instala dependencias PHP via Composer (`--no-scripts`)
+2. **Stage `frontend`** (`node:20-alpine`): instala dependencias npm, ejecuta `npm run build` (Vite)
+3. **Stage `final`** (`php:8.4-fpm-alpine`): copia vendor + assets compilados; imagen de produccion minima
+
+### `docker-entrypoint.sh`
+- Copia `.env.example` → `.env` si no existe
+- Escribe variables de entorno del compose al `.env`
+- Genera `APP_KEY` automaticamente si esta vacio
+- Espera a que MySQL este lista (mysqladmin ping)
+- Limpia caches (config, route, app)
+- Ejecuta `migrate --force`
+- Ejecuta `db:seed` solo si la tabla `users` esta vacia (consulta MySQL directamente)
+- Cachea config/routes/vistas en produccion
+- Arranca `php artisan serve`
+
+### Variables de entorno Docker
+- Credenciales DB por defecto: usuario `clientkosmos` / pass `clientkosmos_secret`
+- `APP_KEY` se genera automaticamente al primer arranque (copiar al `docker-compose.yml` para persistirla)
+- Los emails capturados por Mailpit se visualizan en [http://localhost:8025](http://localhost:8025)
+- Usuarios de prueba creados automaticamente: `admin@clientkosmos.test`, `premium@clientkosmos.test`, `free@clientkosmos.test` (password: `password`)
 
 ---
 
@@ -621,7 +646,7 @@ Invoke-WebRequest -Uri "https://curl.se/ca/cacert.pem" -OutFile "C:\certs\cacert
 | [docs/manual-usuario.md](docs/manual-usuario.md) | Manual de uso para el usuario final |
 | [docs/decisiones-tecnicas.md](docs/decisiones-tecnicas.md) | Justificacion tecnica de cada decision |
 | [docs/contexto-proyecto.md](docs/contexto-proyecto.md) | Contexto completo y estado del proyecto |
-| [docs/guia-estilos.md](docs/guia-estilos.md) | Guia de estilos y design system |
+| [docs/clientkosmos-style-guide.md.md](docs/clientkosmos-style-guide.md.md) | Guia de estilos y design system |
 | [docs/necesidad-y-justificacion.md](docs/necesidad-y-justificacion.md) | Necesidad y justificacion del proyecto |
 
 ---
