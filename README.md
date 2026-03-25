@@ -10,7 +10,7 @@
 [![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Tests](https://img.shields.io/badge/Tests-156_casos-brightgreen?style=flat-square&logo=checkmarx&logoColor=white)]()
-[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white)](docker-compose.yml)
+[![Docker](https://img.shields.io/badge/Docker-samue45%2Fclient--kosmos-2496ED?style=flat-square&logo=docker&logoColor=white)](https://hub.docker.com/r/samue45/client-kosmos)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
 </div>
