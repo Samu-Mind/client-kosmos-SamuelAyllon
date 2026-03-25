@@ -8,12 +8,20 @@
 #   3. app      → la aplicación Laravel
 #
 # COMANDOS BÁSICOS:
-#   docker compose up --build     → construir y arrancar (primera vez)
-#   docker compose up -d          → arrancar en segundo plano
-#   docker compose down           → parar y eliminar contenedores
-#   docker compose down -v        → parar y borrar también los datos
-#   docker compose logs -f app    → ver logs de la app en tiempo real
-#   docker compose exec app bash  → abrir una terminal dentro del contenedor
+#   docker compose up --build        → construir y arrancar (primera vez)
+#   docker compose up -d             → arrancar en segundo plano
+#   docker compose down              → parar y eliminar contenedores
+#   docker compose down -v           → parar y borrar también los datos
+#   docker compose logs -f app       → ver logs de la app en tiempo real
+#   docker compose exec app bash     → abrir una terminal dentro del contenedor
+#   docker compose ps                → ver estado de los contenedores
+#
+# NOTAS:
+#   • El servicio 'app' espera a que MySQL pase su healthcheck antes de arrancar.
+#     Si Docker dice "Waiting for db to be healthy" es normal, tarda ~30 s.
+#   • APP_KEY se genera automáticamente en el primer arranque. Para que no
+#     cambie al recrear el contenedor, cópiala al docker-compose.yml:
+#       docker compose exec app php artisan key:generate --show
 #
 # Accesos:
 #   http://localhost:8000   → aplicación
@@ -33,6 +41,17 @@ services:
   db:
     image: mysql:8.0                  # Imagen oficial de MySQL
     container_name: clientkosmos_db
+    # ── restart ────────────────────────────────────────────────────────────
+    # Define qué hace Docker si el contenedor se detiene inesperadamente.
+    # Valores posibles:
+    #   no             → nunca reinicia (comportamiento por defecto)
+    #   always         → siempre reinicia, incluso si lo paras tú a mano
+    #   on-failure     → solo si el proceso terminó con error (exit code != 0)
+    #   unless-stopped → reinicia siempre EXCEPTO si lo paraste tú con
+    #                    "docker compose stop" o "docker compose down"
+    # Para una base de datos usamos unless-stopped: queremos que se recupere
+    # sola si el sistema reinicia, pero que respete cuando la paramos a mano.
+    restart: unless-stopped
     ports:
       - "3306:3306"                   # Puerto del host : puerto del contenedor
     environment:
@@ -43,6 +62,28 @@ services:
     volumes:
       # Los datos de MySQL se guardan aquí para que no se pierdan al parar el contenedor
       - clientkosmos_dbdata:/var/lib/mysql
+    # ── healthcheck ────────────────────────────────────────────────────────
+    # Sin healthcheck, Docker marca un contenedor como "listo" en cuanto el
+    # proceso arranca, aunque la aplicación dentro todavía no esté preparada.
+    # MySQL tarda varios segundos en inicializar sus tablas internas la primera
+    # vez: el proceso existe pero no acepta conexiones aún.
+    #
+    # Con healthcheck, Docker ejecuta periódicamente el comando definido en
+    # "test" y clasifica el contenedor en uno de tres estados:
+    #   starting  → todavía dentro del start_period, no se cuentan fallos
+    #   healthy   → el último test devolvió exit 0 (éxito)
+    #   unhealthy → falló más veces de las permitidas en "retries"
+    #
+    # Esto permite que el servicio 'app' use "condition: service_healthy" en
+    # su depends_on y no arranque hasta que MySQL responda de verdad.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
+      # mysqladmin ping devuelve exit 0 si MySQL acepta conexiones, exit 1 si no.
+      interval: 10s       # Repite el test cada 10 s
+      timeout: 5s         # Si el test no termina en 5 s, cuenta como fallo
+      retries: 10         # Tras 10 fallos consecutivos → estado "unhealthy"
+      start_period: 30s   # Durante los primeros 30 s los fallos no cuentan
+                          # (tiempo de gracia para que MySQL haga su init)
 
   # ──────────────────────────────────────────────────────────────────────────
   # SERVICIO: mailpit — Servidor de correo para desarrollo
@@ -52,6 +93,9 @@ services:
   mailpit:
     image: axllent/mailpit:latest
     container_name: clientkosmos_mailpit
+    # Mismo razonamiento que en 'db': se recupera sola si algo falla,
+    # pero respeta un "docker compose stop" manual.
+    restart: unless-stopped
     ports:
       - "1025:1025"   # Puerto SMTP (Laravel envía aquí)
       - "8025:8025"   # Interfaz web para ver los correos
@@ -66,9 +110,27 @@ services:
     container_name: clientkosmos_app
     ports:
       - "8000:8000"
+    # on-failure: solo reinicia si el proceso terminó con un código de error.
+    # Es más conservador que unless-stopped: si el entrypoint falla por un
+    # problema transitorio (ej. la DB tardó más de lo esperado), Docker lo
+    # reintenta automáticamente sin que tengas que hacer nada.
+    restart: on-failure
+    # ── depends_on ─────────────────────────────────────────────────────────
+    # depends_on por sí solo solo garantiza el ORDEN de arranque, no que el
+    # servicio dependiente esté realmente listo. Con "condition" podemos ser
+    # más precisos:
+    #
+    #   service_started → el contenedor existe y está corriendo (orden simple)
+    #   service_healthy → el contenedor pasó su healthcheck (realmente listo)
+    #   service_completed_successfully → para contenedores de tareas de un solo uso
+    #
+    # Usamos service_healthy para db porque MySQL puede tardar en inicializarse.
+    # Usamos service_started para mailpit porque responde desde el primer segundo.
     depends_on:
-      - db
-      - mailpit
+      db:
+        condition: service_healthy  # Espera a que MySQL pase su healthcheck
+      mailpit:
+        condition: service_started  # Solo espera a que el contenedor esté en pie
     volumes:
       # Los archivos subidos por usuarios se guardan aquí para que no se pierdan
       - clientkosmos_storage:/app/storage/app/public

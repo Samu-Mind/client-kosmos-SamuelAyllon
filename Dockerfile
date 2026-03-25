@@ -144,10 +144,16 @@ RUN mkdir -p \
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Docker verifica periódicamente que la app responde.
+# /up es la ruta de health check integrada en Laravel 11+.
+# --start-period da 60 s de margen para que el entrypoint termine las migraciones.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/up || exit 1
+
 # Indicamos que la app escucha en el puerto 8000
 EXPOSE 8000
 
-# Script que se ejecuta al arrancar el contenedor (migraciones, etc.)
+# El entrypoint prepara el entorno (migraciones, caches, etc.) y luego
+# ejecuta el CMD que se le pase. Por defecto: php artisan serve.
 ENTRYPOINT ["docker-entrypoint.sh"]
-# Comando principal: levanta el servidor de Laravel
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

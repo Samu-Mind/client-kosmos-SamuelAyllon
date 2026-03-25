@@ -17,8 +17,10 @@
 # ==============================================================================
 
 # Si cualquier comando falla, el script se para.
-# Así la app no arranca si algo va mal.
-set -e
+# -e   → para al primer error
+# -u   → trata variables no definidas como error
+# -o pipefail → un fallo en cualquier parte de un pipe se propaga como error
+set -euo pipefail
 
 echo "==> Iniciando ClientKosmos..."
 
@@ -98,7 +100,9 @@ until mysqladmin ping -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USERNAME" -p"$DB_PASSWORD
 done
 
 if [ $retry -ge $max_retries ]; then
-    echo "==> AVISO: No se pudo verificar la DB. Intentando migrar de todos modos..."
+    echo "==> ERROR: La base de datos no respondio tras $max_retries intentos."
+    echo "    Comprueba que el servicio 'db' esté activo y que DB_HOST/DB_PORT son correctos."
+    echo "    Intentando continuar de todos modos (puede fallar en migraciones)..."
 fi
 
 # ──────────────────────────────────────────────────────────────────────────────
