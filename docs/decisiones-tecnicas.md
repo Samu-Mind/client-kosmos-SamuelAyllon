@@ -215,14 +215,15 @@ GROQ_CA_BUNDLE=C:/certs/cacert.pem                 # CA bundle para SSL (Windows
 
 **Implementación técnica:**
 - `OpenAI\Client` registrado como **singleton** en `AppServiceProvider` con `OpenAI::factory()`, apuntando a Groq via `config('services.groq.*')`
-- `AiController` recibe el cliente por inyección de dependencias en el constructor
-- Método privado `callAi()` usa el SDK tipado (`$this->client->chat()->create(...)`)
+- Clase abstracta `AiAction` recibe el `OpenAI\Client` por inyección de dependencias en el constructor
+- Método protegido `callAi()` en `AiAction` usa el SDK tipado (`$this->client->chat()->create(...)`)
+- 3 clases concretas extienden `AiAction`: `PlanDayAction`, `ClientSummaryAction`, `ClientUpdateAction` (patrón Single-Action Controller)
 - Cada endpoint genera un prompt específico con datos reales del usuario/cliente
-- Modelo `AiLog` registra cada acción IA con `action_type`, `input_context` (JSON) y `output_text`
+- Modelo `AiLog` registra cada acción IA con `action_type` (`plan_day`, `summary`, `update`), `input_context` (JSON) y `output_text`
 - No hay historial de conversación: cada llamada es stateless
 - Parámetros de la API: `temperature: 0.7`, `max_tokens: 500`
 - Rutas bajo middleware `role:premium_user` — funcionalidad exclusiva Solo
-- Autorización adicional: cada endpoint que recibe un cliente verifica ownership via Policy
+- Autorización adicional: cada endpoint que recibe un cliente verifica ownership via método `authorizeProject()` en `AiAction` (no usa Policy, sino `abort_unless` directo)
 - `config/services.php` expone `services.groq.api_key`, `services.groq.base_url`, `services.groq.model` y `services.groq.ca_bundle`
 - En Windows, se configura un `GuzzleClient` con `verify` apuntando al CA bundle de Mozilla para resolver errores SSL de cURL
 

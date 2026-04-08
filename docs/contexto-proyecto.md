@@ -74,20 +74,20 @@ app/Http/Controllers/
   Dashboard/IndexAction.php
   Project/IndexAction.php, ShowAction.php, StoreAction.php...
   Task/IndexAction.php, CompleteAction.php, ReopenAction.php...
-  Ai/PlanDayAction.php, ClientSummaryAction.php, ClientUpdateAction.php
+  Ai/AiAction.php (abstracta), PlanDayAction.php, ClientSummaryAction.php, ClientUpdateAction.php
   Admin/AdminDashboard/IndexAction.php...
 ```
 Cada archivo tiene una unica responsabilidad, facilitando la lectura, el testing y la navegacion por el codigo.
 
 ### Modelos de datos (8)
-- **User**: Hub central con relaciones a todo. Roles via Spatie. Metodos: `canAddTask()`, `getDashboardData()`, `isFreeUser()`, `isPremiumUser()`, `isAdmin()`
-- **Task**: Prioridades (low/medium/high), status (pending/completed), due_date obligatoria, asignacion a cliente (project_id). `markAsCompleted()`, `markAsPending()`. Hard delete.
-- **Idea**: Ideas rapidas. Status (active/resolved), source (manual). Hard delete.
-- **Project**: Ficha de cliente. Status (active/inactive/completed). Color personalizable (#3B82F6 default). `brand_tone`, `service_scope`, `key_links` (JSON), `client_notes`.
+- **User**: Hub central con relaciones a todo. Roles via Spatie. Metodos: `canAddProject()`, `canAddTask()`, `getDashboardData()`, `isFreeUser()`, `isPremiumUser()`, `isAdmin()`, `hasCompletedTutorial()`, `completeTutorial()`
+- **Task**: Prioridades (low/medium/high), status (pending/completed), due_date opcional (nullable), asignacion a cliente (project_id). `markAsCompleted()`, `markAsPending()`. Hard delete (la columna `deleted_at` permanece en la migración pero el modelo no usa el trait SoftDeletes).
+- **Idea**: Ideas rapidas asociables a un cliente (project_id nullable). Status (active/resolved), source (manual/voice/ai_suggestion). Prioridades (low/medium/high). `markAsResolved()`, `markAsActive()`, `convertToTask()`. Hard delete (la columna `deleted_at` permanece en la migración pero el modelo no usa el trait SoftDeletes).
+- **Project**: Ficha de cliente. Status (active/inactive/completed). Color personalizable (#3B82F6 default). Campos de ficha: `brand_tone`, `service_scope`, `key_links` (JSON), `next_deadline` (date), `client_notes`, `user_modified_at`. Metodos: `getTasksSummary()`, `getProgressPercentage()`, `markAsActive()`, `markAsCompleted()`.
 - **Resource**: Recurso asociado a un cliente (project_id). Tipos: link/document/video/image/other.
-- **Subscription**: Plan del usuario (free/solo_monthly/solo_yearly). Control de expiracion.
+- **Subscription**: Plan del usuario (free/premium_monthly/premium_yearly). Control de expiracion. Status (active/expired/cancelled). Metodos: `isActive()`, `upgradeToPremium()`, `downgradeToFree()`, `hasExpired()`, `getDaysRemaining()`. Nota: los valores enum en BD son `premium_*`, la UI los muestra como "Solo Mensual"/"Solo Anual".
 - **Payment**: Transacciones simuladas. Solo almacena ultimos 4 digitos de tarjeta.
-- **AiLog**: Registro de acciones IA. action_type (plan_day/client_summary/client_update). Guarda input_context y output_text.
+- **AiLog**: Registro de acciones IA. action_type (plan_day/summary/update). Guarda input_context (JSON) y output_text. `$timestamps = false` (solo created_at gestionado manualmente).
 
 ### Seguridad (4 capas)
 1. **Middleware de rutas**: `role:premium_user` y `role:admin` (Spatie)
@@ -118,10 +118,10 @@ Se usa `router.delete(url)` de `@inertiajs/react` que genera un HTTP DELETE real
 `Payment::process()` simula un gateway con 80% exito. Solo almacena ultimos 4 digitos (PCI-DSS). Transaction ID formato: `TXN_` + 16 caracteres aleatorios.
 
 ### IA context-aware
-Las clases `Ai\PlanDayAction`, `Ai\ClientSummaryAction` y `Ai\ClientUpdateAction` exponen 3 endpoints de IA contextual (no es un chat conversacional):
-- **planDay**: Recoge tareas pendientes del usuario y genera un plan del dia con 3-5 acciones priorizadas.
-- **clientSummary**: Genera un resumen de 3-4 lineas del estado de un cliente (tareas pendientes, completadas, ideas).
-- **clientUpdate**: Genera un parte semanal detallado del cliente (progreso, bloqueos, proximos pasos).
+La clase abstracta `Ai\AiAction` contiene el constructor con inyeccion del `OpenAI\Client` y el metodo protegido `callAi()`. Las 3 clases concretas la extienden:
+- **PlanDayAction** (`POST /ai/plan-day`): Recoge tareas pendientes del usuario y genera un plan del dia con 3-5 acciones priorizadas. Registra en AiLog con `action_type = 'plan_day'`.
+- **ClientSummaryAction** (`POST /ai/client-summary/{project}`): Genera un resumen de 3-4 lineas del estado de un cliente (tareas pendientes, completadas, ideas). Registra con `action_type = 'summary'`.
+- **ClientUpdateAction** (`POST /ai/client-update/{project}`): Genera un update profesional para enviar al cliente por email o Slack. Registra con `action_type = 'update'`.
 
 El system prompt se genera dinamicamente con datos reales del usuario/cliente.
 
@@ -143,12 +143,12 @@ Referencia rapida de todos los valores enum validos:
 | Task | priority | `low`, `medium`, `high` |
 | Project | status | `active`, `inactive`, `completed` |
 | Idea | status | `active`, `resolved` |
-| Idea | source | `manual` |
+| Idea | source | `manual`, `voice`, `ai_suggestion` |
 | Idea | priority | `low`, `medium`, `high` |
-| Subscription | plan | `free`, `solo_monthly`, `solo_yearly` |
+| Subscription | plan | `free`, `premium_monthly`, `premium_yearly` |
 | Resource | type | `link`, `document`, `video`, `image`, `other` |
 | Payment | status | `pending`, `completed`, `failed` |
-| AiLog | action_type | `plan_day`, `client_summary`, `client_update` |
+| AiLog | action_type | `plan_day`, `summary`, `update` |
 
 ---
 
@@ -168,15 +168,15 @@ Referencia rapida de todos los valores enum validos:
 - **Conexion**: `DB_CONNECTION=mysql` + `MYSQL_ATTR_SSL_CA`
 
 ### Migraciones principales
-1. users (base + 2FA + tutorial_completed_at + user_modified_at)
+1. users (base + 2FA + tutorial_completed_at). Nota: la migracion `add_fields_to_users_table` existe pero esta vacia (no-op)
 2. permission_tables (Spatie roles/permissions)
-3. subscriptions (plan, status, started_at, expires_at)
-4. payments (plan, amount, status, payment_method, transaction_id)
-5. projects (name, description, status, color) — fichas de cliente
-6. tasks (name, priority, status, due_date, completed_at, project_id, deleted_at)
-7. ideas (name, priority, status, source) — ideas
-8. resources (name, url, type, project_id) — recursos por cliente
-9. ai_logs (action_type, input_context, output_text, project_id) — registros IA
+3. subscriptions (user_id, plan [free/premium_monthly/premium_yearly], status [active/expired/cancelled], started_at, expires_at)
+4. payments (user_id, plan [premium_monthly/premium_yearly], amount, status, payment_method, transaction_id, card_last_four)
+5. projects (user_id, name, description, status, color, brand_tone, service_scope, key_links, next_deadline, client_notes, user_modified_at) — fichas de cliente
+6. tasks (user_id, project_id, name, description, priority, status, due_date, completed_at, user_modified_at, deleted_at) — deleted_at permanece en la BD pero el modelo no usa SoftDeletes
+7. ideas (user_id, project_id, name, description, priority, status, source [manual/voice/ai_suggestion], user_modified_at, deleted_at) — deleted_at permanece en la BD pero el modelo no usa SoftDeletes
+8. resources (user_id, project_id, name, description, url, type, user_modified_at) — recursos por cliente
+9. ai_logs (user_id, project_id, action_type [plan_day/summary/update], input_context, output_text, created_at) — registros IA, sin updated_at
 
 ---
 
@@ -242,7 +242,7 @@ Multi-stage build (3 etapas):
 | `routes/settings.php` | Rutas de configuracion de cuenta |
 | `config/services.php` | Configuracion Groq (api_key, base_url, model, ca_bundle) |
 | `app/Models/User.php` | Logica central de roles, limites y dashboard |
-| `app/Http/Controllers/Ai/` | IA contextual: PlanDayAction, ClientSummaryAction, ClientUpdateAction |
+| `app/Http/Controllers/Ai/` | IA contextual: AiAction (base abstracta), PlanDayAction, ClientSummaryAction, ClientUpdateAction |
 | `app/Providers/AppServiceProvider.php` | Singleton OpenAI\Client apuntando a Groq |
 | `docker-entrypoint.sh` | Script de inicializacion del contenedor |
 | `docs/clientkosmos-style-guide.md.md` | Guia de estilos y design system |
@@ -263,7 +263,7 @@ Transformacion de la arquitectura: "Proyectos" pasan a ser "Clientes" (fichas de
 Reescritura completa de los tests para reflejar la nueva arquitectura. 156 test cases y 615 assertions pasando al 100%. Tests cubren: auth, CRUD de clientes/tareas/ideas/recursos, IA contextual, checkout, admin, settings.
 
 ### Fase 4 — Pulido y landing
-Landing page reescrita para freelancers multi-cliente. Precios actualizados: 0€/11.99€/119€. Planes renombrados a "Gratuito"/"Solo Mensual"/"Solo Anual". UserSeeder con datos demo realistas (3 clientes con tareas, ideas y recursos). README y documentacion actualizados.
+Landing page reescrita para freelancers multi-cliente. Precios actualizados: 0€/11.99€/119€. Planes renombrados en la UI a "Gratuito"/"Solo Mensual"/"Solo Anual" (los valores enum en BD permanecen como `free`/`premium_monthly`/`premium_yearly`). UserSeeder con datos demo realistas (3 clientes con tareas, ideas y recursos). README y documentacion actualizados.
 
 ### Fase 5 — UX y conversion (ClientKosmos rebrand)
 Rebrand completo: Flowly → ClientKosmos, Flowy → Kosmo. Panel Hoy reestructurado con tareas agrupadas por cliente. Header de contexto en fichas de cliente. Badges de riesgo en lista de clientes. Nudges contextuales de Kosmo (dismissable, reset diario). Upgrade prompts contextuales (copy refinado en limites de clientes, tareas e IA). Documentacion y Docker actualizados.

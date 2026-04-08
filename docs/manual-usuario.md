@@ -335,7 +335,7 @@ Kosmo genera **nudges contextuales** que aparecen automáticamente cuando se det
 
 1. Accede al detalle de un **cliente**.
 2. Haz clic en **"Parte semanal"**.
-3. La IA generará un informe detallado con: progreso general, bloqueos detectados y próximos pasos recomendados.
+3. La IA generará un update profesional y cercano que puedes enviar directamente al cliente por email o Slack, incluyendo tareas completadas recientemente, próximas tareas e ideas recientes.
 
 > Todas las acciones IA quedan registradas en el sistema para tu referencia.
 
