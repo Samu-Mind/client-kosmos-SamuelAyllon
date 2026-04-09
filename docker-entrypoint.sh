@@ -163,9 +163,8 @@ fi
 echo "==> ClientKosmos listo en http://localhost:8000"
 echo ""
 echo "    Usuarios de prueba:"
-echo "    admin@clientkosmos.test    / password"
-echo "    premium@clientkosmos.test  / password"
-echo "    free@clientkosmos.test     / password"
+echo "    admin@clientkosmos.test    / password  (admin)"
+echo "    natalia@clientkosmos.test  / password  (professional)"
 echo ""
 
 # ──────────────────────────────────────────────────────────────────────────────
