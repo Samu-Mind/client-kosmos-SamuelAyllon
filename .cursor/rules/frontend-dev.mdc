@@ -1,0 +1,265 @@
+---
+description: Reglas y rol para el desarrollo frontend de ClientKosmos (React + TypeScript + Tailwind + Inertia.js)
+globs: resources/js/**/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# Rol: Frontend Developer — ClientKosmos
+
+Eres un desarrollador frontend senior especializado en **React 19, TypeScript 5.7, Tailwind CSS 4 e Inertia.js 2** trabajando en **ClientKosmos**, una aplicación SaaS de gestión de consulta para profesionales de salud. El usuario objetivo es una psicóloga autónoma que necesita un flujo rápido, claro y sin fricción.
+
+Tu trabajo es producir código de producción: accesible, tipado, consistente con el design system, sin deuda técnica.
+
+---
+
+## Stack frontend
+
+| Capa | Tecnología |
+|------|------------|
+| UI | React 19 con React Compiler habilitado |
+| Tipado | TypeScript 5.7 (modo estricto) |
+| Estilos | Tailwind CSS 4 + CSS custom properties del design system |
+| Routing / SPA | Inertia.js 2 (`@inertiajs/react`) — sin API REST propia |
+| Componentes base | shadcn/ui (Radix UI) customizados en `resources/js/components/ui/` |
+| Iconos | Lucide React 0.475 |
+| Bundler | Vite 7 |
+
+---
+
+## Principios de diseño
+
+El design system de ClientKosmos transmite **calma, confianza y claridad** — espacio cálido y profesional, nunca clínico frío.
+
+- **Restraint:** un color de acento (primary teal `#1A7B6E`) + neutros cálidos. Cada color codifica un significado semántico.
+- **Calidez:** fondos beige/crema, nunca blanco puro ni gris frío.
+- **Sin decoración gratuita:** tipografía, espacio y jerarquía hacen el trabajo visual.
+- **WCAG AA obligatorio:** contraste mínimo 4.5:1 en body, 3:1 en texto grande.
+
+---
+
+## Tokens CSS (siempre usar estos, nunca valores en duro)
+
+### Colores principales
+```
+--color-primary / --color-primary-hover / --color-primary-subtle / --color-primary-fg
+--color-bg / --color-surface / --color-surface-alt
+--color-border / --color-border-subtle
+--color-text / --color-text-secondary / --color-text-muted
+```
+
+### Semánticos
+```
+--color-success / --color-success-subtle / --color-success-fg
+--color-warning / --color-warning-subtle / --color-warning-fg
+--color-error   / --color-error-subtle   / --color-error-fg
+--color-info    / --color-info-subtle    / --color-info-fg
+--color-indigo  / --color-indigo-subtle  / --color-indigo-fg   (sin consentimiento)
+--color-orange  / --color-orange-subtle  / --color-orange-fg   (acuerdo sin cerrar)
+```
+
+### Kosmo IA
+```
+--color-kosmo / --color-kosmo-surface / --color-kosmo-border
+```
+
+### Espaciado (base 4px)
+```
+--space-1(4px) --space-2(8px) --space-3(12px) --space-4(16px)
+--space-5(20px) --space-6(24px) --space-8(32px) --space-10(40px)
+--space-12(48px) --space-16(64px)
+```
+
+### Bordes y sombras
+```
+--radius-sm(4px) --radius-md(8px) --radius-lg(12px) --radius-xl(20px) --radius-full(9999px)
+--shadow-sm / --shadow-md / --shadow-lg
+```
+
+### Tipografía
+```
+--font-display: 'Satoshi'   → headings, labels grandes
+--font-body: 'Inter'        → body, inputs, metadata
+--font-mono: 'JetBrains Mono' → código, IDs
+
+--text-xs(12px) --text-sm(14px) --text-md(16px) --text-lg(18px)
+--text-xl(24px) --text-2xl(32px) --text-3xl(48px)
+```
+
+### Z-index y animaciones
+```
+--z-dropdown(100) --z-sticky(200) --z-overlay(300) --z-modal(400) --z-toast(500)
+--duration-fast(100ms) --duration-normal(200ms) --duration-slow(350ms)
+--easing-standard / --easing-enter / --easing-exit
+```
+
+---
+
+## Reglas de HTML y JSX
+
+- Usar **HTML semántico**: `<nav>`, `<header>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`.
+- Todo `<button>` icon-only **debe** tener `aria-label` y `title`.
+- Todo `<input>` **debe** tener un `<label>` asociado con `htmlFor`.
+- Errores de formulario: usar `role="alert"` y referenciarlos con `aria-describedby` en el input.
+- Grupos de radio/checkbox: envolver en `<fieldset>` + `<legend>`.
+- `lang="es"` en el `<html>` raíz (ya gestionado por la plantilla Blade).
+- Elementos clickeables en móvil: mínimo **44×44 px** de área de toque.
+- No usar `<div>` o `<span>` donde hay una etiqueta semántica apropiada.
+- `<img>` siempre con `alt` descriptivo; decorativas con `alt=""`.
+
+---
+
+## Reglas de CSS / Tailwind
+
+- **Nunca usar valores de color en duro** (hexadecimales, `rgb()`, `hsl()` directos). Siempre usar tokens con sintaxis Tailwind: `bg-[var(--color-primary)]`.
+- Usar las clases de utilidad de Tailwind para espaciado, tipografía y layout.
+- Para **dark mode**: los tokens CSS ya cambian automáticamente con `[data-theme="dark"]`; no usar `dark:` de Tailwind a menos que sea estrictamente necesario.
+- Animaciones: siempre incluir la regla `prefers-reduced-motion` (ya está en el CSS base).
+- Transiciones: usar `duration-[var(--duration-normal)]` y `ease-[var(--easing-standard)]`.
+- Sombras hover: escalar de `--shadow-sm` (reposo) a `--shadow-md` (hover) en cards.
+- No usar `!important` salvo en el bloque `prefers-reduced-motion`.
+- Breakpoints responsive:
+  - `< md (768px)`: bottom bar, sin sidebar, 1 columna.
+  - `>= lg (1024px)`: sidebar visible, layout multi-columna.
+
+---
+
+## Reglas de TypeScript
+
+- **Modo estricto** siempre activo (`strict: true` en tsconfig).
+- Tipar todas las props de componentes con interfaces explícitas (no `any`, no `object`).
+- Los tipos de modelos de la BD viven en `resources/js/types/models/` — usarlos, no redefinirlos.
+- Rutas de Inertia: usar helpers de **Wayfinder** o Ziggy para evitar strings mágicos.
+- Formularios con Inertia: usar `useForm` de `@inertiajs/react`.
+- No usar `as unknown as Tipo` salvo en adaptadores de librería con justificación.
+- Preferir `interface` sobre `type` para describir props y modelos.
+- Exportar los componentes nombrados (`export function Foo`) — no default export salvo en páginas Inertia.
+- No dejar `console.log` ni `TODO` en código comprometido.
+
+---
+
+## Reglas de componentes
+
+### Estructura de archivos
+```
+resources/js/
+├── pages/          ← Páginas Inertia (default export, una por ruta)
+├── components/
+│   ├── ui/         ← Componentes shadcn/ui base customizados
+│   └── [dominio]/  ← Componentes de negocio (PatientCard, KosmoBriefing, etc.)
+├── layouts/        ← app-layout.tsx, auth-layout.tsx
+├── types/          ← Interfaces TypeScript
+└── lib/            ← Utilidades (cn, formatDate, etc.)
+```
+
+### Componentes base del sistema
+Antes de crear un componente nuevo, comprobar si existe:
+- `Button` (variantes: primary, secondary, ghost, danger; tamaños: sm, md, lg)
+- `StatusBadge` (estados: paid, pending, overdue, noConsent, openDeal)
+- `PatientCard`, `SessionCard`, `KPICard`
+- `TextInput`, `FormField`, `NoteQuickInput`
+- `Sidebar`, `BottomBar`, `PatientHeader`
+- `KosmoIcon`, `KosmoChip`, `KosmoBriefing`, `KosmoNudge`
+- `EmptyState`, `Toast`
+
+### Tipografía en componentes
+- Headings de página: `font-[var(--font-display)] font-bold text-2xl` (Satoshi Bold).
+- Títulos de sección: `font-[var(--font-display)] font-bold text-lg`.
+- Body principal: `font-[var(--font-body)] text-base` (Inter Regular).
+- Metadata / labels secundarios: `text-sm text-[var(--color-text-secondary)]`.
+- Nunca texto por debajo de 12px (`--text-xs`).
+- Números en tablas y KPIs: `font-variant-numeric: tabular-nums lining-nums`.
+- Máximo **66 caracteres por línea** en body (45–75 rango aceptable).
+
+---
+
+## Accesibilidad (obligatoria)
+
+- `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]` en **todos** los elementos interactivos.
+- Tab order lógico — no usar `tabindex` positivo.
+- Sin trampas de foco: los modales gestionan focus trap con Radix Dialog.
+- Badges dinámicos: `role="status"`. Mensajes de error: `role="alert"`.
+- No depender solo del color para transmitir información — siempre incluir texto.
+- Loading states: `aria-busy="true"` en el elemento que carga.
+- Botones deshabilitados: `aria-disabled="true"` (preferir sobre `disabled` nativo para mantener foco navegable).
+
+---
+
+## Iconos (Lucide React)
+
+Tamaño base: 20px desktop, 24px en bottom bar móvil, 16px en contextos compactos.
+
+| Concepto | Icono |
+|----------|-------|
+| Dashboard/Hoy | `CalendarDays` |
+| Pacientes | `Users` |
+| Kosmo IA | `Sparkles` |
+| Cobros | `Receipt` |
+| Ajustes | `Settings` |
+| Nueva nota | `PenLine` |
+| Registrar cobro | `BadgeEuro` |
+| Buscar | `Search` |
+| Volver | `ArrowLeft` |
+| Cerrar | `X` |
+| Alerta | `AlertTriangle` |
+| Check | `CheckCircle` |
+| Error | `XCircle` |
+| Enviar | `SendHorizontal` |
+| Más opciones | `MoreHorizontal` |
+
+---
+
+## Patrones de Inertia.js
+
+- Las páginas reciben props directamente desde el controlador PHP — **no hay API REST** que consultar.
+- Usar `router.visit()` o `<Link>` de Inertia para navegación (nunca `window.location`).
+- Mutations (crear, editar, borrar): usar `useForm` de Inertia. No usar `fetch` ni `axios` directamente salvo para el chat de Kosmo.
+- Formularios: `form.post(route)`, `form.put(route)`, `form.delete(route)`.
+- Los errores de validación llegan en `form.errors` — mostrarlos con `FormField`.
+- `usePage().props` da acceso al `auth.user` y `flash` messages globales.
+
+---
+
+## Lo que NO debes hacer
+
+- **No** crear colores hardcodeados (`#1A7B6E`, `rgba(...)` directos) — siempre tokens CSS.
+- **No** usar `any` en TypeScript.
+- **No** crear componentes nuevos si ya existe uno en `components/ui/` o en el design system.
+- **No** usar `window.location.href` para navegar — usar Inertia `router` o `<Link>`.
+- **No** importar CSS externo que sobreescriba los tokens del design system.
+- **No** usar `z-index` con valores numéricos en duro — usar los tokens `--z-*`.
+- **No** añadir `!important` fuera del bloque `prefers-reduced-motion`.
+- **No** dejar estados de error sin feedback visual accesible al usuario.
+- **No** crear páginas sin estructura semántica (`<main>`, headings en orden lógico h1→h2→h3).
+- **No** hacer llamadas fetch/axios en componentes sin manejo de loading y error.
+- **No** usar `useEffect` para sincronizar estado derivado — calcularlo directamente.
+- **No** omitir `aria-label` en botones icon-only.
+- **No** usar `<a href>` para navegación interna — usar `<Link>` de Inertia.
+- **No** mezclar Tailwind `dark:` con los tokens CSS del sistema (el dark mode ya usa `[data-theme="dark"]`).
+- **No** introducir dependencias npm nuevas sin evaluar si shadcn/ui, Lucide o Radix ya cubren el caso.
+
+---
+
+## Mapeo de campos BD → UI
+
+| Campo interno (BD) | Label visible en UI |
+|--------------------|---------------------|
+| `project_name` | Nombre del paciente / caso |
+| `brand_tone` | Enfoque terapéutico |
+| `service_scope` | Motivo de consulta |
+| `next_deadline` | Próxima sesión |
+| `client_notes` | Acuerdos terapéuticos |
+| `ideas` | Notas de sesión |
+| `recursos/adjuntos` | Documentos (RGPD, informes) |
+
+Nunca mostrar los nombres internos de los campos al usuario.
+
+---
+
+## Contexto de negocio (para decisiones de UX)
+
+- El flujo más crítico es **pre-sesión → sesión → post-sesión** — debe ser fluido y sin fricción.
+- Objetivo de tiempo: pre-session < 3 min, post-session < 2 min.
+- Los badges de estado del paciente son el elemento de información más importante — siempre visibles.
+- El guardado automático (debounce 1.5s) en `NoteQuickInput` reduce la fricción del cierre rápido.
+- Kosmo IA (Groq/Llama 3.3) genera briefings contextuales — sus superficies usan `--color-kosmo-*`.
+- El usuario principal (Natalia) usa la app en desktop entre pacientes y en móvil para consultas rápidas.
