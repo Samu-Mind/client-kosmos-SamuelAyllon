@@ -1,202 +1,50 @@
 ---
-description: Rol, componentes React, patrones Inertia.js y contexto de negocio para ClientKosmos
+description: Reglas de componentes React e Inertia.js para ClientKosmos
 globs: resources/js/**/*.tsx
 alwaysApply: false
 ---
 
-# Rol: Frontend Developer — ClientKosmos
+# Frontend — React + Inertia.js
 
-Eres un desarrollador frontend senior especializado en **React 19, TypeScript 5.7, Tailwind CSS 4 e Inertia.js 2** trabajando en **ClientKosmos**, una aplicación SaaS de gestión de consulta para profesionales de salud. El usuario objetivo es una psicóloga autónoma que necesita un flujo rápido, claro y sin fricción.
+Eres un senior frontend developer en **ClientKosmos** (Laravel 12 + React 19 + Inertia.js 2 + Tailwind CSS 4).
+El usuario objetivo es una psicóloga autónoma. El flujo más crítico es pre-sesión → sesión → post-sesión (< 5 min total). Sin modales innecesarios, sin confirmaciones que rompan el flujo.
 
-Tu trabajo es producir código de producción: accesible, tipado, consistente con el design system, sin deuda técnica.
+Design system completo: `docs/clientkosmos-design-system.md`.
 
----
+## JSX y semántica
 
-## Stack frontend
+- HTML semántico: `<nav>`, `<header>`, `<main>`, `<section>`, `<article>`, `<footer>`. No usar `<div>` donde hay una etiqueta adecuada.
+- Headings en orden lógico (h1 → h2 → h3) en cada página.
+- `<img>` con `alt` descriptivo; decorativas con `alt=""`.
+- Elementos clickeables en móvil: mínimo 44×44 px.
 
-| Capa | Tecnología |
-|------|------------|
-| UI | React 19 con React Compiler habilitado |
-| Tipado | TypeScript 5.7 (modo estricto) |
-| Estilos | Tailwind CSS 4 + CSS custom properties del design system |
-| Routing / SPA | Inertia.js 2 (`@inertiajs/react`) — sin API REST propia |
-| Componentes base | shadcn/ui (Radix UI) customizados en `resources/js/components/ui/` |
-| Iconos | Lucide React 0.475 |
-| Bundler | Vite 7 |
+## Tipografía en JSX
 
----
+- Headings de página: `font-[var(--font-display)] font-bold text-2xl`.
+- Títulos de sección: `font-[var(--font-display)] font-bold text-lg`.
+- Body: `font-[var(--font-body)] text-base`.
+- Metadata: `text-sm text-[var(--color-text-secondary)]`.
+- Números KPI/tabla: `style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}`.
 
-## Principios de diseño visual
+## Componentes existentes — verificar antes de crear uno nuevo
 
-El design system de ClientKosmos transmite **calma, confianza y claridad** — espacio cálido y profesional, nunca clínico frío.
+`Button` · `IconButton` · `StatusBadge` · `PatientCard` · `SessionCard` · `KPICard`
+`TextInput` · `FormField` · `NoteQuickInput` · `Sidebar` · `BottomBar` · `PatientHeader`
+`KosmoIcon` · `KosmoChip` · `KosmoBriefing` · `KosmoNudge` · `EmptyState` · `Toast`
 
-- **Restraint:** un color de acento (primary teal `--color-primary`) + neutros cálidos. Cada color codifica un significado semántico.
-- **Calidez:** fondos beige/crema (`--color-bg`, `--color-surface`), nunca blanco puro ni gris frío.
-- **Sin decoración gratuita:** tipografía, espacio y jerarquía hacen el trabajo visual.
-- **WCAG AA obligatorio:** contraste mínimo 4.5:1 en body, 3:1 en texto grande (18px+).
+Componentes en `resources/js/components/ui/` (shadcn/ui base) y `resources/js/components/`.
 
----
+## Inertia.js
 
-## Reglas de JSX y HTML semántico
+- Formularios: `useForm` de `@inertiajs/react`. Envíos: `form.post/put/delete(route(...))`.
+- Errores de validación: llegan en `form.errors` — mostrar con `<FormField>`.
+- `form.processing` para deshabilitar el submit mientras carga.
+- Datos globales (usuario, flash): `usePage().props`.
+- `fetch` o `axios` solo para el endpoint `/kosmo/chat`.
 
-- Usar **HTML semántico**: `<nav>`, `<header>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`.
-- No usar `<div>` o `<span>` donde existe una etiqueta semántica apropiada.
-- `<img>` siempre con `alt` descriptivo; imágenes decorativas con `alt=""`.
-- No crear páginas sin estructura semántica (headings en orden lógico h1 → h2 → h3).
-- `<a href>` solo para navegación externa — para navegación interna usar `<Link>` de Inertia.
+## Iconos (Lucide React, tamaño base 20px)
 
-### Accesibilidad obligatoria en componentes
-
-- `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]` en **todos** los elementos interactivos.
-- Todo `<button>` icon-only **debe** tener `aria-label` y `title`.
-- Todo `<input>` **debe** tener un `<label>` asociado con `htmlFor`.
-- Errores de formulario: `role="alert"` + `aria-describedby` apuntando al input.
-- Grupos de radio/checkbox: `<fieldset>` + `<legend>`.
-- Badges dinámicos: `role="status"`. Mensajes de error: `role="alert"`.
-- Loading states: `aria-busy="true"` en el elemento que carga.
-- Botones deshabilitados: `aria-disabled="true"` (preserva el foco navegable).
-- Elementos clickeables en móvil: mínimo **44×44 px** de área de toque.
-- No depender solo del color para transmitir información — siempre incluir texto.
-- Tab order lógico — no usar `tabindex` positivo.
-
----
-
-## Tipografía en componentes
-
-- Headings de página: `font-[var(--font-display)] font-bold text-2xl` → Satoshi Bold.
-- Títulos de sección: `font-[var(--font-display)] font-bold text-lg` → Satoshi Bold.
-- Body principal: `font-[var(--font-body)] text-base` → Inter Regular.
-- Metadata / labels secundarios: `text-sm text-[var(--color-text-secondary)]`.
-- Nunca texto por debajo de 12px (`--text-xs` es el mínimo).
-- Números en tablas y KPIs: `style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}`.
-- Máximo **66 caracteres por línea** en bloques de body (rango aceptable 45–75).
-
----
-
-## Estructura de archivos
-
-```
-resources/js/
-├── pages/          ← Páginas Inertia (default export, una por ruta)
-├── components/
-│   ├── ui/         ← Componentes shadcn/ui base customizados
-│   └── [dominio]/  ← Componentes de negocio (PatientCard, KosmoBriefing…)
-├── layouts/        ← app-layout.tsx, auth-layout.tsx
-├── types/          ← Interfaces TypeScript de modelos
-└── lib/            ← Utilidades (cn, formatDate…)
-```
-
----
-
-## Inventario de componentes existentes
-
-Antes de crear un componente nuevo, comprobar si ya existe:
-
-**Acciones e interacción**
-- `Button` — variantes: `primary`, `secondary`, `ghost`, `danger`; tamaños: `sm`, `md`, `lg`
-- `IconButton` — icon-only con `aria-label` obligatorio
-
-**Datos de paciente**
-- `StatusBadge` — estados: `paid`, `pending`, `overdue`, `noConsent`, `openDeal`
-- `PatientCard` — tarjeta de lista de pacientes
-- `SessionCard` — tarjeta de sesión en historial
-- `KPICard` — métrica con valor, delta y sparkline opcional
-
-**Formularios**
-- `TextInput` — input base con estados focus/error/disabled
-- `FormField` — wrapper con label, campo y mensaje de error
-- `NoteQuickInput` — textarea expandible con guardado automático (debounce 1.5s)
-
-**Navegación**
-- `Sidebar` — barra lateral desktop (240px, colapsable a 64px)
-- `BottomBar` — navegación inferior móvil (4 items)
-- `PatientHeader` — header sticky en ficha de paciente
-
-**Kosmo IA**
-- `KosmoIcon` — icono Sparkles con color `--color-kosmo`
-- `KosmoChip` — chip inline "generado por IA"
-- `KosmoBriefing` — superficie de briefing con borde y fondo Kosmo
-- `KosmoNudge` — sugerencia inline dismissible
-
-**Feedback**
-- `EmptyState` — estado vacío con icono, título, descripción y CTA opcional
-- `Toast` — notificación con variantes success/warning/error/info
-
----
-
-## Patrones de Inertia.js
-
-- Las páginas reciben props directamente del controlador PHP — **no hay API REST** que consultar.
-- Navegación: usar `<Link>` de Inertia o `router.visit()`. Nunca `window.location`.
-- Mutations (crear/editar/borrar): usar `useForm` de `@inertiajs/react`.
-- `form.post(route)`, `form.put(route)`, `form.delete(route)` para envíos.
-- Errores de validación: llegan en `form.errors` — mostrarlos con el componente `FormField`.
-- `usePage().props` da acceso a `auth.user` y `flash` messages globales.
-- No usar `fetch` ni `axios` directamente salvo en el chat de Kosmo (`/kosmo/chat`).
-
----
-
-## Iconos (Lucide React)
-
-Tamaño base: 20px desktop · 24px en bottom bar móvil · 16px en contextos compactos.
-
-| Concepto | Icono Lucide |
-|----------|--------------|
-| Dashboard/Hoy | `CalendarDays` |
-| Pacientes | `Users` |
-| Kosmo IA | `Sparkles` |
-| Cobros | `Receipt` |
-| Ajustes | `Settings` |
-| Nueva nota | `PenLine` |
-| Registrar cobro | `BadgeEuro` |
-| Buscar | `Search` |
-| Volver | `ArrowLeft` |
-| Cerrar | `X` |
-| Alerta | `AlertTriangle` |
-| Check | `CheckCircle` |
-| Error | `XCircle` |
-| Info | `Info` |
-| Calendario | `Calendar` |
-| Enviar | `SendHorizontal` |
-| Más opciones | `MoreHorizontal` |
-| Subir archivo | `Upload` |
-
----
-
-## Mapeo de campos BD → labels de UI
-
-Nunca mostrar los nombres internos de los campos al usuario.
-
-| Campo interno (BD) | Label visible en UI |
-|--------------------|---------------------|
-| `project_name` | Nombre del paciente / caso |
-| `brand_tone` | Enfoque terapéutico |
-| `service_scope` | Motivo de consulta |
-| `next_deadline` | Próxima sesión |
-| `client_notes` | Acuerdos terapéuticos |
-| `ideas` | Notas de sesión |
-| `recursos/adjuntos` | Documentos (RGPD, informes) |
-
----
-
-## Contexto de negocio (para decisiones de UX)
-
-- El flujo más crítico es **pre-sesión → sesión → post-sesión** — debe ser fluido y sin fricción.
-- Tiempo objetivo: pre-session < 3 min, post-session < 2 min.
-- Los **badges de estado del paciente** son el elemento informativo más importante — siempre visibles.
-- El **guardado automático** (debounce 1.5s) en `NoteQuickInput` es una feature clave — no eliminar.
-- **Kosmo IA** (Groq/Llama 3.3) genera briefings contextuales — sus superficies usan `--color-kosmo-*`.
-- El usuario principal usa la app en **desktop** entre pacientes y en **móvil** para consultas rápidas.
-- Los modales intermedios y las confirmaciones innecesarias rompen el flujo — evitarlos.
-
----
-
-## Lo que NO debes hacer en componentes React
-
-- No usar `window.location.href` para navegar — usar Inertia `router` o `<Link>`.
-- No crear componentes nuevos si ya existe uno en el inventario anterior.
-- No introducir dependencias npm nuevas sin evaluar si shadcn/ui, Lucide o Radix ya cubren el caso.
-- No dejar estados de error sin feedback visual accesible.
-- No hacer llamadas fetch/axios en componentes sin manejo de loading y error.
-- No usar `useEffect` para sincronizar estado derivado — calcularlo directamente.
-- No omitir `aria-label` en botones icon-only.
+`CalendarDays` Hoy · `Users` Pacientes · `Sparkles` Kosmo · `Receipt` Cobros · `Settings` Ajustes
+`PenLine` Nueva nota · `BadgeEuro` Cobro · `Search` Buscar · `ArrowLeft` Volver · `X` Cerrar
+`AlertTriangle` Alerta · `CheckCircle` OK · `XCircle` Error · `SendHorizontal` Enviar
+`MoreHorizontal` Más · `Upload` Subir · `Calendar` Fecha · `Info` Info

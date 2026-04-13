@@ -1,0 +1,32 @@
+---
+description: Restricciones globales de ClientKosmos — aplican a todos los archivos
+alwaysApply: true
+---
+
+# ClientKosmos — Reglas globales
+
+Stack: Laravel 12 + React 19 + TypeScript 5.7 + Tailwind CSS 4 + Inertia.js 2.
+Documentación de referencia: `docs/clientkosmos-design-system.md`, `docs/proyect_information.md`.
+
+## Restricciones absolutas
+
+- Sin `any` en TypeScript. Sin valores de color hardcodeados (hex, rgb, hsl) en CSS o clases Tailwind.
+- Sin `window.location` para navegar — usar `<Link>` o `router` de Inertia.
+- Sin `console.log` ni comentarios `TODO` en código que se va a commitear.
+- Sin z-index numérico en duro — usar los tokens `--z-dropdown/sticky/overlay/modal/toast`.
+- Sin `!important` fuera del bloque `prefers-reduced-motion`.
+- Sin duplicar tipos que ya existen en `resources/js/types/`.
+- Sin instalar dependencias npm sin verificar si shadcn/ui, Lucide o Radix ya cubren el caso.
+
+## Convenciones de nombrado y exports
+
+- Componentes: export nombrado (`export function Foo`). Default export solo en páginas Inertia.
+- Rutas: Wayfinder o Ziggy — nunca strings como `'/patients/1/notes'`.
+- Modelos de BD mapeados a labels de UI: ver `docs/clientkosmos-design-system.md` apéndice A.
+
+## Accesibilidad — mínimos no negociables
+
+- `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]` en todo elemento interactivo.
+- Botones icon-only: `aria-label` + `title` obligatorios.
+- Inputs: `<label htmlFor>` obligatorio. Errores: `role="alert"` + `aria-describedby`.
+- Contraste mínimo WCAG AA: 4.5:1 body, 3:1 texto grande.

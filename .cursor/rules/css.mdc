@@ -1,255 +1,69 @@
 ---
-description: Reglas de CSS y Tailwind para ClientKosmos — tokens, dark mode, responsive, animaciones
+description: Reglas de CSS y Tailwind para ClientKosmos
 globs: resources/**/*.css
 alwaysApply: false
 ---
 
-# CSS — Reglas para ClientKosmos
+# CSS — ClientKosmos
 
-Estas reglas aplican a todos los archivos `.css` del proyecto. El sistema de estilos se basa en **Tailwind CSS 4** con CSS custom properties como capa de design tokens. Los tokens son la fuente de verdad — nunca los valores en duro.
+Design tokens completos: `docs/clientkosmos-design-system.md` sección 1 y sección 6.
 
----
+## Uso de tokens en Tailwind
 
-## Tokens CSS — referencia completa
-
-Todos los valores visuales deben referenciar estos tokens. Nunca usar hexadecimales, `rgb()` o `hsl()` directos.
-
-### Colores principales
-```css
---color-primary          /* #1A7B6E teal cálido — CTAs, enlaces, activos */
---color-primary-hover    /* #135E54 */
---color-primary-subtle   /* #E6F5F2 fondos suaves de acento */
---color-primary-fg       /* #FFFFFF texto sobre primary */
-```
-
-### Superficies
-```css
---color-bg               /* #FAF8F5 fondo principal — beige cálido */
---color-surface          /* #FFFFFF cards, paneles, modales */
---color-surface-alt      /* #F5F2ED superficies secundarias, sidebar */
-```
-
-### Bordes
-```css
---color-border           /* #E0DBD3 bordes de cards, separadores */
---color-border-subtle    /* #EBE7E0 separadores internos suaves */
-```
-
-### Texto
-```css
---color-text             /* #2C2825 body principal */
---color-text-secondary   /* #7A746C metadata, etiquetas secundarias */
---color-text-muted       /* #B5AFA7 placeholders, texto terciario */
-```
-
-### Semánticos
-```css
---color-success / --color-success-subtle / --color-success-fg    /* Pagado */
---color-warning / --color-warning-subtle / --color-warning-fg    /* Pendiente */
---color-error   / --color-error-subtle   / --color-error-fg      /* Vencido / error */
---color-info    / --color-info-subtle    / --color-info-fg        /* Informativo */
---color-indigo  / --color-indigo-subtle  / --color-indigo-fg     /* Sin consentimiento */
---color-orange  / --color-orange-subtle  / --color-orange-fg     /* Acuerdo sin cerrar */
-```
-
-### Kosmo IA
-```css
---color-kosmo            /* igual que --color-primary */
---color-kosmo-surface    /* #ECF7F5 fondo de briefings */
---color-kosmo-border     /* #C2E4DE borde de superficies Kosmo */
-```
-
-### Tipografía
-```css
---font-display: 'Satoshi', sans-serif        /* headings, labels grandes */
---font-body:    'Inter', sans-serif          /* body, inputs, metadata */
---font-mono:    'JetBrains Mono', monospace  /* código, IDs */
-
---text-xs: 0.75rem    /* 12px — mínimo absoluto */
---text-sm: 0.875rem   /* 14px */
---text-md: 1rem       /* 16px */
---text-lg: 1.125rem   /* 18px */
---text-xl: 1.5rem     /* 24px */
---text-2xl: 2rem      /* 32px */
---text-3xl: 3rem      /* 48px */
-```
-
-### Espaciado (base 4px)
-```css
---space-1: 0.25rem   /* 4px */
---space-2: 0.5rem    /* 8px */
---space-3: 0.75rem   /* 12px */
---space-4: 1rem      /* 16px */
---space-5: 1.25rem   /* 20px */
---space-6: 1.5rem    /* 24px */
---space-8: 2rem      /* 32px */
---space-10: 2.5rem   /* 40px */
---space-12: 3rem     /* 48px */
---space-16: 4rem     /* 64px */
-```
-
-### Border radius
-```css
---radius-sm: 4px      /* badges, chips pequeños */
---radius-md: 8px      /* inputs, botones, cards internas */
---radius-lg: 12px     /* cards principales, modales */
---radius-xl: 20px     /* cards destacadas, panels flotantes */
---radius-full: 9999px /* avatares, pills */
-```
-
-### Sombras
-```css
---shadow-sm   /* cards en reposo */
---shadow-md   /* cards hover, dropdowns */
---shadow-lg   /* modales, panels flotantes */
-```
-
-### Z-index
-```css
---z-base:     0
---z-dropdown: 100
---z-sticky:   200
---z-overlay:  300
---z-modal:    400
---z-toast:    500
-```
-
-### Animaciones
-```css
---duration-fast:     100ms   /* hover de botones, toggles */
---duration-normal:   200ms   /* transiciones de color, scale, opacity */
---duration-slow:     350ms   /* abrir/cerrar panels, sidebar, modales */
---easing-standard:   cubic-bezier(0.4, 0.0, 0.2, 1)
---easing-enter:      cubic-bezier(0.0, 0.0, 0.2, 1)
---easing-exit:       cubic-bezier(0.4, 0.0, 1, 1)
-```
-
----
-
-## Reglas de Tailwind CSS
-
-### Uso de tokens en clases de Tailwind
-Siempre referenciar tokens CSS con la sintaxis `[var(--token)]`:
+Siempre `[var(--token)]`, nunca valores hardcodeados:
 
 ```html
 <!-- Bien -->
-<div class="bg-[var(--color-surface)] border-[var(--color-border)] rounded-[var(--radius-lg)]">
-
-<!-- Mal — valor hardcodeado -->
-<div class="bg-white border-gray-200 rounded-xl">
-```
-
-### Dark mode
-El dark mode se gestiona con el selector `[data-theme="dark"]` en el CSS base — los tokens cambian solos.
-- **No usar** el prefijo `dark:` de Tailwind salvo que haya una razón que los tokens no cubran.
-- No mezclar los dos sistemas (`dark:` + `[data-theme="dark"]`) en el mismo componente.
-
-### Z-index
-Nunca usar valores numéricos en duro para `z-index` — siempre los tokens:
-```html
-<!-- Bien -->
-<nav class="z-[var(--z-sticky)]">
+<div class="bg-[var(--color-surface)] border-[var(--color-border)] rounded-[var(--radius-lg)]
+            shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]
+            transition-all duration-[var(--duration-normal)] ease-[var(--easing-standard)]">
 
 <!-- Mal -->
-<nav class="z-50">
+<div class="bg-white border-gray-200 rounded-xl shadow-sm">
 ```
 
-### Transiciones
-```html
-<!-- Patrón estándar -->
-<div class="transition-all duration-[var(--duration-normal)] ease-[var(--easing-standard)]">
+## Dark mode
 
-<!-- Para sombras hover en cards: -->
-<div class="shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]
-            border-[var(--color-border-subtle)] hover:border-[var(--color-border)]
-            transition-all duration-[var(--duration-normal)] ease-[var(--easing-standard)]">
-```
+- El dark mode usa `[data-theme="dark"]` — los tokens CSS cambian automáticamente.
+- No usar el prefijo `dark:` de Tailwind. No mezclar ambos sistemas.
 
----
+## Reglas de aplicación de tokens
 
-## Dark mode — estructura del CSS base
+| Propiedad | Token a usar |
+|-----------|-------------|
+| Fondo de página | `--color-bg` |
+| Cards / paneles | `--color-surface` |
+| Sidebar / superficies alt | `--color-surface-alt` |
+| Bordes principales | `--color-border` |
+| Separadores internos | `--color-border-subtle` |
+| Texto body | `--color-text` |
+| Texto secundario | `--color-text-secondary` |
+| Placeholders | `--color-text-muted` |
+| Z-index | `--z-dropdown/sticky/overlay/modal/toast` |
+| Transición duración | `--duration-fast/normal/slow` |
+| Transición easing | `--easing-standard/enter/exit` |
+
+## Responsive (mobile-first)
+
+- `< md` (768px): bottom bar, sin sidebar, 1 columna.
+- `>= lg` (1024px): sidebar visible, layout multi-columna.
+- Enfoque mobile-first: estilos base para móvil, overrides con `md:` y `lg:`.
+
+## Accesibilidad
+
+El bloque `prefers-reduced-motion` ya existe en el CSS base — no eliminarlo ni sobreescribirlo.
 
 ```css
-/* Light (por defecto) */
-:root {
-  --color-primary: #1A7B6E;
-  --color-bg: #FAF8F5;
-  /* ... resto de tokens ... */
-}
-
-/* Dark */
-[data-theme="dark"] {
-  --color-primary: #4ABEAB;
-  --color-bg: #161412;
-  /* ... sobreescrituras ... */
-}
-```
-
-Las sombras en dark mode usan `rgba(0, 0, 0, ...)` con opacidades ~0.10 mayores que en light.
-
----
-
-## Responsive — breakpoints
-
-| Token Tailwind | Valor | Comportamiento |
-|----------------|-------|----------------|
-| `sm` | 640px | Móvil grande |
-| `md` | 768px | Tablet |
-| `lg` | 1024px | Desktop (sidebar visible) |
-| `xl` | 1280px | Desktop amplio |
-| `2xl` | 1536px | Pantalla grande |
-
-**Reglas:**
-- `< md` (< 768px): bottom bar, sin sidebar, layout 1 columna.
-- `>= lg` (≥ 1024px): sidebar visible, layout multi-columna.
-- Sidebar colapsa a iconos entre `md` y `lg` (768–1024px).
-- Enfoque **mobile-first**: estilos base para móvil, luego overrides con `md:`, `lg:`.
-
----
-
-## Accesibilidad en CSS
-
-### `prefers-reduced-motion` (ya incluido en el CSS base — no eliminarlo)
-```css
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-```
-
-### Focus visible
-Todos los elementos interactivos deben tener outline visible al navegar con teclado:
-```css
-.elemento-interactivo:focus-visible {
+/* Focus visible — patrón para elementos interactivos custom */
+.elemento:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 ```
-En Tailwind: `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]`.
 
----
+## Tipografía
 
-## Tipografía — reglas
-
-- Nunca texto por debajo de `--text-xs` (12px).
-- Headings siempre con `--font-display` (Satoshi); body siempre con `--font-body` (Inter).
-- Números en tablas y KPIs: `font-variant-numeric: tabular-nums lining-nums`.
-- No usar itálica de Satoshi (no disponible en todos los pesos) — usar Inter italic cuando sea necesario.
-- Máximo 66 caracteres por línea en body (`max-w-prose` de Tailwind o `max-width: 66ch`).
-
----
-
-## Lo que NO debes hacer en CSS
-
-- No usar valores hexadecimales, `rgb()` o `hsl()` en duro — siempre tokens CSS.
-- No usar `z-index` con números directos — usar los tokens `--z-*`.
-- No añadir `!important` fuera del bloque `prefers-reduced-motion`.
-- No importar hojas de estilo externas que sobreescriban los tokens del design system.
-- No usar el prefijo `dark:` de Tailwind mezclado con `[data-theme="dark"]`.
-- No crear nuevas custom properties sin seguir el naming convention `--color-*`, `--space-*`, `--radius-*`, etc.
-- No añadir fuentes nuevas sin actualizar las variables `--font-*` correspondientes.
+- Mínimo absoluto: `--text-xs` (12px). Nunca por debajo.
+- Headings: `--font-display` (Satoshi). Body: `--font-body` (Inter).
+- No usar itálica de Satoshi — usar Inter italic cuando sea necesario.
+- Ancho máximo de columna de texto: `max-width: 66ch`.
