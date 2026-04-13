@@ -1,32 +1,42 @@
 ---
-description: Restricciones globales de ClientKosmos — aplican a todos los archivos
+description: Comandos, guardrails y convenciones globales de ClientKosmos
 alwaysApply: true
 ---
 
 # ClientKosmos — Reglas globales
 
 Stack: Laravel 12 + React 19 + TypeScript 5.7 + Tailwind CSS 4 + Inertia.js 2.
-Documentación de referencia: `docs/clientkosmos-design-system.md`, `docs/proyect_information.md`.
 
-## Restricciones absolutas
+## Comandos
 
-- Sin `any` en TypeScript. Sin valores de color hardcodeados (hex, rgb, hsl) en CSS o clases Tailwind.
+```bash
+npm run dev          # servidor de desarrollo (Vite)
+npm run build        # build de producción
+npm run types        # tsc --noEmit (verificar tipos sin compilar)
+npm run lint         # ESLint --fix
+npm run format       # Prettier sobre resources/
+php artisan test     # tests con Pest (97 tests)
+./vendor/bin/pint    # formatter PHP
+```
+
+Antes de commitear: `npm run types && npm run lint`.
+
+## Archivos que no modificar
+
+- `resources/js/types/models/` — generados desde el backend, editar el modelo PHP correspondiente.
+- `database/migrations/` — nunca editar una migración ya ejecutada, crear una nueva.
+- `bootstrap/`, `public/index.php` — infraestructura de Laravel, no tocar.
+
+## Guardrails de código
+
+- Sin `any` en TypeScript. Sin colores hardcodeados (hex, rgb, hsl) en CSS o Tailwind.
 - Sin `window.location` para navegar — usar `<Link>` o `router` de Inertia.
-- Sin `console.log` ni comentarios `TODO` en código que se va a commitear.
-- Sin z-index numérico en duro — usar los tokens `--z-dropdown/sticky/overlay/modal/toast`.
-- Sin `!important` fuera del bloque `prefers-reduced-motion`.
-- Sin duplicar tipos que ya existen en `resources/js/types/`.
-- Sin instalar dependencias npm sin verificar si shadcn/ui, Lucide o Radix ya cubren el caso.
+- Sin `console.log` ni `TODO` en código que se va a commitear.
+- Sin z-index numérico en duro — usar tokens `--z-dropdown/sticky/overlay/modal/toast`.
+- Sin instalar dependencias npm sin verificar si shadcn/ui, Lucide o Radix ya lo cubren.
 
-## Convenciones de nombrado y exports
+## Convenciones
 
 - Componentes: export nombrado (`export function Foo`). Default export solo en páginas Inertia.
-- Rutas: Wayfinder o Ziggy — nunca strings como `'/patients/1/notes'`.
-- Modelos de BD mapeados a labels de UI: ver `docs/clientkosmos-design-system.md` apéndice A.
-
-## Accesibilidad — mínimos no negociables
-
-- `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]` en todo elemento interactivo.
-- Botones icon-only: `aria-label` + `title` obligatorios.
-- Inputs: `<label htmlFor>` obligatorio. Errores: `role="alert"` + `aria-describedby`.
-- Contraste mínimo WCAG AA: 4.5:1 body, 3:1 texto grande.
+- Rutas: `route('nombre.accion')` (Ziggy) o helpers Wayfinder. Nunca strings literales de ruta.
+- Labels de UI para campos de BD: ver `docs/clientkosmos-design-system.md` apéndice A.

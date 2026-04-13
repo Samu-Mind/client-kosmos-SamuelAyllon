@@ -1,50 +1,52 @@
 ---
-description: Reglas de componentes React e Inertia.js para ClientKosmos
+description: Convenciones de componentes React e Inertia.js para ClientKosmos
 globs: resources/js/**/*.tsx
 alwaysApply: false
 ---
 
 # Frontend — React + Inertia.js
 
-Eres un senior frontend developer en **ClientKosmos** (Laravel 12 + React 19 + Inertia.js 2 + Tailwind CSS 4).
-El usuario objetivo es una psicóloga autónoma. El flujo más crítico es pre-sesión → sesión → post-sesión (< 5 min total). Sin modales innecesarios, sin confirmaciones que rompan el flujo.
+Design system: `docs/clientkosmos-design-system.md`.
+Componentes existentes: `resources/js/components/` y `resources/js/components/ui/`.
 
-Design system completo: `docs/clientkosmos-design-system.md`.
+## Antes de crear un componente nuevo
 
-## JSX y semántica
+Verificar si ya existe: `Button` · `IconButton` · `StatusBadge` · `PatientCard` · `SessionCard` · `KPICard` · `TextInput` · `FormField` · `NoteQuickInput` · `Sidebar` · `BottomBar` · `PatientHeader` · `KosmoIcon` · `KosmoChip` · `KosmoBriefing` · `KosmoNudge` · `EmptyState` · `Toast`
 
-- HTML semántico: `<nav>`, `<header>`, `<main>`, `<section>`, `<article>`, `<footer>`. No usar `<div>` donde hay una etiqueta adecuada.
-- Headings en orden lógico (h1 → h2 → h3) en cada página.
-- `<img>` con `alt` descriptivo; decorativas con `alt=""`.
+## Convenciones JSX
+
+- HTML semántico (`<nav>`, `<main>`, `<section>`…). Sin `<div>` donde hay etiqueta apropiada.
+- Headings en orden lógico h1 → h2 → h3. Sin saltarse niveles.
+- `<img>` siempre con `alt`. Decorativas: `alt=""`.
 - Elementos clickeables en móvil: mínimo 44×44 px.
+- Iconos: Lucide React, 20px base. Ver usos canónicos en `resources/js/components/ui/`.
 
-## Tipografía en JSX
+## Tipografía — clases canónicas
 
-- Headings de página: `font-[var(--font-display)] font-bold text-2xl`.
-- Títulos de sección: `font-[var(--font-display)] font-bold text-lg`.
-- Body: `font-[var(--font-body)] text-base`.
-- Metadata: `text-sm text-[var(--color-text-secondary)]`.
-- Números KPI/tabla: `style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}`.
+```tsx
+// Heading de página
+<h1 className="font-[var(--font-display)] font-bold text-2xl text-[var(--color-text)]">
 
-## Componentes existentes — verificar antes de crear uno nuevo
+// Título de sección
+<h2 className="font-[var(--font-display)] font-bold text-lg text-[var(--color-text)]">
 
-`Button` · `IconButton` · `StatusBadge` · `PatientCard` · `SessionCard` · `KPICard`
-`TextInput` · `FormField` · `NoteQuickInput` · `Sidebar` · `BottomBar` · `PatientHeader`
-`KosmoIcon` · `KosmoChip` · `KosmoBriefing` · `KosmoNudge` · `EmptyState` · `Toast`
+// Body
+<p className="font-[var(--font-body)] text-base text-[var(--color-text)]">
 
-Componentes en `resources/js/components/ui/` (shadcn/ui base) y `resources/js/components/`.
+// Metadata / labels secundarios
+<span className="text-sm text-[var(--color-text-secondary)]">
 
-## Inertia.js
+// Números KPI y tablas
+<span style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>
+```
 
-- Formularios: `useForm` de `@inertiajs/react`. Envíos: `form.post/put/delete(route(...))`.
-- Errores de validación: llegan en `form.errors` — mostrar con `<FormField>`.
-- `form.processing` para deshabilitar el submit mientras carga.
-- Datos globales (usuario, flash): `usePage().props`.
-- `fetch` o `axios` solo para el endpoint `/kosmo/chat`.
+## Inertia.js — patrón de formulario
 
-## Iconos (Lucide React, tamaño base 20px)
-
-`CalendarDays` Hoy · `Users` Pacientes · `Sparkles` Kosmo · `Receipt` Cobros · `Settings` Ajustes
-`PenLine` Nueva nota · `BadgeEuro` Cobro · `Search` Buscar · `ArrowLeft` Volver · `X` Cerrar
-`AlertTriangle` Alerta · `CheckCircle` OK · `XCircle` Error · `SendHorizontal` Enviar
-`MoreHorizontal` Más · `Upload` Subir · `Calendar` Fecha · `Info` Info
+```tsx
+const form = useForm({ field: '' });
+// form.post/put/delete(route('resource.action', id))
+// form.errors.field → pasar a <FormField error={form.errors.field}>
+// form.processing  → deshabilitar submit
+// usePage().props  → auth.user, flash
+// fetch/axios solo en /kosmo/chat
+```
