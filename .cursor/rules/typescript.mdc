@@ -1,0 +1,133 @@
+---
+description: Reglas de TypeScript para ClientKosmos (modo estricto, tipado, patrones)
+globs: resources/js/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# TypeScript — Reglas para ClientKosmos
+
+Estas reglas aplican a todos los archivos `.ts` y `.tsx` del proyecto. El objetivo es código tipado con cero `any`, máxima inferencia y convenciones consistentes.
+
+---
+
+## Configuración base
+
+- **Modo estricto activo** (`strict: true` en `tsconfig.json`) — nunca desactivar flags individuales para "silenciar" errores.
+- `noUncheckedIndexedAccess: true` — accesos a arrays y objetos indexados siempre pueden ser `undefined`.
+- `exactOptionalPropertyTypes: true` — `prop?: string` no acepta `undefined` explícito, solo ausencia.
+
+---
+
+## Tipado de props y modelos
+
+- Tipar todas las props de componentes con **interfaces explícitas** — nunca `any`, nunca `object`.
+- Preferir `interface` sobre `type` para describir props y modelos de datos.
+- Usar `type` para unions, intersecciones y aliases de tipos primitivos.
+- Los tipos de los modelos de la BD viven en `resources/js/types/models/` — **usarlos, no redefinirlos**.
+- No duplicar tipos que ya existen en `resources/js/types/` — buscar antes de crear.
+
+```ts
+// Bien
+interface PatientCardProps {
+  patient: Patient;
+  className?: string;
+}
+
+// Mal
+const PatientCard = ({ patient, className }: { patient: any; className?: string }) => { ... }
+```
+
+---
+
+## Inferencia y aserciones
+
+- No usar `as unknown as Tipo` salvo en adaptadores de librería de terceros — y con comentario que explique por qué.
+- No usar aserción no nula (`!`) salvo cuando el valor es garantizado por el contexto y no hay otra opción.
+- Preferir narrowing explícito (`typeof`, `instanceof`, guards) sobre casteos.
+
+```ts
+// Bien
+if (patient.next_deadline) {
+  formatDate(patient.next_deadline);
+}
+
+// Mal
+formatDate(patient.next_deadline!);
+```
+
+---
+
+## Exports y organización
+
+- Exportar componentes con **export nombrado** (`export function Foo`).
+- **Default export solo en páginas Inertia** (`pages/*.tsx`) — Inertia lo requiere.
+- Agrupar imports: librerías externas → aliased internos (`@/`) → relativos.
+- No reexportar todo desde un barrel `index.ts` si solo hay 1-2 archivos en la carpeta.
+
+---
+
+## Formularios con Inertia
+
+Usar siempre `useForm` de `@inertiajs/react` para formularios que envían datos al servidor:
+
+```ts
+const form = useForm({
+  name: '',
+  email: '',
+});
+
+// Envío
+form.post(route('patients.store'));
+form.put(route('patients.update', patient.id));
+form.delete(route('patients.destroy', patient.id));
+```
+
+- Los errores de validación llegan tipados en `form.errors` (objeto `Partial<Record<keyof T, string>>`).
+- `form.processing` controla el estado de carga — usarlo para deshabilitar el botón de submit.
+- No mezclar `useForm` de Inertia con `useState` manual para los mismos campos.
+
+---
+
+## Rutas
+
+- Usar **Wayfinder** o **Ziggy** para referenciar rutas — nunca strings mágicos como `'/patients/1/notes'`.
+- Wayfinder genera helpers tipados en `resources/js/actions/` — importar desde ahí.
+
+```ts
+// Bien (Ziggy)
+route('patients.show', { patient: patient.id })
+
+// Mal
+`/patients/${patient.id}`
+```
+
+---
+
+## Utilidades comunes
+
+- `cn(...classes)` de `resources/js/lib/utils.ts` para combinar clases condicionales (wrapper de `clsx` + `tailwind-merge`).
+- `formatDate(date)` y `formatDateTime(date)` de `resources/js/lib/utils.ts` para fechas — no reinventar.
+
+---
+
+## Lo que NO debes hacer en TypeScript
+
+- No usar `any` — si el tipo es desconocido usar `unknown` y hacer narrowing.
+- No suprimir errores con `@ts-ignore` — usar `@ts-expect-error` solo si es inevitable, con comentario.
+- No redefinir tipos que ya existen en `resources/js/types/`.
+- No dejar `console.log` ni comentarios `TODO` en código comprometido.
+- No usar `as Tipo` para "forzar" un tipo que no cuadra — corregir el tipo origen.
+- No crear enums de TypeScript — preferir `const` objects con `as const` o union de strings literales.
+
+```ts
+// Bien
+const PaymentStatus = {
+  PENDING: 'pending',
+  PAID: 'paid',
+  OVERDUE: 'overdue',
+} as const;
+type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
+
+// Mal
+enum PaymentStatus { PENDING, PAID, OVERDUE }
+```
