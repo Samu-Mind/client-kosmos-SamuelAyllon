@@ -7,11 +7,14 @@ alwaysApply: false
 # Frontend — React + Inertia.js
 
 Design system: `docs/clientkosmos-design-system.md`.
-Componentes existentes: `resources/js/components/` y `resources/js/components/ui/`.
+Componentes: `resources/js/components/` y `resources/js/components/ui/`.
+Hooks reutilizables: `resources/js/hooks/` — revisar antes de crear uno nuevo.
 
 ## Antes de crear un componente nuevo
 
-Verificar si ya existe: `Button` · `IconButton` · `StatusBadge` · `PatientCard` · `SessionCard` · `KPICard` · `TextInput` · `FormField` · `NoteQuickInput` · `Sidebar` · `BottomBar` · `PatientHeader` · `KosmoIcon` · `KosmoChip` · `KosmoBriefing` · `KosmoNudge` · `EmptyState` · `Toast`
+Verificar si ya existe: `Button` · `IconButton` · `StatusBadge` · `PatientCard` · `SessionCard` · `KPICard` · `TextInput` / `Input` · `FormField` · `Sidebar` · `BottomBar` · `PatientHeader` · `KosmoIcon` · `KosmoChip` · `KosmoBriefing` · `KosmoNudge` · `EmptyState`
+
+Hooks existentes: `use-mobile` · `use-appearance` · `use-clipboard` · `use-initials` · `use-mobile-navigation` · `use-current-url` · `use-two-factor-auth`
 
 ## Convenciones JSX
 
@@ -19,15 +22,15 @@ Verificar si ya existe: `Button` · `IconButton` · `StatusBadge` · `PatientCar
 - Headings en orden lógico h1 → h2 → h3. Sin saltarse niveles.
 - `<img>` siempre con `alt`. Decorativas: `alt=""`.
 - Elementos clickeables en móvil: mínimo 44×44 px.
-- Iconos: Lucide React, 20px base. Ver usos canónicos en `resources/js/components/ui/`.
+- Iconos: Lucide React, 20px base — ver ejemplos canónicos en `resources/js/components/ui/icon.tsx`.
 
 ## Tipografía — clases canónicas
 
 ```tsx
-// Heading de página
-<h1 className="font-[var(--font-display)] font-bold text-2xl text-[var(--color-text)]">
+// Heading de página — ejemplo real de patients/index.tsx
+<h1 className="text-display-2xl text-[var(--color-text)]">
 
-// Título de sección
+// Heading de sección
 <h2 className="font-[var(--font-display)] font-bold text-lg text-[var(--color-text)]">
 
 // Body
@@ -40,13 +43,29 @@ Verificar si ya existe: `Button` · `IconButton` · `StatusBadge` · `PatientCar
 <span style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>
 ```
 
-## Inertia.js — patrón de formulario
+## Inertia.js — patrón de página
 
 ```tsx
+// Estructura de una página (default export obligatorio)
+import AppLayout from '@/layouts/app-layout';
+import type { Patient } from '@/types';
+
+interface Props { patients: Patient[] }
+
+export default function PatientsIndex({ patients }: Props) {
+    return (
+        <AppLayout>
+            <Head title="Pacientes — ClientKosmos" />
+            {/* contenido */}
+        </AppLayout>
+    );
+}
+
+// Formularios
 const form = useForm({ field: '' });
 // form.post/put/delete(route('resource.action', id))
 // form.errors.field → pasar a <FormField error={form.errors.field}>
 // form.processing  → deshabilitar submit
-// usePage().props  → auth.user, flash
-// fetch/axios solo en /kosmo/chat
+// usePage().props  → auth.user, flash messages
+// axios solo en /kosmo/chat (configurado en @/lib/axios.ts)
 ```

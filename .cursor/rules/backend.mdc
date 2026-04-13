@@ -1,0 +1,87 @@
+---
+description: Convenciones de PHP y Laravel para ClientKosmos
+globs: "{app,routes,database,tests}/**/*.php"
+alwaysApply: false
+---
+
+# Backend — Laravel 12
+
+Patrón: Single Action Controller + FormRequest + Policy + Service.
+Ejemplo canónico completo: `app/Http/Controllers/Patient/StoreAction.php`.
+
+## Single Action Controllers
+
+Cada acción HTTP es una clase invocable con un único método `__invoke`. Sin métodos CRUD en un solo controller.
+
+```php
+// Convención de naming: Dominio/VerbAction.php
+// app/Http/Controllers/Patient/StoreAction.php
+class StoreAction extends Controller
+{
+    public function __invoke(StorePatientRequest $request): RedirectResponse
+    {
+        $this->authorize('create', Patient::class);  // ← Policy siempre primero
+
+        $patient = Patient::create([
+            ...$request->validated(),               // ← Solo datos validados
+            'user_id' => $request->user()->id,
+        ]);
+
+        return redirect()->route('patients.show', $patient)
+            ->with('success', 'Mensaje de confirmación.');
+    }
+}
+```
+
+## FormRequests
+
+- Un FormRequest por operación de escritura (`StorePatientRequest`, `StorePaymentRequest`…).
+- Ubicación: `app/Http/Requests/`.
+- Reglas comunes reutilizables: `app/Concerns/PasswordValidationRules.php`, `ProfileValidationRules.php`.
+- Nunca validar en el controller — siempre en el FormRequest.
+
+## Policies
+
+- Una Policy por modelo con ownership: `app/Policies/PatientPolicy.php`, `PaymentPolicy.php`.
+- El ownership es `user_id` — un profesional solo accede a sus propios recursos.
+- Llamar `$this->authorize()` en el controller antes de cualquier lógica de negocio.
+- Guardrail: no modificar `app/Policies/AdminPolicy.php` sin revisar el impacto en el panel admin.
+
+## Services
+
+Lógica de negocio compleja va en `app/Services/`:
+- `KosmoService` — generación de briefings con Groq/Llama.
+- `PatientContextService` — contexto de paciente para Kosmo.
+- `BillingService` — cálculos de facturación.
+- `RgpdService` — gestión de consentimientos y expiración.
+- `PaymentReminderService` — recordatorios de cobro.
+
+Inyectar Services en el constructor del controller, no instanciarlos con `new`.
+
+## Jobs
+
+Jobs de larga duración: `app/Jobs/`. Los existentes:
+- `GenerateDailyBriefing`, `GeneratePreSessionBriefing` — IA Kosmo.
+- `CheckConsentExpiry` — RGPD.
+- `SendPaymentReminder` — cobros.
+
+## Rutas
+
+- Formato: `Route::verbo('/ruta', AccionAction::class)->name('dominio.accion')`.
+- Rutas de profesional: middleware `['auth', 'verified', 'professional']` en `routes/web.php`.
+- Rutas de admin: middleware `['auth', 'verified', 'admin']`, prefix `admin`, name `admin.`.
+- Rutas de settings: en `routes/settings.php` (incluido al final de `web.php`).
+- Alias de imports en rutas: `use App\...\StoreAction as PatientStoreAction` — evitar colisiones.
+
+## Modelos
+
+- Ownership por `user_id` en todos los modelos de paciente y sus relaciones.
+- Soft deletes activos en `Patient` (`deleted_at`).
+- Observers existentes: `PatientObserver`, `PaymentObserver` — revisar antes de añadir lógica en eventos del modelo.
+
+## Guardrails
+
+- No editar migraciones ya ejecutadas — crear una nueva migración.
+- No modificar `app/Actions/Fortify/` salvo para cambios de autenticación deliberados.
+- No añadir lógica de negocio en controllers — usar Services.
+- `./vendor/bin/pint` antes de commitear PHP.

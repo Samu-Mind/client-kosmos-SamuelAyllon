@@ -6,38 +6,58 @@ alwaysApply: false
 
 # TypeScript — ClientKosmos
 
-`strict: true` · `noUncheckedIndexedAccess: true` · `exactOptionalPropertyTypes: true`
+Config activa en `tsconfig.json`: `strict: true`, `noImplicitAny: true`, `isolatedModules: true`, `moduleResolution: bundler`.
+Alias de paths: `@/*` → `resources/js/*`.
+
+## Imports
+
+ESLint fuerza `import type` para todos los imports de tipos (`@typescript-eslint/consistent-type-imports`).
+El orden de imports lo gestiona `eslint-plugin-import` (builtin → external → internal → parent → sibling) — no reordenar manualmente.
+
+```ts
+// Bien — type import separado
+import { useState } from 'react';
+import type { Patient } from '@/types';
+
+// Mal — mezclar en el mismo import
+import { useState, type Patient } from 'react';
+```
 
 ## Tipado
 
-- Props de componentes: `interface` explícita, nunca `any` ni `object`.
-- `interface` para props y modelos · `type` para unions, intersecciones y aliases.
-- Tipos de modelos de BD: ya existen en `resources/js/types/models/` — usarlos, no redefinirlos.
-- Sin `as unknown as Tipo` salvo en adaptadores de librería (comentar el motivo).
+- Props de componentes: `interface` explícita. `type` para unions e intersecciones.
+- Tipos de modelos: `resources/js/types/models/patient.ts` y `resources/js/types/auth.ts` — usarlos, no redefinir.
+- Barrel de tipos: `import type { Patient, Note, Payment } from '@/types'`.
+- Sin `as X` para forzar un tipo que no encaja — corregir el tipo origen.
 - Sin aserción no nula (`!`) cuando hay narrowing disponible.
-- Sin enums — usar `const` object con `as const` + union de strings literales.
+- Sin enums — usar `const` object con `as const`:
 
 ```ts
-// Bien
-const PaymentStatus = { PENDING: 'pending', PAID: 'paid', OVERDUE: 'overdue' } as const;
-type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
+const PaymentMethod = { CASH: 'cash', BIZUM: 'bizum', TRANSFER: 'transfer', CARD: 'card' } as const;
+type PaymentMethod = typeof PaymentMethod[keyof typeof PaymentMethod];
 ```
 
-## Organización
+## Utilidades disponibles en `@/lib/utils.ts`
+
+- `cn(...classes)` — combina clases con `clsx` + `tailwind-merge`.
+- `toUrl(url)` — convierte `InertiaLinkProps['href']` a `string`.
+
+No existen `formatDate` ni `formatDateTime` — implementar inline o crear en `lib/utils.ts` si se necesitan.
+
+## Exports y organización
 
 - Export nombrado en componentes (`export function Foo`). Default export solo en páginas Inertia.
-- No suprimir con `@ts-ignore` — usar `@ts-expect-error` solo si es inevitable, con comentario.
-- Imports agrupados: librerías externas → `@/` internos → relativos.
+- Sin `@ts-ignore` — usar `@ts-expect-error` solo si es inevitable, con comentario explicando por qué.
 
 ## Formularios e Inertia
 
 ```ts
 const form = useForm({ field: '' });
-form.post(route('resource.store'));     // form.errors.field tiene el error de validación
+form.post(route('resource.store'));
 form.put(route('resource.update', id));
 form.delete(route('resource.destroy', id));
-// form.processing → deshabilitar submit mientras carga
+// form.errors.field → mensaje de validación
+// form.processing  → deshabilitar submit
 ```
 
-- Rutas: `route('nombre.accion', params)` (Ziggy) o helpers de Wayfinder — nunca template literals de ruta.
-- Utilidades compartidas: `cn()`, `formatDate()`, `formatDateTime()` en `resources/js/lib/utils.ts`.
+Rutas: `route('nombre.accion', params)` (Ziggy) o helpers de Wayfinder generados en `resources/js/actions/`.
