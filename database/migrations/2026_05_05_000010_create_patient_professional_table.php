@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('professional_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('clinic_id')->constrained()->cascadeOnDelete();
             $table->boolean('is_primary')->default(true);
-            $table->enum('status', ['active', 'discharged', 'suspended', 'transferred'])->default('active');
+            $table->enum('status', ['active', 'inactive', 'discharged'])->default('active');
             $table->date('started_at')->nullable();
             $table->date('ended_at')->nullable();
             $table->text('notes')->nullable();

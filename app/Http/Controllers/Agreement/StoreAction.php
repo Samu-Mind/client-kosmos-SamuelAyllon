@@ -16,9 +16,9 @@ class StoreAction extends Controller
         $request->validate(['content' => ['required', 'string', 'min:1']]);
 
         $patient->agreements()->create([
-            'content'               => $request->content,
-            'consulting_session_id' => $request->consulting_session_id,
-            'user_id'               => $request->user()->id,
+            'content'        => $request->content,
+            'appointment_id' => $request->appointment_id,
+            'user_id'        => $request->user()->id,
         ]);
 
         return back()->with('success', 'Acuerdo guardado.');

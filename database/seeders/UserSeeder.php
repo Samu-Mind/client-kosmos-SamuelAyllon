@@ -6,10 +6,10 @@ use App\Models\Agreement;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\ConsentForm;
-use App\Models\ConsultingSession;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Note;
 use App\Models\PatientProfile;
-use App\Models\Payment;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -145,79 +145,26 @@ class UserSeeder extends Seeder
             'expires_at'       => now()->addMonths(7)->toDateString(),
         ]);
 
-        $s1a = ConsultingSession::create([
-            'patient_id'       => $p1->id,
-            'user_id'          => $owner->id,
-            'scheduled_at'     => now()->subWeeks(2),
-            'started_at'       => now()->subWeeks(2),
-            'ended_at'         => now()->subWeeks(2)->addMinutes(50),
-            'duration_minutes' => 50,
-            'status'           => 'completed',
-            'ai_summary'       => 'La paciente reportó mejora en las técnicas de respiración. Se exploró la raíz del pensamiento catastrófico.',
+        $a1a = Appointment::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser1->id,
+            'professional_id' => $owner->id,
+            'service_id'      => $serviceSession->id,
+            'starts_at'       => now()->subWeeks(2)->setHour(10)->setMinute(0),
+            'ends_at'         => now()->subWeeks(2)->setHour(10)->setMinute(50),
+            'status'          => 'completed',
+            'modality'        => 'video_call',
         ]);
 
-        $s1b = ConsultingSession::create([
-            'patient_id'       => $p1->id,
-            'user_id'          => $owner->id,
-            'scheduled_at'     => now()->subWeek(),
-            'started_at'       => now()->subWeek(),
-            'ended_at'         => now()->subWeek()->addMinutes(50),
-            'duration_minutes' => 50,
-            'status'           => 'completed',
-            'ai_summary'       => 'Se trabajó el registro de pensamientos automáticos. La paciente completó las tareas asignadas.',
-        ]);
-
-        ConsultingSession::create([
-            'patient_id'   => $p1->id,
-            'user_id'      => $owner->id,
-            'scheduled_at' => now()->addDays(7),
-            'status'       => 'scheduled',
-        ]);
-
-        Note::create([
-            'patient_id'            => $p1->id,
-            'user_id'               => $owner->id,
-            'consulting_session_id' => $s1a->id,
-            'content'               => 'Progreso notable en el manejo de las situaciones de estrés. Mantiene el diario de pensamientos.',
-            'type'                  => 'session_note',
-        ]);
-
-        Note::create([
-            'patient_id' => $p1->id,
-            'user_id'    => $owner->id,
-            'content'    => 'Llamó para comentar que tuvo un momento de ansiedad en el trabajo. Se le recordaron las técnicas de grounding.',
-            'type'       => 'quick_note',
-        ]);
-
-        Agreement::create([
-            'patient_id'            => $p1->id,
-            'user_id'               => $owner->id,
-            'consulting_session_id' => $s1b->id,
-            'content'               => 'Practicar la técnica 5-4-3-2-1 cuando sienta ansiedad en el trabajo.',
-            'is_completed'          => true,
-            'completed_at'          => now()->subDays(3),
-        ]);
-
-        Payment::create([
-            'patient_id'     => $p1->id,
-            'user_id'        => $owner->id,
-            'amount'         => 70.00,
-            'concept'        => 'Sesión de psicología #5',
-            'payment_method' => 'bizum',
-            'status'         => 'paid',
-            'due_date'       => now()->subWeeks(2)->toDateString(),
-            'paid_at'        => now()->subWeeks(2),
-        ]);
-
-        Payment::create([
-            'patient_id'     => $p1->id,
-            'user_id'        => $owner->id,
-            'amount'         => 70.00,
-            'concept'        => 'Sesión de psicología #6',
-            'payment_method' => 'bizum',
-            'status'         => 'paid',
-            'due_date'       => now()->subWeek()->toDateString(),
-            'paid_at'        => now()->subWeek(),
+        $a1b = Appointment::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser1->id,
+            'professional_id' => $owner->id,
+            'service_id'      => $serviceSession->id,
+            'starts_at'       => now()->subWeek()->setHour(10)->setMinute(0),
+            'ends_at'         => now()->subWeek()->setHour(10)->setMinute(50),
+            'status'          => 'completed',
+            'modality'        => 'video_call',
         ]);
 
         Appointment::create([
@@ -228,8 +175,64 @@ class UserSeeder extends Seeder
             'starts_at'       => now()->addDays(7)->setHour(10)->setMinute(0),
             'ends_at'         => now()->addDays(7)->setHour(10)->setMinute(50),
             'status'          => 'confirmed',
-            'modality'        => 'video',
+            'modality'        => 'video_call',
         ]);
+
+        Note::create([
+            'patient_id'     => $p1->id,
+            'user_id'        => $owner->id,
+            'appointment_id' => $a1a->id,
+            'content'        => 'Progreso notable en el manejo de las situaciones de estrés. Mantiene el diario de pensamientos.',
+            'type'           => 'session_note',
+        ]);
+
+        Note::create([
+            'patient_id' => $p1->id,
+            'user_id'    => $owner->id,
+            'content'    => 'Llamó para comentar que tuvo un momento de ansiedad en el trabajo. Se le recordaron las técnicas de grounding.',
+            'type'       => 'quick_note',
+        ]);
+
+        Agreement::create([
+            'patient_id'     => $p1->id,
+            'user_id'        => $owner->id,
+            'appointment_id' => $a1b->id,
+            'content'        => 'Practicar la técnica 5-4-3-2-1 cuando sienta ansiedad en el trabajo.',
+            'is_completed'   => true,
+            'completed_at'   => now()->subDays(3),
+        ]);
+
+        $inv1a = Invoice::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser1->id,
+            'professional_id' => $owner->id,
+            'invoice_number'  => 'FAC-2026-001',
+            'status'          => 'paid',
+            'subtotal'        => 70.00,
+            'tax_rate'        => 0,
+            'tax_amount'      => 0,
+            'total'           => 70.00,
+            'payment_method'  => 'bizum',
+            'due_at'          => now()->subWeeks(2)->toDateString(),
+            'paid_at'         => now()->subWeeks(2),
+        ]);
+        InvoiceItem::create(['invoice_id' => $inv1a->id, 'description' => 'Sesión de psicología #5', 'quantity' => 1, 'unit_price' => 70.00, 'total' => 70.00, 'appointment_id' => $a1a->id]);
+
+        $inv1b = Invoice::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser1->id,
+            'professional_id' => $owner->id,
+            'invoice_number'  => 'FAC-2026-002',
+            'status'          => 'paid',
+            'subtotal'        => 70.00,
+            'tax_rate'        => 0,
+            'tax_amount'      => 0,
+            'total'           => 70.00,
+            'payment_method'  => 'bizum',
+            'due_at'          => now()->subWeek()->toDateString(),
+            'paid_at'         => now()->subWeek(),
+        ]);
+        InvoiceItem::create(['invoice_id' => $inv1b->id, 'description' => 'Sesión de psicología #6', 'quantity' => 1, 'unit_price' => 70.00, 'total' => 70.00, 'appointment_id' => $a1b->id]);
 
         // ══════════════════════════════════════════════════
         //  PACIENTE 2 — Marcos Ruiz (cobro pendiente + acuerdo abierto)
@@ -269,46 +272,15 @@ class UserSeeder extends Seeder
             'expires_at'       => now()->addMonths(9)->toDateString(),
         ]);
 
-        $s2a = ConsultingSession::create([
-            'patient_id'       => $p2->id,
-            'user_id'          => $owner->id,
-            'scheduled_at'     => now()->subDays(10),
-            'started_at'       => now()->subDays(10),
-            'ended_at'         => now()->subDays(10)->addMinutes(60),
-            'duration_minutes' => 60,
-            'status'           => 'completed',
-        ]);
-
-        ConsultingSession::create([
-            'patient_id'   => $p2->id,
-            'user_id'      => $owner->id,
-            'scheduled_at' => now()->addDays(3),
-            'status'       => 'scheduled',
-        ]);
-
-        Note::create([
-            'patient_id'            => $p2->id,
-            'user_id'               => $owner->id,
-            'consulting_session_id' => $s2a->id,
-            'content'               => 'Primera sesión de EMDR. El paciente toleró bien la estimulación bilateral. Reducción leve de la intensidad del recuerdo traumático.',
-            'type'                  => 'session_note',
-        ]);
-
-        Agreement::create([
-            'patient_id'            => $p2->id,
-            'user_id'               => $owner->id,
-            'consulting_session_id' => $s2a->id,
-            'content'               => 'Escribir en el diario 10 minutos cada noche sobre las emociones del día.',
-            'is_completed'          => false,
-        ]);
-
-        Payment::create([
-            'patient_id' => $p2->id,
-            'user_id'    => $owner->id,
-            'amount'     => 80.00,
-            'concept'    => 'Sesión EMDR #3',
-            'status'     => 'pending',
-            'due_date'   => now()->subDays(5)->toDateString(),
+        $a2a = Appointment::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser2->id,
+            'professional_id' => $owner->id,
+            'service_id'      => $serviceSession->id,
+            'starts_at'       => now()->subDays(10)->setHour(11)->setMinute(0),
+            'ends_at'         => now()->subDays(10)->setHour(12)->setMinute(0),
+            'status'          => 'completed',
+            'modality'        => 'in_person',
         ]);
 
         Appointment::create([
@@ -321,6 +293,36 @@ class UserSeeder extends Seeder
             'status'          => 'confirmed',
             'modality'        => 'in_person',
         ]);
+
+        Note::create([
+            'patient_id'     => $p2->id,
+            'user_id'        => $owner->id,
+            'appointment_id' => $a2a->id,
+            'content'        => 'Primera sesión de EMDR. El paciente toleró bien la estimulación bilateral. Reducción leve de la intensidad del recuerdo traumático.',
+            'type'           => 'session_note',
+        ]);
+
+        Agreement::create([
+            'patient_id'     => $p2->id,
+            'user_id'        => $owner->id,
+            'appointment_id' => $a2a->id,
+            'content'        => 'Escribir en el diario 10 minutos cada noche sobre las emociones del día.',
+            'is_completed'   => false,
+        ]);
+
+        $inv2 = Invoice::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser2->id,
+            'professional_id' => $owner->id,
+            'invoice_number'  => 'FAC-2026-003',
+            'status'          => 'overdue',
+            'subtotal'        => 80.00,
+            'tax_rate'        => 0,
+            'tax_amount'      => 0,
+            'total'           => 80.00,
+            'due_at'          => now()->subDays(5)->toDateString(),
+        ]);
+        InvoiceItem::create(['invoice_id' => $inv2->id, 'description' => 'Sesión EMDR #3', 'quantity' => 1, 'unit_price' => 80.00, 'total' => 80.00, 'appointment_id' => $a2a->id]);
 
         // ══════════════════════════════════════════════════
         //  PACIENTE 3 — Laura Sánchez (sin consentimiento + cobro vencido)
@@ -346,38 +348,49 @@ class UserSeeder extends Seeder
             'first_session_at'=> now()->subDays(14),
         ]);
 
-        ConsultingSession::create([
-            'patient_id'       => $p3->id,
-            'user_id'          => $owner->id,
-            'scheduled_at'     => now()->subDays(14),
-            'started_at'       => now()->subDays(14),
-            'ended_at'         => now()->subDays(14)->addMinutes(50),
-            'duration_minutes' => 50,
-            'status'           => 'completed',
+        $a3a = Appointment::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser3->id,
+            'professional_id' => $owner->id,
+            'service_id'      => $serviceSession->id,
+            'starts_at'       => now()->subDays(14)->setHour(10)->setMinute(0),
+            'ends_at'         => now()->subDays(14)->setHour(10)->setMinute(50),
+            'status'          => 'completed',
+            'modality'        => 'in_person',
         ]);
 
-        ConsultingSession::create([
-            'patient_id'   => $p3->id,
-            'user_id'      => $owner->id,
-            'scheduled_at' => now()->addDays(10),
-            'status'       => 'scheduled',
+        Appointment::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser3->id,
+            'professional_id' => $owner->id,
+            'service_id'      => $serviceSession->id,
+            'starts_at'       => now()->addDays(10)->setHour(10)->setMinute(0),
+            'ends_at'         => now()->addDays(10)->setHour(10)->setMinute(50),
+            'status'          => 'confirmed',
+            'modality'        => 'in_person',
         ]);
 
         Note::create([
-            'patient_id' => $p3->id,
-            'user_id'    => $owner->id,
-            'content'    => 'Primera sesión de evaluación. La paciente se muestra con poca energía y cierta resistencia a hablar del fallecimiento. Buen rapport inicial.',
-            'type'       => 'session_note',
+            'patient_id'     => $p3->id,
+            'user_id'        => $owner->id,
+            'appointment_id' => $a3a->id,
+            'content'        => 'Primera sesión de evaluación. La paciente se muestra con poca energía y cierta resistencia a hablar del fallecimiento. Buen rapport inicial.',
+            'type'           => 'session_note',
         ]);
 
-        Payment::create([
-            'patient_id' => $p3->id,
-            'user_id'    => $owner->id,
-            'amount'     => 70.00,
-            'concept'    => 'Primera consulta',
-            'status'     => 'overdue',
-            'due_date'   => now()->subDays(10)->toDateString(),
+        $inv3 = Invoice::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser3->id,
+            'professional_id' => $owner->id,
+            'invoice_number'  => 'FAC-2026-004',
+            'status'          => 'overdue',
+            'subtotal'        => 70.00,
+            'tax_rate'        => 0,
+            'tax_amount'      => 0,
+            'total'           => 70.00,
+            'due_at'          => now()->subDays(10)->toDateString(),
         ]);
+        InvoiceItem::create(['invoice_id' => $inv3->id, 'description' => 'Primera consulta', 'quantity' => 1, 'unit_price' => 70.00, 'total' => 70.00, 'appointment_id' => $a3a->id]);
 
         // ══════════════════════════════════════════════════
         //  PACIENTE 4 — Javier Moreno (alta, todo en regla)
@@ -417,16 +430,21 @@ class UserSeeder extends Seeder
             'expires_at'       => now()->addMonths(4)->toDateString(),
         ]);
 
-        Payment::create([
-            'patient_id'     => $p4->id,
-            'user_id'        => $owner->id,
-            'amount'         => 70.00,
-            'concept'        => 'Sesión de cierre',
-            'payment_method' => 'transfer',
-            'status'         => 'paid',
-            'due_date'       => now()->subMonth()->toDateString(),
-            'paid_at'        => now()->subMonth(),
+        $inv4 = Invoice::create([
+            'clinic_id'       => $clinic->id,
+            'patient_id'      => $patientUser4->id,
+            'professional_id' => $owner->id,
+            'invoice_number'  => 'FAC-2026-005',
+            'status'          => 'paid',
+            'subtotal'        => 70.00,
+            'tax_rate'        => 0,
+            'tax_amount'      => 0,
+            'total'           => 70.00,
+            'payment_method'  => 'transfer',
+            'due_at'          => now()->subMonth()->toDateString(),
+            'paid_at'         => now()->subMonth(),
         ]);
+        InvoiceItem::create(['invoice_id' => $inv4->id, 'description' => 'Sesión de cierre', 'quantity' => 1, 'unit_price' => 70.00, 'total' => 70.00]);
 
         $this->command->info('Users seeded successfully (v2).');
         $this->command->info('  admin@clientkosmos.test    / password  [admin]');

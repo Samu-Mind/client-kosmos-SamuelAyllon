@@ -36,8 +36,8 @@ class PatientProfileFactory extends Factory
         return $this->state(['status' => 'discharged', 'is_active' => false]);
     }
 
-    public function suspended(): static
+    public function inactive(): static
     {
-        return $this->state(['status' => 'suspended']);
+        return $this->state(['status' => 'inactive', 'is_active' => false]);
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Payment;
+use App\Models\Invoice;
 
 class PaymentReminderService
 {
     /**
-     * @todo Send payment reminder notifications for all overdue/pending payments
+     * @todo Send payment reminder notifications for all overdue invoices
      *       that haven't been reminded recently
      */
     public function sendPendingReminders(): void
@@ -16,9 +16,9 @@ class PaymentReminderService
     }
 
     /**
-     * @todo Mark a payment as claimed (escalated) and log the action
+     * @todo Mark an invoice as claimed (escalated) and log the action
      */
-    public function markAsClaimed(Payment $payment): void
+    public function markAsClaimed(Invoice $invoice): void
     {
         // @todo
     }

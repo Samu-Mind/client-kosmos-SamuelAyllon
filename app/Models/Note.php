@@ -11,7 +11,7 @@ class Note extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'patient_id', 'user_id', 'consulting_session_id',
+        'patient_id', 'user_id', 'appointment_id',
         'content', 'type', 'is_ai_generated',
     ];
 
@@ -29,8 +29,8 @@ class Note extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function session()
+    public function appointment()
     {
-        return $this->belongsTo(ConsultingSession::class, 'consulting_session_id');
+        return $this->belongsTo(Appointment::class);
     }
 }

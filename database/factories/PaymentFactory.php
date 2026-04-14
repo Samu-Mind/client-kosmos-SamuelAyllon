@@ -2,28 +2,37 @@
 
 namespace Database\Factories;
 
-use App\Models\Patient;
+use App\Models\Clinic;
+use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Payment>
+ * @deprecated Use InvoiceFactory instead.
+ * @extends Factory<Invoice>
  */
 class PaymentFactory extends Factory
 {
+    protected $model = Invoice::class;
+
     public function definition(): array
     {
+        $amount = fake()->randomFloat(2, 40, 200);
+
         return [
-            'patient_id'            => Patient::factory(),
-            'user_id'               => User::factory(),
-            'consulting_session_id' => null,
-            'amount'                => fake()->randomFloat(2, 40, 200),
-            'concept'               => fake()->optional(0.7)->sentence(3),
-            'payment_method'        => fake()->optional(0.8)->randomElement(['cash', 'bizum', 'transfer', 'card']),
-            'status'                => 'pending',
-            'due_date'              => fake()->dateTimeBetween('-1 month', '+2 months')->format('Y-m-d'),
-            'paid_at'               => null,
-            'invoice_number'        => null,
+            'clinic_id'       => Clinic::factory(),
+            'patient_id'      => User::factory(),
+            'professional_id' => User::factory(),
+            'invoice_number'  => 'FAC-' . strtoupper(Str::random(8)),
+            'status'          => 'draft',
+            'subtotal'        => $amount,
+            'tax_rate'        => 0,
+            'tax_amount'      => 0,
+            'total'           => $amount,
+            'payment_method'  => fake()->optional(0.8)->randomElement(['cash', 'bizum', 'transfer', 'card']),
+            'due_at'          => fake()->dateTimeBetween('-1 month', '+2 months')->format('Y-m-d'),
+            'paid_at'         => null,
         ];
     }
 
@@ -38,8 +47,8 @@ class PaymentFactory extends Factory
     public function overdue(): static
     {
         return $this->state([
-            'status'   => 'overdue',
-            'due_date' => fake()->dateTimeBetween('-3 months', '-1 day')->format('Y-m-d'),
+            'status' => 'overdue',
+            'due_at' => fake()->dateTimeBetween('-3 months', '-1 day')->format('Y-m-d'),
         ]);
     }
 }

@@ -38,7 +38,7 @@ class Clinic extends Model
     {
         return $this->belongsToMany(User::class, 'clinic_user')
             ->withPivot(['role', 'can_view_all_patients', 'joined_at', 'is_active'])
-            ->wherePivotIn('role', ['owner', 'professional'])
+            ->wherePivot('role', 'professional')
             ->withTimestamps();
     }
 

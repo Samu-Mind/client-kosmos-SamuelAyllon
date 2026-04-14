@@ -40,19 +40,18 @@ class PatientProfile extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function clinic()
-    {
-        return $this->belongsTo(Clinic::class);
-    }
-
     public function professional()
     {
         return $this->belongsTo(User::class, 'professional_id');
     }
 
-    public function sessions()
+    /**
+     * Appointments where this patient profile's user is the patient.
+     * appointments.patient_id references users.id, so we bridge via user_id.
+     */
+    public function appointments()
     {
-        return $this->hasMany(ConsultingSession::class, 'patient_id');
+        return $this->hasMany(Appointment::class, 'patient_id', 'user_id');
     }
 
     public function notes()
@@ -65,9 +64,12 @@ class PatientProfile extends Model
         return $this->hasMany(Agreement::class, 'patient_id');
     }
 
-    public function payments()
+    /**
+     * Invoices for this patient (invoices.patient_id references users.id).
+     */
+    public function invoices()
     {
-        return $this->hasMany(Payment::class, 'patient_id');
+        return $this->hasMany(Invoice::class, 'patient_id', 'user_id');
     }
 
     public function documents()
@@ -80,9 +82,14 @@ class PatientProfile extends Model
         return $this->hasMany(ConsentForm::class, 'patient_id');
     }
 
+    public function kosmoBriefings()
+    {
+        return $this->hasMany(KosmoBriefing::class, 'patient_id');
+    }
+
     public function professionals()
     {
-        return $this->belongsToMany(User::class, 'patient_professional', 'patient_id', 'professional_id')
+        return $this->belongsToMany(User::class, 'patient_professional', 'patient_id', 'professional_id', 'user_id')
             ->withPivot(['clinic_id', 'is_primary', 'status', 'started_at', 'ended_at', 'notes'])
             ->withTimestamps();
     }
@@ -93,6 +100,11 @@ class PatientProfile extends Model
     }
 
     public function scopeInactive($query)
+    {
+        return $query->where('status', 'inactive');
+    }
+
+    public function scopeDischarged($query)
     {
         return $query->where('status', 'discharged');
     }

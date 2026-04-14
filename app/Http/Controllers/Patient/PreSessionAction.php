@@ -15,11 +15,11 @@ class PreSessionAction extends Controller
         $this->authorize('view', $patient);
 
         $context = [
-            'lastSessions'   => $patient->sessions()->orderByDesc('scheduled_at')->limit(3)->get(),
-            'recentNotes'    => $patient->notes()->orderByDesc('created_at')->limit(5)->get(),
-            'openAgreements' => $patient->agreements()->where('is_completed', false)->get(),
-            'lastPayment'    => $patient->payments()->orderByDesc('due_date')->first(),
-            'validConsent'   => $patient->consentForms()->where('status', 'signed')->first(),
+            'lastAppointments' => $patient->appointments()->orderByDesc('starts_at')->limit(3)->get(),
+            'recentNotes'      => $patient->notes()->orderByDesc('created_at')->limit(5)->get(),
+            'openAgreements'   => $patient->agreements()->where('is_completed', false)->get(),
+            'lastInvoice'      => $patient->invoices()->orderByDesc('due_at')->first(),
+            'validConsent'     => $patient->consentForms()->where('status', 'signed')->first(),
         ];
 
         $briefing = KosmoBriefing::where('patient_id', $patient->id)

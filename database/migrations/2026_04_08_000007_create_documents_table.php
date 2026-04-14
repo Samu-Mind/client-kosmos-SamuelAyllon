@@ -10,10 +10,14 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('patient_id')->constrained('patient_profiles')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('clinic_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
-            $table->string('file_path');
+            $table->string('local_path')->nullable();
+            $table->enum('storage_type', ['local', 'gdrive'])->default('local');
+            $table->string('gdrive_file_id')->nullable();
+            $table->string('gdrive_url')->nullable();
             $table->string('mime_type')->nullable();
             $table->unsignedInteger('file_size')->nullable();
             $table->enum('category', ['rgpd_consent', 'informed_consent', 'report', 'invoice', 'other'])->default('other');
@@ -21,6 +25,7 @@ return new class extends Migration
             $table->date('expires_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
             $table->index(['patient_id', 'category']);
         });
     }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('ends_at');
             $table->enum('status', ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show'])
                 ->default('pending');
-            $table->enum('modality', ['in_person', 'video', 'phone'])->default('video');
+            $table->enum('modality', ['in_person', 'video_call'])->default('video_call');
             $table->string('meeting_room_id')->nullable();
             $table->string('meeting_url')->nullable();
             $table->text('cancellation_reason')->nullable();

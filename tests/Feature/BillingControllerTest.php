@@ -1,7 +1,8 @@
 <?php
 
-use App\Models\Patient;
-use App\Models\Payment;
+use App\Models\Invoice;
+use App\Models\PatientProfile;
+use App\Models\User;
 
 it('redirects guests from billing to login', function () {
     $this->get(route('billing'))->assertRedirect(route('login'));
@@ -14,12 +15,12 @@ it('professional can view billing page', function () {
         ->assertInertia(fn ($page) => $page->component('billing/index'));
 });
 
-it('billing page returns payments, stats and filters', function () {
+it('billing page returns invoices, stats and filters', function () {
     $this->actingAs(createProfessional())
         ->get(route('billing'))
         ->assertInertia(fn ($page) => $page
             ->component('billing/index')
-            ->has('payments')
+            ->has('invoices')
             ->has('stats')
             ->has('filters')
         );
@@ -35,41 +36,41 @@ it('billing stats include total_paid, total_pending and total_overdue', function
         );
 });
 
-it('billing only shows payments belonging to authenticated user', function () {
-    $user = createProfessional();
+it('billing only shows invoices belonging to authenticated professional', function () {
+    $user  = createProfessional();
     $other = createProfessional();
 
-    $patientOwn = Patient::factory()->create(['user_id' => $user->id]);
-    $patientOther = Patient::factory()->create(['user_id' => $other->id]);
+    $patientUser      = User::factory()->create();
+    $patientUserOther = User::factory()->create();
 
-    Payment::factory()->count(3)->create([
-        'user_id'    => $user->id,
-        'patient_id' => $patientOwn->id,
+    Invoice::factory()->count(3)->create([
+        'professional_id' => $user->id,
+        'patient_id'      => $patientUser->id,
     ]);
-    Payment::factory()->create([
-        'user_id'    => $other->id,
-        'patient_id' => $patientOther->id,
+    Invoice::factory()->create([
+        'professional_id' => $other->id,
+        'patient_id'      => $patientUserOther->id,
     ]);
 
     $this->actingAs($user)
         ->get(route('billing'))
         ->assertInertia(fn ($page) => $page
             ->component('billing/index')
-            ->has('payments.data', 3)
+            ->has('invoices.data', 3)
         );
 });
 
-it('billing can be filtered by payment status', function () {
-    $user = createProfessional();
-    $patient = Patient::factory()->create(['user_id' => $user->id]);
+it('billing can be filtered by invoice status', function () {
+    $user       = createProfessional();
+    $patientUser = User::factory()->create();
 
-    Payment::factory()->create(['user_id' => $user->id, 'patient_id' => $patient->id, 'status' => 'paid']);
-    Payment::factory()->create(['user_id' => $user->id, 'patient_id' => $patient->id, 'status' => 'pending']);
+    Invoice::factory()->create(['professional_id' => $user->id, 'patient_id' => $patientUser->id, 'status' => 'paid']);
+    Invoice::factory()->create(['professional_id' => $user->id, 'patient_id' => $patientUser->id, 'status' => 'draft']);
 
     $this->actingAs($user)
         ->get(route('billing', ['status' => 'paid']))
         ->assertInertia(fn ($page) => $page
             ->component('billing/index')
-            ->has('payments.data', 1)
+            ->has('invoices.data', 1)
         );
 });

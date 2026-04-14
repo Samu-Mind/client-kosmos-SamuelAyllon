@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Http\Responses\LoginResponse;
 use App\Models\PatientProfile;
-use App\Models\Payment;
+use App\Models\Invoice;
 use App\Models\User;
 use App\Observers\PatientObserver;
 use App\Observers\PaymentObserver;
@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         PatientProfile::observe(PatientObserver::class);
-        Payment::observe(PaymentObserver::class);
+        Invoice::observe(PaymentObserver::class);
 
         Gate::policy(User::class, AdminPolicy::class);
     }

@@ -2,32 +2,39 @@
 
 namespace App\Services;
 
-use App\Models\Payment;
+use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class BillingService
 {
     /**
-     * @todo Generate a unique invoice number for the user based on prefix and counter
+     * Generates a unique invoice number in the format FAC-{YEAR}-{RANDOM}.
+     * Retries on collision to guarantee uniqueness against the invoices table.
      */
     public function generateInvoiceNumber(User $user): string
     {
-        // @todo
-        return '';
+        $year = now()->year;
+
+        do {
+            $number = 'FAC-' . $year . '-' . strtoupper(Str::random(6));
+        } while (Invoice::where('invoice_number', $number)->exists());
+
+        return $number;
     }
 
     /**
-     * @todo Generate a PDF invoice for the given payment and store it
+     * @todo Generate a PDF invoice and store it in the invoice's pdf_path
      */
-    public function createInvoiceForPayment(Payment $payment): void
+    public function generatePdf(Invoice $invoice): void
     {
         // @todo
     }
 
     /**
-     * @todo Mark a payment as paid, set paid_at and generate invoice if needed
+     * @todo Mark an invoice as paid, set paid_at and update status
      */
-    public function markAsPaid(Payment $payment, string $method): void
+    public function markAsPaid(Invoice $invoice, string $method): void
     {
         // @todo
     }

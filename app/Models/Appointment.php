@@ -60,6 +60,21 @@ class Appointment extends Model
         return $this->belongsTo(User::class, 'cancelled_by');
     }
 
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
+    public function agreements()
+    {
+        return $this->hasMany(Agreement::class);
+    }
+
+    public function kosmoBriefings()
+    {
+        return $this->hasMany(KosmoBriefing::class);
+    }
+
     public function isPending(): bool
     {
         return $this->status === 'pending';

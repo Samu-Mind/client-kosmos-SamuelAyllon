@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\ConsultingSession;
+use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\User;
 
 class KosmoService
 {
     /**
-     * @todo Generate a daily briefing for the user with session agenda, alerts, and key reminders
+     * @todo Generate a daily briefing for the user with appointment agenda, alerts, and key reminders
      */
     public function generateDailyBriefing(User $user): void
     {
@@ -17,10 +17,10 @@ class KosmoService
     }
 
     /**
-     * @todo Generate a pre-session briefing for the patient, summarizing last session,
-     *       open agreements, payment status and key notes
+     * @todo Generate a pre-session briefing for the patient, summarizing last appointment,
+     *       open agreements, invoice status and key notes
      */
-    public function generatePreSessionBriefing(Patient $patient, ConsultingSession $session): void
+    public function generatePreSessionBriefing(Patient $patient, Appointment $appointment): void
     {
         // @todo
     }
@@ -28,7 +28,7 @@ class KosmoService
     /**
      * @todo Generate a post-session briefing summarizing what was discussed and agreed
      */
-    public function generatePostSessionBriefing(ConsultingSession $session): void
+    public function generatePostSessionBriefing(Appointment $appointment): void
     {
         // @todo
     }

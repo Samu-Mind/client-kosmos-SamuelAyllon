@@ -2,13 +2,13 @@
 
 namespace App\Observers;
 
-use App\Models\Payment;
+use App\Models\Invoice;
 
 class PaymentObserver
 {
-    public function saved(Payment $payment): void
+    public function saved(Invoice $invoice): void
     {
-        // payment_status was removed from patient_profiles in v2.
-        // Payment status is now computed dynamically from queries.
+        // Invoice status is the source of truth for billing state.
+        // Any side-effects on save (e.g. notifications) go here.
     }
 }

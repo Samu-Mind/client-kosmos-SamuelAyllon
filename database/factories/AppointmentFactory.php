@@ -24,7 +24,7 @@ class AppointmentFactory extends Factory
             'starts_at'       => $startsAt,
             'ends_at'         => $endsAt,
             'status'          => 'pending',
-            'modality'        => fake()->randomElement(['in_person', 'video', 'phone']),
+            'modality'        => fake()->randomElement(['in_person', 'video_call']),
             'notes'           => null,
         ];
     }
