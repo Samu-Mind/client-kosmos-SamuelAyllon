@@ -1,18 +1,17 @@
 ---
-description: Estándares para la creación de componentes y sus historias en Storybook
-globs: resources/js/components/**/*.{tsx,ts}
+description: Storybook conventions if the project adds Storybook (not currently a dependency)
+globs: resources/js/components/**/*.stories.tsx
 alwaysApply: false
 ---
 
-# Storybook Standards (CSF 3.0)
+# Storybook (optional)
 
-Siempre que se cree o modifique un componente visual:
+**Estado del repo:** `storybook` no figura en `package.json`. Esta regla aplica solo si el equipo añade Storybook como dependencia y archivos `*.stories.tsx`.
 
-1. **Ubicación**: El archivo de historia debe estar en la misma carpeta que el componente: `[ComponentName].stories.tsx`.
-2. **Formato**: Usa Component Story Format 3 (CSF 3).
-3. **Historias Mínimas**:
-   - `Default`: Estado base con props representativos.
-   - `Loading`: Si el componente maneja estados de carga.
-   - `Empty`: Si el componente maneja listas o datos opcionales.
-4. **Documentación**: Incluye `tags: ['autodocs']` y descripciones en `argTypes` para cada prop.
-5. **Accesibilidad**: Define el `layout: 'centered'` a menos que sea un componente de página.
+Si en el futuro se adopta Storybook para componentes visuales:
+
+1. **Ubicación**: historia junto al componente: `[ComponentName].stories.tsx`.
+2. **Formato**: Component Story Format 3 (CSF 3).
+3. **Historias mínimas**: `Default`; añadir `Loading` / `Empty` solo si el componente los modela.
+4. **Documentación**: `tags: ['autodocs']` y `argTypes` cuando aporte valor.
+5. **Layout**: `layout: 'centered'` salvo componentes de página completa.

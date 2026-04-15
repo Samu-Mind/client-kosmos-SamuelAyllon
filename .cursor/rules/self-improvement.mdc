@@ -32,20 +32,7 @@ alwaysApply: false
   - Related rules have been updated
   - Implementation details have changed
 
-- **Example Pattern Recognition:**
-
-  ```typescript
-  // If you see repeated patterns like:
-  const data = await prisma.user.findMany({
-    select: { id: true, email: true },
-    where: { status: 'ACTIVE' }
-  });
-
-  // Consider adding to [prisma.mdc](mdc:shipixen/.cursor/rules/prisma.mdc):
-  // - Standard select fields
-  // - Common where conditions
-  // - Performance optimization patterns
-  ```
+- **Example pattern recognition:** If the same Laravel pattern appears repeatedly (e.g. workspace scoping + policy checks in every `*Action`), consider capturing it in a dedicated rule or a small shared abstraction — and document the convention in `.cursor/rules/backend/`.
 
 - **Rule Quality Checks:**
 - Rules should be actionable and specific
@@ -75,5 +62,5 @@ alwaysApply: false
 - Maintain links between related rules
 - Document breaking changes
 
-Follow [cursor-rules.mdc](mdc:.cursor/rules/curs or-rules.mdc) for proper rule formatting and structure.
+Follow [cursor-rules-mdc.mdc](mdc:.cursor/rules/cursor-rules-mdc.mdc) for rule file location and front matter.
 

@@ -20,80 +20,69 @@ Before proposing, implementing, or reviewing changes, align decisions with these
 erDiagram
     USERS {
         bigint id PK
-        string name
         string email UK
-        string password
     }
 
-    CLINICS {
+    WORKSPACES {
         bigint id PK
-        bigint owner_id FK
+        bigint creator_id FK
         string name
         string slug UK
     }
 
-    CLINIC_USER {
+    WORKSPACE_MEMBERS {
         bigint id PK
-        bigint clinic_id FK
+        bigint workspace_id FK
         bigint user_id FK
-        enum role
-        boolean can_view_all_patients
+        string role
+    }
+
+    PROFESSIONAL_PROFILES {
+        bigint id PK
+        bigint user_id UK
     }
 
     PATIENT_PROFILES {
         bigint id PK
         bigint user_id FK
-        bigint clinic_id FK
+        bigint workspace_id FK
         bigint professional_id FK
-        enum status
-        boolean is_active
+        string status
     }
 
-    PATIENT_PROFESSIONAL {
+    CASE_ASSIGNMENTS {
         bigint id PK
         bigint patient_id FK
         bigint professional_id FK
-        bigint clinic_id FK
+        bigint workspace_id FK
         boolean is_primary
-        enum status
+        string role
+        string status
     }
 
     SERVICES {
         bigint id PK
-        bigint clinic_id FK
-        string name
-        decimal price
-        int duration_minutes
+        bigint workspace_id FK
     }
 
     AVAILABILITIES {
         bigint id PK
         bigint professional_id FK
-        bigint clinic_id FK
-        tinyint day_of_week
-        time start_time
-        time end_time
+        bigint workspace_id FK
     }
 
     APPOINTMENTS {
         bigint id PK
-        bigint clinic_id FK
+        bigint workspace_id FK
         bigint patient_id FK
         bigint professional_id FK
         bigint service_id FK
-        bigint cancelled_by FK
-        datetime starts_at
-        datetime ends_at
-        enum status
-        enum modality
+        string status
     }
 
     SESSION_RECORDINGS {
         bigint id PK
         bigint appointment_id FK
-        text transcription
-        text ai_summary
-        enum transcription_status
     }
 
     NOTES {
@@ -101,7 +90,6 @@ erDiagram
         bigint patient_id FK
         bigint user_id FK
         bigint appointment_id FK
-        enum type
     }
 
     AGREEMENTS {
@@ -109,24 +97,19 @@ erDiagram
         bigint patient_id FK
         bigint user_id FK
         bigint appointment_id FK
-        boolean is_completed
     }
 
     CONSENT_FORMS {
         bigint id PK
         bigint patient_id FK
         bigint user_id FK
-        enum status
-        datetime signed_at
     }
 
     DOCUMENTS {
         bigint id PK
         bigint patient_id FK
         bigint user_id FK
-        bigint clinic_id FK
-        enum category
-        enum storage_type
+        bigint workspace_id FK
     }
 
     KOSMO_BRIEFINGS {
@@ -134,58 +117,64 @@ erDiagram
         bigint user_id FK
         bigint patient_id FK
         bigint appointment_id FK
-        enum type
-        json content
+        string type
     }
 
     INVOICES {
         bigint id PK
-        bigint clinic_id FK
+        bigint workspace_id FK
         bigint patient_id FK
         bigint professional_id FK
-        string invoice_number UK
-        enum status
-        decimal total
     }
 
     INVOICE_ITEMS {
         bigint id PK
         bigint invoice_id FK
         bigint appointment_id FK
-        decimal unit_price
-        decimal total
     }
 
     MESSAGES {
         bigint id PK
-        bigint clinic_id FK
+        bigint workspace_id FK
         bigint sender_id FK
         bigint receiver_id FK
-        string related_type
-        bigint related_id
-        datetime read_at
     }
 
-    USERS ||--o{ CLINICS : "owns (owner_id)"
-    USERS ||--o{ CLINIC_USER : "membership"
-    CLINICS ||--o{ CLINIC_USER : "members"
+    COLLABORATION_AGREEMENTS {
+        bigint id PK
+        bigint professional_a_id FK
+        bigint professional_b_id FK
+        bigint workspace_id FK
+    }
+
+    REFERRALS {
+        bigint id PK
+        bigint from_professional_id FK
+        bigint to_professional_id FK
+        bigint patient_id FK
+    }
+
+    USERS ||--o{ WORKSPACES : "creates (creator_id)"
+    USERS ||--o{ WORKSPACE_MEMBERS : "membership"
+    WORKSPACES ||--o{ WORKSPACE_MEMBERS : "has"
+
+    USERS ||--|| PROFESSIONAL_PROFILES : "user_id"
 
     USERS ||--o{ PATIENT_PROFILES : "patient user_id"
     USERS ||--o{ PATIENT_PROFILES : "professional_id"
-    CLINICS ||--o{ PATIENT_PROFILES : "clinic_id"
+    WORKSPACES ||--o{ PATIENT_PROFILES : "workspace_id"
 
-    USERS ||--o{ PATIENT_PROFESSIONAL : "patient_id"
-    USERS ||--o{ PATIENT_PROFESSIONAL : "professional_id"
-    CLINICS ||--o{ PATIENT_PROFESSIONAL : "clinic_id"
+    USERS ||--o{ CASE_ASSIGNMENTS : "patient_id"
+    USERS ||--o{ CASE_ASSIGNMENTS : "professional_id"
+    WORKSPACES ||--o{ CASE_ASSIGNMENTS : "workspace_id"
 
-    CLINICS ||--o{ SERVICES : "has"
+    WORKSPACES ||--o{ SERVICES : "has"
     USERS ||--o{ AVAILABILITIES : "professional_id"
-    CLINICS ||--o{ AVAILABILITIES : "clinic_id"
+    WORKSPACES ||--o{ AVAILABILITIES : "workspace_id"
 
-    CLINICS ||--o{ APPOINTMENTS : "clinic_id"
+    WORKSPACES ||--o{ APPOINTMENTS : "workspace_id"
     USERS ||--o{ APPOINTMENTS : "patient_id"
     USERS ||--o{ APPOINTMENTS : "professional_id"
-    USERS ||--o{ APPOINTMENTS : "cancelled_by"
     SERVICES ||--o{ APPOINTMENTS : "service_id"
 
     APPOINTMENTS ||--o| SESSION_RECORDINGS : "recording"
@@ -199,6 +188,7 @@ erDiagram
     PATIENT_PROFILES ||--o{ CONSENT_FORMS : "patient_id"
     PATIENT_PROFILES ||--o{ DOCUMENTS : "patient_id"
     PATIENT_PROFILES ||--o{ KOSMO_BRIEFINGS : "patient_id"
+    PATIENT_PROFILES ||--o{ REFERRALS : "patient_id"
 
     USERS ||--o{ NOTES : "author user_id"
     USERS ||--o{ AGREEMENTS : "author user_id"
@@ -206,14 +196,18 @@ erDiagram
     USERS ||--o{ DOCUMENTS : "uploader user_id"
     USERS ||--o{ KOSMO_BRIEFINGS : "target user_id"
 
-    CLINICS ||--o{ INVOICES : "clinic_id"
+    WORKSPACES ||--o{ INVOICES : "workspace_id"
     USERS ||--o{ INVOICES : "patient_id"
     USERS ||--o{ INVOICES : "professional_id"
     INVOICES ||--o{ INVOICE_ITEMS : "items"
 
-    CLINICS ||--o{ MESSAGES : "clinic_id"
+    WORKSPACES ||--o{ MESSAGES : "workspace_id"
     USERS ||--o{ MESSAGES : "sender_id"
     USERS ||--o{ MESSAGES : "receiver_id"
+
+    USERS ||--o{ COLLABORATION_AGREEMENTS : "professional_a_id"
+    USERS ||--o{ COLLABORATION_AGREEMENTS : "professional_b_id"
+    WORKSPACES ||--o{ COLLABORATION_AGREEMENTS : "workspace_id"
 ```
 
 ## Canonical Business Flow
@@ -221,8 +215,8 @@ erDiagram
 ```mermaid
 flowchart TD
     A[Registro/Login + rol] --> B{Rol}
-    B -->|professional| C[Onboarding + clinica actual]
-    B -->|admin| Z[Panel admin usuarios/clinicas]
+    B -->|professional| C[Onboarding + workspace actual]
+    B -->|admin| Z[Panel admin usuarios/workspaces]
     B -->|patient| P[Portal paciente]
 
     C --> D[Crear paciente: users + patient_profiles]
@@ -244,7 +238,7 @@ flowchart TD
 ## Mandatory Modeling Guidance
 
 1. Distinguish patient identity (`users.id`) from clinical profile (`patient_profiles.id`).
-2. Respect clinic scoping in records that include `clinic_id`.
+2. Respect workspace scoping in records that include `workspace_id`.
 3. Keep appointment-centric artifacts linked to `appointments` when applicable.
 4. Ensure billing consistency: invoice header in `invoices`, lines in `invoice_items`.
 5. Preserve role-driven flows: `admin`, `professional`, and `patient` behavior must remain separated.

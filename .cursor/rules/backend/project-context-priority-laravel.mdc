@@ -18,7 +18,7 @@ Before implementing, anchor decisions to this repository's actual stack and stru
 - Backend: Laravel 12, PHP 8.4, single-action controllers (`*Action` + `__invoke`).
 - Frontend bridge: Inertia + React + TypeScript (not Livewire-first).
 - Tests: Pest as default for new backend feature coverage.
-- Multi-tenant and domain constraints: clinic scoping and patient identity semantics must be preserved.
+- Multi-tenant and domain constraints: workspace scoping (`workspace_id`) and patient identity semantics must be preserved.
 
 ## Implementation Checklist
 

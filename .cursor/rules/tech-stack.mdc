@@ -37,7 +37,7 @@ alwaysApply: false
 - The `#[\Deprecated]` attribute is now built-in — use it to mark legacy code.
 
 ### Laravel ^12.0
-- Released February 2025. Minimal breaking changes from v11.
+- Current major line for this repo; follow Laravel 12 upgrade notes when bumping dependencies.
 - Service providers are consolidated — avoid creating unnecessary providers; use `AppServiceProvider` for bindings.
 - Application bootstrap is via `bootstrap/app.php` with fluent middleware/exception registration.
 - Eloquent `Model::$preventLazyLoading` should be enabled in development (`AppServiceProvider`).
@@ -65,10 +65,11 @@ alwaysApply: false
 - Do NOT use the legacy `route()` Ziggy helper; Wayfinder is the project standard.
 
 ### Spatie Laravel Permission ^7.2
-- Roles in use: `admin`, `professional`.
+- Roles in use: `admin`, `professional`, `patient` (see `RoleSeeder`).
 - Always assign permissions via roles, not directly on users (`$user->assignRole('professional')`).
-- Use the `EnsureAdmin` and `EnsureProfessional` middleware (not `can:` gates) for route protection.
-- Cache is automatically invalidated on role/permission changes; no manual cache:clear needed for permissions.
+- Route aliases include `admin` → `EnsureAdmin`, `professional` → `EnsureProfessional`, `workspace.access` → `EnsureWorkspaceAccess`, plus Spatie `role`, `permission`, `role_or_permission` middleware — match what `routes/*.php` actually uses.
+- **Workspace membership** (`workspace_members.role`: `member` | `billing_manager`) is separate from Spatie roles; do not conflate the two.
+- Cache is automatically invalidated on role/permission changes; no manual `cache:clear` needed for permissions.
 
 ### openai-php/client ^0.19.0
 - All AI logic is encapsulated in `app/Services/KosmoService.php` — do not call the OpenAI client directly from controllers.
@@ -109,8 +110,7 @@ alwaysApply: false
 - Use `tailwind-merge` (`twMerge`) via the `cn()` helper in `lib/utils.ts` to merge conditional classes safely.
 
 ### shadcn/ui (Radix UI primitives)
-- Components are in `resources/js/components/ui/` — **do not edit these files directly**.
-- Extend shadcn components by wrapping them in a new component in `resources/js/components/`.
+- Components live in `resources/js/components/ui/` — prefer **wrappers** in `resources/js/components/` for project-specific behavior instead of forking primitives in place.
 - New shadcn components are added via: `npx shadcn@latest add <component>` (not manual copy-paste).
 - `class-variance-authority` (CVA) is used to define component variants — follow the same pattern when building new variant-based components.
 - `clsx` + `tailwind-merge` are unified in the `cn()` helper (`lib/utils.ts`) — always use `cn()` for className composition.
@@ -150,7 +150,7 @@ alwaysApply: false
 ### Laravel Wayfinder (Dev)
 - `@laravel/vite-plugin-wayfinder` auto-generates `resources/js/actions/` during `npm run dev`.
 - The generated files are **auto-generated** — do not edit them manually; they will be overwritten.
-- Add `resources/js/actions/` to `.gitignore` if not already present, or commit them — be consistent with the team.
+- This repo **gitignores** `resources/js/actions/` (regenerate locally after pull or route changes).
 
 ---
 

@@ -5,8 +5,9 @@ alwaysApply: false
 ---
 # Filament Conditional Standards
 
+**Repo actual:** Filament no está en `composer.json`. Ignora esta regla salvo que se añada el paquete y aparezcan recursos/paneles Filament.
+
 Apply this rule only when Filament resources are present in the repository.
-If Filament is not installed, ignore this rule.
 
 ## Resource Generation and Testing
 

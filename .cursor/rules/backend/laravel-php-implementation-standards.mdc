@@ -58,4 +58,4 @@ Prioritize consistency with the current architecture: single-action controllers,
 - Keep patient identity semantics explicit:
   - `users.id` represents patient user identity in some tables.
   - `patient_profiles.id` represents clinical patient profile identity in others.
-- Preserve clinic scoping (`clinic_id`) and role boundaries (`admin`, `professional`, `patient`) in all query and policy changes.
+- Preserve workspace scoping (`workspace_id`) and role boundaries (`admin`, `professional`, `patient`) in all query and policy changes.

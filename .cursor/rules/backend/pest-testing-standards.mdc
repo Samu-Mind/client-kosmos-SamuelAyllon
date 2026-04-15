@@ -40,5 +40,5 @@ Before writing tests:
 ## Scope and Safety Expectations
 
 - Assert authorization and role boundaries when behavior differs by role.
-- Assert clinic scoping where records are tenant-bound by `clinic_id`.
+- Assert workspace scoping where records are tenant-bound by `workspace_id`.
 - Update related policy/factory expectations when schema or relationships change.

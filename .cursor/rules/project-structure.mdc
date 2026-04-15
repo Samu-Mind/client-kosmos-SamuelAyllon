@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 # Project Directory Structure
 
-This is a **Laravel 12 + Inertia.js + React (TypeScript)** application for a psychology/consulting client management platform called **Kosmos**. The stack uses Vite, Tailwind CSS v4, shadcn/ui, Spatie Permissions, Laravel Fortify, and Laravel Wayfinder.
+This is a **Laravel 12 + Inertia.js + React (TypeScript)** application for a psychology/consulting client management platform called **Kosmos**. The stack uses Vite, Tailwind CSS v4, shadcn/ui, Spatie Permission, Laravel Fortify, and Laravel Wayfinder. **Multi-tenant data** is scoped to **`workspaces`** (not “clinics” in code or schema).
 
 ## Root-Level Important Files
 
@@ -22,7 +22,7 @@ This is a **Laravel 12 + Inertia.js + React (TypeScript)** application for a psy
 | `pint.json` | Laravel Pint (PHP code style) configuration |
 | `eslint.config.js` | ESLint rules for TypeScript/React |
 | `.prettierrc` | Prettier formatting rules |
-| `Dockerfile` / `docker-compose.yml` | Docker setup for containerised deployment |
+| `Dockerfile`, `docker-compose.yml`, `deploy/docker-compose.yml` | Docker / deploy compose variants |
 | `.env.example` | Environment variable template |
 
 ## Backend (`app/`)
@@ -39,51 +39,40 @@ app/
 ├── Http/
 │   ├── Controllers/
 │   │   ├── Admin/
-│   │   │   ├── Clinics/            # Admin clinic list/show
 │   │   │   ├── Users/              # CRUD + role updates
+│   │   │   ├── Workspaces/       # Admin workspace list/show
 │   │   │   └── ImpersonationController.php
 │   │   ├── Agreement/
-│   │   ├── Appointment/ # Sessions: CRUD, call, transcribe, summarize, generate invoice
+│   │   ├── Appointment/          # Sessions: CRUD, call, transcribe, summarize, invoice
 │   │   ├── Auth/Authenticate/
-│   │   ├── Clinic/
-│   │   │   ├── Analytics/
-│   │   │   ├── Services/
-│   │   │   ├── Settings/
-│   │   │   └── Team/
 │   │   ├── ConsentForm/
 │   │   ├── Dashboard/
 │   │   ├── Document/
-│   │   ├── Invoice/              # Professional invoices (index/show/store/update, PDF, send)
+│   │   ├── Invoice/
 │   │   ├── Kosmo/
 │   │   ├── Message/
 │   │   ├── Note/
 │   │   ├── Onboarding/
-│   │   ├── Patient/              # CRUD, pre/post session, portal invite
-│   │   ├── Portal/               # Patient-facing area
-│   │   │   ├── Appointment/
-│   │   │   ├── ConsentForm/
-│   │   │   ├── Dashboard/
-│   │   │   ├── Document/
-│   │   │   ├── Invoice/
-│   │   │   ├── Message/
-│   │   │   └── Profile/
+│   │   ├── Patient/
+│   │   ├── Portal/               # Patient-facing (/portal)
 │   │   ├── Schedule/
 │   │   │   └── Availability/
-│   │   └── Settings/
-│   │       ├── Password/
-│   │       ├── Profile/
-│   │       └── TwoFactorAuthentication/
+│   │   ├── Settings/
+│   │   │   ├── Password/
+│   │   │   ├── Profile/
+│   │   │   └── TwoFactorAuthentication/
+│   │   └── Workspace/            # Professional workspace: analytics, services, settings, team
 │   ├── Middleware/
 │   │   ├── EnsureAdmin.php
 │   │   ├── EnsureProfessional.php
-│   │   ├── EnsureClinicAccess.php
+│   │   ├── EnsureWorkspaceAccess.php
 │   │   ├── HandleAppearance.php
 │   │   └── HandleInertiaRequests.php
 │   ├── Requests/
-│   │   ├── Settings/             # Profile, password, 2FA, delete account
+│   │   ├── Settings/
 │   │   ├── StorePatientRequest.php
 │   │   ├── StoreNoteRequest.php
-│   │   ├── StorePaymentRequest.php   # Validates invoice create/update payload
+│   │   ├── StorePaymentRequest.php   # Invoice payload validation (legacy name)
 │   │   └── SignConsentFormRequest.php
 │   └── Responses/
 │       └── LoginResponse.php
@@ -94,35 +83,37 @@ app/
 │   └── SendPaymentReminder.php
 ├── Models/
 │   ├── Concerns/
-│   │   └── BelongsToClinic.php
-│   ├── User.php
-│   ├── Clinic.php
-│   ├── PatientProfile.php        # Core patient row (linked to user + clinic + professional)
-│   ├── Patient.php               # Domain model / relations
-│   ├── PatientProfessional.php   # Pivot model
-│   ├── Appointment.php
-│   ├── Service.php
-│   ├── Availability.php
-│   ├── SessionRecording.php
-│   ├── Note.php
+│   │   └── BelongsToWorkspace.php
 │   ├── Agreement.php
+│   ├── Appointment.php
+│   ├── Availability.php
+│   ├── CaseAssignment.php
+│   ├── CollaborationAgreement.php
 │   ├── ConsentForm.php
 │   ├── Document.php
-│   ├── KosmoBriefing.php
 │   ├── Invoice.php
 │   ├── InvoiceItem.php
-│   └── Message.php
+│   ├── KosmoBriefing.php
+│   ├── Message.php
+│   ├── Note.php
+│   ├── PatientProfile.php
+│   ├── ProfessionalProfile.php
+│   ├── Referral.php
+│   ├── Service.php
+│   ├── SessionRecording.php
+│   ├── User.php
+│   └── Workspace.php
 ├── Observers/
 │   ├── PatientObserver.php
-│   └── PaymentObserver.php       # Typed on Invoice (billing side-effects)
+│   └── PaymentObserver.php       # Invoice lifecycle side-effects
 ├── Policies/
 │   ├── AdminPolicy.php
 │   ├── PatientPolicy.php
-│   └── PaymentPolicy.php         # Authorization for Invoice resources
+│   └── PaymentPolicy.php         # Invoice authorization (legacy name)
 ├── Providers/
 │   └── AppServiceProvider.php
 └── Services/
-    ├── BillingService.php # Invoice numbers, PDF, calculations
+    ├── BillingService.php
     ├── KosmoService.php
     ├── PatientContextService.php
     ├── PaymentReminderService.php
@@ -133,7 +124,7 @@ app/
 
 | File | Purpose |
 |------|---------|
-| `routes/web.php` | Home, professional app (patients, appointments, clinic, invoices, schedule, messages, Kosmo), admin, **patient portal** (`/portal/*`) |
+| `routes/web.php` | Home, professional app under `workspace/*`, admin, **patient portal** (`/portal/*`) |
 | `routes/settings.php` | Settings routes (profile, password, 2FA) |
 | `routes/console.php` | Artisan scheduled commands |
 
@@ -143,12 +134,14 @@ app/
 database/
 ├── factories/
 │   ├── AppointmentFactory.php
-│   ├── ClinicFactory.php
+│   ├── CaseAssignmentFactory.php
+│   ├── CollaborationAgreementFactory.php
 │   ├── InvoiceFactory.php
-│   ├── PatientFactory.php
 │   ├── PatientProfileFactory.php
-│   ├── PaymentFactory.php        # Legacy name / invoice-related tests
-│   └── UserFactory.php
+│   ├── ProfessionalProfileFactory.php
+│   ├── ReferralFactory.php
+│   ├── UserFactory.php
+│   └── WorkspaceFactory.php
 ├── migrations/
 │   ├── 0001_01_01_000000_create_users_table.php
 │   ├── 0001_01_01_000001_create_cache_table.php
@@ -162,8 +155,8 @@ database/
 │   ├── 2026_04_08_000006_create_consent_forms_table.php
 │   ├── 2026_04_08_000007_create_documents_table.php
 │   ├── 2026_04_08_000008_create_kosmo_briefings_table.php
-│   ├── 2026_05_05_000001_create_clinics_table.php
-│   ├── 2026_05_05_000002_create_clinic_user_table.php
+│   ├── 2026_05_05_000001_create_workspaces_table.php
+│   ├── 2026_05_05_000002_create_workspace_members_table.php
 │   ├── 2026_05_05_000003_create_services_table.php
 │   ├── 2026_05_05_000004_create_availabilities_table.php
 │   ├── 2026_05_05_000005_create_appointments_table.php
@@ -171,8 +164,11 @@ database/
 │   ├── 2026_05_05_000007_create_invoices_table.php
 │   ├── 2026_05_05_000008_create_invoice_items_table.php
 │   ├── 2026_05_05_000009_create_messages_table.php
-│   ├── 2026_05_05_000010_create_patient_professional_table.php
-│   └── 2026_05_05_000011_modify_users_table.php
+│   ├── 2026_05_05_000010_create_case_assignments_table.php
+│   ├── 2026_05_05_000011_modify_users_table.php
+│   ├── 2026_05_05_000012_create_professional_profiles_table.php
+│   ├── 2026_05_05_000013_create_collaboration_agreements_table.php
+│   └── 2026_05_05_000014_create_referrals_table.php
 └── seeders/
     ├── DatabaseSeeder.php
     ├── PermissionSeeder.php
@@ -187,7 +183,7 @@ resources/js/
 ├── app.tsx
 ├── ssr.tsx
 ├── components/
-│   ├── ui/                       # shadcn/ui primitives — do not edit in place
+│   ├── ui/                       # shadcn/ui primitives — extend via wrappers
 │   ├── admin/
 │   │   └── impersonation-banner.tsx
 │   ├── kosmo/
@@ -275,9 +271,9 @@ resources/js/
     └── shared/ (index, pagination, view-types)
 ```
 
-**Inertia pages vs. controllers:** Several actions render pages under `appointments/`, `clinic/`, `invoices/`, `messages/`, `schedule/`, and `portal/` that are not yet present under `resources/js/pages/` in this checkout. New UI should follow the exact `Inertia::render('…')` paths in the corresponding controller.
+**Inertia pages vs. controllers:** Committed pages today cover `dashboard`, `onboarding`, `welcome`, `admin/*`, `auth/*`, `billing/index`, `kosmo/index`, `patients/*`, and `settings/*`. Controllers also render many **`workspace/*`**, **`appointments/*`**, **`schedule/*`**, **`invoices/*`**, **`messages/*`**, and **`portal/*`** pages that may not have a matching file under `resources/js/pages/` yet — align new UI with the exact `Inertia::render('…')` string in each action.
 
-Wayfinder may generate `resources/js/actions/` during `npm run dev`; treat those files as generated output, not hand-edited source.
+Wayfinder generates `resources/js/actions/` during `npm run dev` (directory is gitignored here); never edit generated files by hand.
 
 ## Views & Assets
 
@@ -317,12 +313,13 @@ tests/
 
 ## Key Conventions
 
-- **Controllers use single-action classes** (`IndexAction`, `StoreAction`, `UpdateAction`, `DestroyAction`, …) grouped by resource.
-- **Roles:** `admin` and `professional`, with `EnsureAdmin` and `EnsureProfessional`. Clinic-scoped access uses `EnsureClinicAccess` where applied.
-- **Clinics:** Multi-user clinics via `clinic_user`; many models use `BelongsToClinic` / `clinic_id`.
-- **Sessions:** `Appointment` replaces the older consulting-session concept; notes and invoices link to appointments where relevant.
-- **Billing:** `Invoice` / `InvoiceItem` are the persisted billing records; `StorePaymentRequest` and `PaymentPolicy`/`PaymentObserver` names are legacy but operate on invoices.
-- **Patient portal:** Routes under `/portal` with `Portal\…` controllers for dashboard, appointments, invoices, documents, consent forms, messages, profile.
-- **Frontend pages** mirror backend `Inertia::render` paths; keep `resources/js/types/pages/` in sync for props.
-- **shadcn/ui** in `resources/js/components/ui/` — extend via wrappers in `components/`, do not fork primitives.
-- **Kosmo:** Backend in `app/Services/KosmoService.php` and `app/Models/KosmoBriefing.php`; frontend in `pages/kosmo/` and `components/kosmo/`.
+- **Controllers use single-action classes** (`*Action` + `__invoke`) grouped by resource.
+- **Spatie roles:** `admin`, `professional`, `patient`. Middleware aliases: `admin`, `professional`, `workspace.access` (see `bootstrap/app.php` and route groups).
+- **Workspaces:** Tenant row in `workspaces`; membership in `workspace_members` (roles `member` | `billing_manager`). Domain models use `BelongsToWorkspace` / `workspace_id` where applicable.
+- **Case linking:** `case_assignments` ties patient users to professionals (and optional workspace); do not reference removed `patient_professional` / `clinic_*` tables.
+- **Sessions:** `Appointment` is the scheduling/session aggregate; notes, invoice lines, and recordings link to appointments where relevant.
+- **Billing:** `Invoice` / `InvoiceItem` are persisted billing; `StorePaymentRequest`, `PaymentPolicy`, and `PaymentObserver` names are legacy but refer to invoices.
+- **Patient portal:** `/portal/*` with `Portal\…` controllers.
+- **Frontend:** Keep `resources/js/types/pages/` aligned with real Inertia page props.
+- **shadcn/ui** lives under `resources/js/components/ui/` — extend via wrappers, do not fork primitives in place.
+- **Kosmo:** `app/Services/KosmoService.php`, `app/Models/KosmoBriefing.php`; UI under `pages/kosmo/` and `components/kosmo/`.

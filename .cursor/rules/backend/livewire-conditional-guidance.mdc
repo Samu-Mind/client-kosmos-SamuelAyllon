@@ -18,7 +18,7 @@ If the task is in Inertia/React code, ignore this rule.
 ## UI Standards
 
 - Use Tailwind utility classes consistently.
-- Use daisyUI components/themes when present in the project.
+- This stack is Inertia + React for product UI; if Livewire appears, align Blade styling with existing Tailwind usage (no daisyUI in current `package.json`).
 - Keep accessibility attributes (`aria-*`) where relevant.
 
 ## Backend Alignment
