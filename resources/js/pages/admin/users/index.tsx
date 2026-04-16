@@ -52,7 +52,7 @@ export default function AdminUsersIndex({ users }: Props) {
                             {users.total} profesionales registrados
                         </p>
                     </div>
-                    <Link href={route('admin.users.create')}>
+                    <Link href="/admin/users/create">
                         <Button variant="primary">
                             <Plus size={16} />
                             Nuevo profesional

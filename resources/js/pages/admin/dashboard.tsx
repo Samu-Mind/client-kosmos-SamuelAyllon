@@ -37,10 +37,6 @@ const formatDate = (d: string) =>
     new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d));
 
 export default function AdminDashboard({ stats, recentUsers }: Props) {
-    function route(arg0: string): string | import("@inertiajs/core").UrlMethodPair | undefined {
-        throw new Error('Function not implemented.');
-    }
-
     return (
         <>
             <Head title="Admin Dashboard — ClientKosmos" />

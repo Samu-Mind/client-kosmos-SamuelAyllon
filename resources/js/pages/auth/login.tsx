@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { LogIn, Mail, Lock, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -8,13 +8,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
+import AuthSplitLayout from '@/layouts/auth/auth-split-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
-const layoutTitle = 'Iniciar sesión';
-const layoutDescription = 'Introduce tu email y contraseña para acceder';
+const layoutTitle = 'Welcome back.';
+const layoutDescription = 'Step into your focused workspace.';
 
 type Props = {
     status?: string;
@@ -32,8 +32,8 @@ export default function Login({
             <Head title="Iniciar sesión" />
 
             {status && (
-                <div className="flex items-center gap-3 rounded-xl bg-green-500/10 border-2 border-green-500/20 px-4 py-3 mb-6">
-                    <div className="h-8 w-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                <div className="flex items-center gap-3 rounded-xl border-2 border-green-500/20 bg-green-500/10 px-4 py-3 mb-6">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/20">
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
                     </div>
                     <span className="text-sm font-medium text-green-700 dark:text-green-400">{status}</span>
@@ -49,83 +49,82 @@ export default function Login({
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-5">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email" className="text-sm font-semibold">Correo electrónico</Label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        name="email"
-                                        required
-                                        autoFocus
-                                        tabIndex={1}
-                                        autoComplete="email"
-                                        placeholder="email@ejemplo.com"
-                                        className="pl-10 h-11 border-2 rounded-xl transition-all focus:ring-2 focus:ring-primary/20"
-                                    />
-                                </div>
+                            <div className="grid gap-1.5">
+                                <Label htmlFor="email" className="text-[11px] font-semibold tracking-widest uppercase text-muted-foreground">
+                                    Email address
+                                </Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    required
+                                    autoFocus
+                                    tabIndex={1}
+                                    autoComplete="email"
+                                    placeholder="email@ejemplo.com"
+                                    className="h-11 rounded-xl border-2 transition-all focus:ring-2 focus:ring-primary/20"
+                                />
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="grid gap-2">
+                            <div className="grid gap-1.5">
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="password" className="text-sm font-semibold">Contraseña</Label>
+                                    <Label htmlFor="password" className="text-[11px] font-semibold tracking-widest uppercase text-muted-foreground">
+                                        Password
+                                    </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="text-xs text-primary hover:underline font-medium"
+                                            className="text-xs text-muted-foreground hover:text-foreground"
                                             tabIndex={5}
                                         >
-                                            ¿Olvidaste tu contraseña?
+                                            Forgot?
                                         </TextLink>
                                     )}
                                 </div>
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        name="password"
-                                        required
-                                        tabIndex={2}
-                                        autoComplete="current-password"
-                                        placeholder="Tu contraseña"
-                                        className="pl-10 h-11 border-2 rounded-xl transition-all focus:ring-2 focus:ring-primary/20"
-                                    />
-                                </div>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    tabIndex={2}
+                                    autoComplete="current-password"
+                                    placeholder="••••••••••"
+                                    className="h-11 rounded-xl border-2 transition-all focus:ring-2 focus:ring-primary/20"
+                                />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-2.5">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
                                     className="border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                 />
-                                <Label htmlFor="remember" className="text-sm cursor-pointer">Recordarme</Label>
+                                <Label htmlFor="remember" className="cursor-pointer text-sm text-muted-foreground">
+                                    Keep my session active
+                                </Label>
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-2 w-full h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
+                                className="mt-1 h-11 w-full rounded-xl text-sm font-semibold"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
-                                {processing ? <Spinner /> : <LogIn className="h-4 w-4 mr-2" />}
-                                Iniciar sesión
+                                {processing ? <Spinner /> : 'Sign in'}
                             </Button>
                         </div>
 
                         {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground pt-2">
-                                ¿No tienes una cuenta?{' '}
-                                <TextLink href={register()} tabIndex={5} className="text-primary font-semibold hover:underline">
-                                    Regístrate
+                            <p className="text-center text-sm text-muted-foreground">
+                                No tienes cuenta?{' '}
+                                <TextLink href={register()} tabIndex={5} className="font-semibold text-foreground hover:underline">
+                                    Regístrate aquí
                                 </TextLink>
-                            </div>
+                            </p>
                         )}
                     </>
                 )}
@@ -135,5 +134,5 @@ export default function Login({
 }
 
 Login.layout = (page: ReactNode) => (
-    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+    <AuthSplitLayout title={layoutTitle} description={layoutDescription}>{page}</AuthSplitLayout>
 );
