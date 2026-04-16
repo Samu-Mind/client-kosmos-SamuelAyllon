@@ -1,7 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     CalendarDays,
-    Receipt,
+    CalendarRange,
+    CircleDollarSign,
+    Handshake,
+    Library,
     Sparkles,
     Settings,
     Users,
@@ -41,14 +44,29 @@ const professionalNavItems: NavItem[] = [
         icon: Users,
     },
     {
+        title: 'Cobros',
+        href: '/invoices',
+        icon: CircleDollarSign,
+    },
+    {
+        title: 'Recursos',
+        href: '/resources',
+        icon: Library,
+    },
+    {
+        title: 'Calendario',
+        href: '/calendar',
+        icon: CalendarRange,
+    },
+    {
         title: 'Kosmo',
         href: '/kosmo',
         icon: Sparkles,
     },
     {
-        title: 'Cobros',
-        href: '/invoices',
-        icon: Receipt,
+        title: 'Equipo',
+        href: '/team',
+        icon: Handshake,
     },
 ];
 
@@ -69,7 +87,7 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="h-24!">
                             <Link href={isAdmin ? '/admin/users' : '/dashboard'} prefetch>
                                 <AppLogo />
                             </Link>

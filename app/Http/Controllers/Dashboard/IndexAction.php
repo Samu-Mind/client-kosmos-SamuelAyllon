@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Invoice;
 use App\Models\KosmoBriefing;
 use App\Models\PatientProfile;
@@ -16,20 +17,67 @@ class IndexAction extends Controller
     {
         $user = $request->user();
 
-        $activePatients = PatientProfile::withoutGlobalScopes()
+        $activePatientProfiles = PatientProfile::withoutGlobalScopes()
             ->where('professional_id', $user->id)
             ->where('is_active', true)
+            ->with('user:id,name,avatar_path')
             ->get();
 
+        $patientProfileMap = $activePatientProfiles->keyBy('user_id');
+
         $todaySessions = $user->professionalAppointments()
-            ->with('patient')
+            ->with(['patient:id,name,avatar_path', 'service:id,name'])
             ->whereDate('starts_at', today())
+            ->whereNotIn('status', ['cancelled'])
             ->orderBy('starts_at')
             ->get()
-            ->map(fn ($appointment) => [
-                'id' => $appointment->id,
-                'scheduled_at' => $appointment->starts_at,
-                'patient' => $appointment->patient,
+            ->map(function ($appointment) use ($user, $patientProfileMap) {
+                $sessionNumber = Appointment::where('professional_id', $user->id)
+                    ->where('patient_id', $appointment->patient_id)
+                    ->where('status', 'completed')
+                    ->where('starts_at', '<', $appointment->starts_at)
+                    ->count() + 1;
+
+                $totalSessions = Appointment::where('professional_id', $user->id)
+                    ->where('patient_id', $appointment->patient_id)
+                    ->whereNotIn('status', ['cancelled'])
+                    ->count();
+
+                $patientProfile = $patientProfileMap->get($appointment->patient_id);
+
+                return [
+                    'id' => $appointment->id,
+                    'scheduled_at' => $appointment->starts_at,
+                    'modality' => $appointment->modality ?? 'presencial',
+                    'status' => $appointment->status,
+                    'session_number' => $sessionNumber,
+                    'total_sessions' => max($totalSessions, $sessionNumber),
+                    'patient' => [
+                        'id' => $patientProfile?->id ?? $appointment->patient_id,
+                        'patient_user_id' => $appointment->patient_id,
+                        'name' => $appointment->patient?->name ?? 'Paciente',
+                        'avatar_path' => $appointment->patient?->avatar_path,
+                    ],
+                    'service_name' => $appointment->service?->name,
+                ];
+            });
+
+        $pendingPayments = Invoice::where('professional_id', $user->id)
+            ->whereIn('status', ['sent', 'overdue'])
+            ->with('patient:id,name')
+            ->orderBy('due_at')
+            ->take(5)
+            ->get()
+            ->map(fn ($invoice) => [
+                'id' => $invoice->id,
+                'patient_id' => $invoice->patient_id,
+                'patient_name' => $invoice->patient?->name ?? 'Paciente',
+                'amount' => (float) $invoice->total,
+                'status' => $invoice->status,
+                'due_at' => $invoice->due_at?->format('Y-m-d'),
+                'hours_since_due' => $invoice->due_at
+                    ? max(0, (int) $invoice->due_at->diffInHours(now()))
+                    : null,
             ]);
 
         $alerts = [
@@ -37,14 +85,25 @@ class IndexAction extends Controller
                 ->where('professional_id', $user->id)
                 ->whereHas('invoices', fn ($q) => $q->whereIn('status', ['sent', 'overdue']))
                 ->where('is_active', true)
-                ->get(['id', 'user_id']),
+                ->with('user:id,name')
+                ->get(['id', 'user_id'])
+                ->map(fn ($p) => [
+                    'id' => $p->id,
+                    'project_name' => $p->user?->name ?? 'Paciente',
+                    'payment_status' => 'pending',
+                ]),
             'consent' => PatientProfile::withoutGlobalScopes()
                 ->where('professional_id', $user->id)
                 ->whereDoesntHave('consentForms', fn ($q) => $q
                     ->where('status', 'signed')
                     ->where(fn ($q2) => $q2->whereNull('expires_at')->orWhere('expires_at', '>', now())))
                 ->where('is_active', true)
-                ->get(['id', 'user_id']),
+                ->with('user:id,name')
+                ->get(['id', 'user_id'])
+                ->map(fn ($p) => [
+                    'id' => $p->id,
+                    'project_name' => $p->user?->name ?? 'Paciente',
+                ]),
         ];
 
         $dailyBriefing = KosmoBriefing::where('user_id', $user->id)
@@ -53,19 +112,21 @@ class IndexAction extends Controller
             ->first();
 
         $stats = [
+            'sessions_today' => $todaySessions->count(),
             'appointments_this_week' => $user->professionalAppointments()
                 ->whereBetween('starts_at', [now()->startOfWeek(), now()->endOfWeek()])
                 ->count(),
             'pending_invoices' => Invoice::where('professional_id', $user->id)
                 ->whereIn('status', ['sent', 'overdue'])
                 ->sum('total'),
-            'active_patients' => $activePatients->count(),
+            'active_patients' => $activePatientProfiles->count(),
             'collection_rate' => $this->getCollectionRate($user->id),
         ];
 
         return Inertia::render('dashboard', [
-            'activePatients' => $activePatients,
+            'activePatients' => $activePatientProfiles,
             'todayAppointments' => $todaySessions,
+            'pendingPayments' => $pendingPayments,
             'alerts' => $alerts,
             'dailyBriefing' => $dailyBriefing,
             'stats' => $stats,
