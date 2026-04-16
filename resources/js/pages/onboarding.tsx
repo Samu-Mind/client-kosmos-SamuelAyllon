@@ -45,7 +45,7 @@ export default function Onboarding() {
     });
 
     const submit = () => {
-        post('/onboarding');
+        post(route('onboarding'));
     };
 
     const stepLabels = ['Sobre tu consulta', 'Tu primer paciente', 'Ya casi'];

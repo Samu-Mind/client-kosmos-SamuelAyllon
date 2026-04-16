@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { Lock, ShieldAlert } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -8,12 +9,12 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/password/confirm';
 
+const layoutTitle = 'Confirma tu contraseña';
+const layoutDescription = 'Esta es una zona segura. Confirma tu contraseña para continuar.';
+
 export default function ConfirmPassword() {
     return (
-        <AuthLayout
-            title="Confirma tu contraseña"
-            description="Esta es una zona segura. Confirma tu contraseña para continuar."
-        >
+        <>
             <Head title="Confirmar contraseña" />
 
             <div className="flex justify-center mb-6">
@@ -22,7 +23,7 @@ export default function ConfirmPassword() {
                 </div>
             </div>
 
-            <Form {...store.form()} resetOnSuccess={['password']}>
+            <Form action={store.url()} method="post" resetOnSuccess={['password']}>
                 {({ processing, errors }) => (
                     <div className="space-y-6">
                         <div className="grid gap-2">
@@ -54,6 +55,10 @@ export default function ConfirmPassword() {
                     </div>
                 )}
             </Form>
-        </AuthLayout>
+        </>
     );
 }
+
+ConfirmPassword.layout = (page: ReactNode) => (
+    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+);

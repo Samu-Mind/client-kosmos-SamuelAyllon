@@ -1,4 +1,5 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { CheckCircle, FileText, Receipt, Shield } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
@@ -51,7 +52,7 @@ export default function PatientShow({ patient }: Props) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title={`${patient.project_name} — ClientKosmos`} />
 
             <div className="flex flex-col">
@@ -300,6 +301,8 @@ export default function PatientShow({ patient }: Props) {
 
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+PatientShow.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

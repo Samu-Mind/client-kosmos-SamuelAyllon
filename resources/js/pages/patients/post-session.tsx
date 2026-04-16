@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -57,7 +58,7 @@ export default function PostSession({ patient }: Props) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Post-sesión: ${patient.project_name} — ClientKosmos`} />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-4xl">
@@ -169,6 +170,8 @@ export default function PostSession({ patient }: Props) {
                     </Link>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+PostSession.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

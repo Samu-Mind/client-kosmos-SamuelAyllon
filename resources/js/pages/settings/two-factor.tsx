@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { ShieldBan, ShieldCheck, Shield, Smartphone } from 'lucide-react';
 import { useState } from 'react';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
@@ -41,7 +42,7 @@ export default function TwoFactor({
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Autenticación de dos factores" />
 
             <h1 className="sr-only">Ajustes de Autenticación de Dos Factores</h1>
@@ -90,7 +91,7 @@ export default function TwoFactor({
                                 />
 
                                 <div className="border-t pt-6">
-                                    <Form {...disable.form()}>
+                                    <Form action={disable.url()} method="delete">
                                         {({ processing }) => (
                                             <Button
                                                 variant="destructive"
@@ -155,7 +156,8 @@ export default function TwoFactor({
                                         </Button>
                                     ) : (
                                         <Form
-                                            {...enable.form()}
+                                            action={enable.url()}
+                                            method="post"
                                             onSuccess={() =>
                                                 setShowSetupModal(true)
                                             }
@@ -194,6 +196,10 @@ export default function TwoFactor({
                     </CardContent>
                 </Card>
             </SettingsLayout>
-        </AppLayout>
+        </>
     );
 }
+
+TwoFactor.layout = (page: ReactNode) => (
+    <AppLayout breadcrumbs={breadcrumbs}>{page}</AppLayout>
+);

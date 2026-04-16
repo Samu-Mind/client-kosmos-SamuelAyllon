@@ -1,5 +1,6 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { LoaderCircle, Mail, CheckCircle2, ArrowLeft } from 'lucide-react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -10,12 +11,12 @@ import AuthLayout from '@/layouts/auth-layout';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 
+const layoutTitle = '¿Olvidaste tu contraseña?';
+const layoutDescription = 'Introduce tu email para recibir un enlace de recuperación';
+
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
-        <AuthLayout
-            title="¿Olvidaste tu contraseña?"
-            description="Introduce tu email para recibir un enlace de recuperación"
-        >
+        <>
             <Head title="Recuperar contraseña" />
 
             {status && (
@@ -28,7 +29,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
             )}
 
             <div className="space-y-6">
-                <Form {...email.form()}>
+                <Form action={email.url()} method="post">
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
@@ -73,6 +74,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     <TextLink href={login()} className="text-primary font-semibold hover:underline">iniciar sesión</TextLink>
                 </div>
             </div>
-        </AuthLayout>
+        </>
     );
 }
+
+ForgotPassword.layout = (page: ReactNode) => (
+    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+);

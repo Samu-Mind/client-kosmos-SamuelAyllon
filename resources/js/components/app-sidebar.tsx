@@ -47,7 +47,7 @@ const professionalNavItems: NavItem[] = [
     },
     {
         title: 'Cobros',
-        href: '/billing',
+        href: '/invoices',
         icon: Receipt,
     },
 ];

@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,11 +22,11 @@ export default function PatientEdit({ patient }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/patients/${patient.id}`);
+        put(route('patients.update', patient.id));
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Editar ${patient.project_name} — ClientKosmos`} />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-2xl">
@@ -89,6 +90,8 @@ export default function PatientEdit({ patient }: Props) {
                     </div>
                 </form>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+PatientEdit.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

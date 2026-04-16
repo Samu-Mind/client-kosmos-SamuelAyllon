@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { KeyRound, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -14,6 +15,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/two-factor/login';
+
+const layoutTitle = 'Código de autenticación';
+const layoutDescription = 'Introduce el código de 6 dígitos de tu aplicación de autenticación.';
 
 export default function TwoFactorChallenge() {
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
@@ -53,10 +57,7 @@ export default function TwoFactorChallenge() {
     const IconComponent = authConfigContent.icon;
 
     return (
-        <AuthLayout
-            title={authConfigContent.title}
-            description={authConfigContent.description}
-        >
+        <>
             <Head title="Autenticación en dos pasos" />
 
             <div className="flex justify-center mb-6">
@@ -67,7 +68,8 @@ export default function TwoFactorChallenge() {
 
             <div className="space-y-6">
                 <Form
-                    {...store.form()}
+                    action={store.url()}
+                    method="post"
                     className="space-y-5"
                     resetOnError
                     resetOnSuccess={!showRecoveryInput}
@@ -143,6 +145,10 @@ export default function TwoFactorChallenge() {
                     )}
                 </Form>
             </div>
-        </AuthLayout>
+        </>
     );
 }
+
+TwoFactorChallenge.layout = (page: ReactNode) => (
+    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+);

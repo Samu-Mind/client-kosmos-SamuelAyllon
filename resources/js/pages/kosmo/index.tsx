@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
@@ -39,7 +40,7 @@ export default function KosmoPage({ briefings }: Props) {
         setLoading(true);
 
         try {
-            const res = await fetch('/kosmo/chat', {
+            const res = await fetch(route('kosmo.chat'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ export default function KosmoPage({ briefings }: Props) {
         new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' }).format(d);
 
     return (
-        <AppLayout>
+        <>
             <Head title="Kosmo — ClientKosmos" />
 
             <div className="flex flex-col h-full p-6 lg:p-8 gap-6 max-w-4xl">
@@ -188,13 +189,15 @@ export default function KosmoPage({ briefings }: Props) {
                                                 : 'Ver detalle'}
                                         </p>
                                     }
-                                    onDismiss={() => router.post(`/kosmo/briefings/${briefing.id}/read`)}
+                                    onDismiss={() => router.post(route('kosmo.briefings.read', briefing.id))}
                                 />
                             ))
                         )}
                     </div>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+KosmoPage.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

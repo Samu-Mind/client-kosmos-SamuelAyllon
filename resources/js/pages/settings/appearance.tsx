@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { Palette } from 'lucide-react';
 import AppearanceTabs from '@/components/appearance-tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Appearance() {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Ajustes de apariencia" />
 
             <h1 className="sr-only">Ajustes de Apariencia</h1>
@@ -42,6 +43,10 @@ export default function Appearance() {
                     </CardContent>
                 </Card>
             </SettingsLayout>
-        </AppLayout>
+        </>
     );
 }
+
+Appearance.layout = (page: ReactNode) => (
+    <AppLayout breadcrumbs={breadcrumbs}>{page}</AppLayout>
+);

@@ -1,4 +1,5 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { ArrowLeft, UserCog, Trash2 } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import { Button } from '@/components/ui/button';
@@ -42,14 +43,14 @@ export default function AdminUserShow({ user }: Props) {
         new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d));
 
     return (
-        <AdminLayout>
+        <>
             <Head title={`${user.name} — Admin — ClientKosmos`} />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-4xl">
                 <div className="flex items-start justify-between">
                     <div>
                         <Link
-                            href="/admin/users"
+                            href={route('admin.users.index')}
                             className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] mb-4"
                         >
                             <ArrowLeft size={16} />
@@ -124,6 +125,8 @@ export default function AdminUserShow({ user }: Props) {
                     </div>
                 )}
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+AdminUserShow.layout = (page: ReactNode) => <AdminLayout>{page}</AdminLayout>;

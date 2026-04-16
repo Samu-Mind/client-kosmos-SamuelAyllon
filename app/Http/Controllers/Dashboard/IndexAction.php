@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\ConsentForm;
 use App\Models\Invoice;
 use App\Models\KosmoBriefing;
 use App\Models\PatientProfile;
@@ -22,11 +21,16 @@ class IndexAction extends Controller
             ->where('is_active', true)
             ->get();
 
-        $todayAppointments = $user->professionalAppointments()
+        $todaySessions = $user->professionalAppointments()
             ->with('patient')
             ->whereDate('starts_at', today())
             ->orderBy('starts_at')
-            ->get();
+            ->get()
+            ->map(fn ($appointment) => [
+                'id' => $appointment->id,
+                'scheduled_at' => $appointment->starts_at,
+                'patient' => $appointment->patient,
+            ]);
 
         $alerts = [
             'invoice' => PatientProfile::withoutGlobalScopes()
@@ -52,19 +56,19 @@ class IndexAction extends Controller
             'appointments_this_week' => $user->professionalAppointments()
                 ->whereBetween('starts_at', [now()->startOfWeek(), now()->endOfWeek()])
                 ->count(),
-            'pending_invoices'       => Invoice::where('professional_id', $user->id)
+            'pending_invoices' => Invoice::where('professional_id', $user->id)
                 ->whereIn('status', ['sent', 'overdue'])
                 ->sum('total'),
-            'active_patients'        => $activePatients->count(),
-            'collection_rate'        => $this->getCollectionRate($user->id),
+            'active_patients' => $activePatients->count(),
+            'collection_rate' => $this->getCollectionRate($user->id),
         ];
 
         return Inertia::render('dashboard', [
-            'activePatients'    => $activePatients,
-            'todayAppointments' => $todayAppointments,
-            'alerts'            => $alerts,
-            'dailyBriefing'     => $dailyBriefing,
-            'stats'             => $stats,
+            'activePatients' => $activePatients,
+            'todayAppointments' => $todaySessions,
+            'alerts' => $alerts,
+            'dailyBriefing' => $dailyBriefing,
+            'stats' => $stats,
         ]);
     }
 

@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Admin\Workspaces\IndexAction as AdminWorkspaceIndexAction;
-use App\Http\Controllers\Admin\Workspaces\ShowAction as AdminWorkspaceShowAction;
 use App\Http\Controllers\Admin\Users\CreateAction as AdminUserCreateAction;
 use App\Http\Controllers\Admin\Users\DestroyAction as AdminUserDestroyAction;
 use App\Http\Controllers\Admin\Users\IndexAction as AdminUserIndexAction;
 use App\Http\Controllers\Admin\Users\ShowAction as AdminUserShowAction;
 use App\Http\Controllers\Admin\Users\StoreAction as AdminUserStoreAction;
 use App\Http\Controllers\Admin\Users\UpdateRoleAction as AdminUserUpdateRoleAction;
+use App\Http\Controllers\Admin\Workspaces\IndexAction as AdminWorkspaceIndexAction;
+use App\Http\Controllers\Admin\Workspaces\ShowAction as AdminWorkspaceShowAction;
 use App\Http\Controllers\Agreement\DestroyAction as AgreementDestroyAction;
 use App\Http\Controllers\Agreement\StoreAction as AgreementStoreAction;
 use App\Http\Controllers\Agreement\UpdateAction as AgreementUpdateAction;
@@ -21,17 +21,10 @@ use App\Http\Controllers\Appointment\SummarizeAction;
 use App\Http\Controllers\Appointment\TranscribeAction;
 use App\Http\Controllers\Appointment\UpdateAction as AppointmentUpdateAction;
 use App\Http\Controllers\Appointment\UpdateStatusAction;
-use App\Http\Controllers\Workspace\Analytics\IndexAction as WorkspaceAnalyticsIndexAction;
-use App\Http\Controllers\Workspace\Services\DestroyAction as WorkspaceServiceDestroyAction;
-use App\Http\Controllers\Workspace\Services\IndexAction as WorkspaceServiceIndexAction;
-use App\Http\Controllers\Workspace\Services\StoreAction as WorkspaceServiceStoreAction;
-use App\Http\Controllers\Workspace\Services\UpdateAction as WorkspaceServiceUpdateAction;
-use App\Http\Controllers\Workspace\Settings\IndexAction as WorkspaceSettingsIndexAction;
-use App\Http\Controllers\Workspace\Settings\UpdateAction as WorkspaceSettingsUpdateAction;
-use App\Http\Controllers\Workspace\Team\DestroyAction as WorkspaceTeamDestroyAction;
-use App\Http\Controllers\Workspace\Team\IndexAction as WorkspaceTeamIndexAction;
-use App\Http\Controllers\Workspace\Team\InviteAction as WorkspaceTeamInviteAction;
-use App\Http\Controllers\Workspace\Team\UpdatePermissionsAction as WorkspaceTeamUpdatePermissionsAction;
+use App\Http\Controllers\CollaborationAgreement\DestroyAction as CollaborationDestroyAction;
+use App\Http\Controllers\CollaborationAgreement\IndexAction as CollaborationIndexAction;
+use App\Http\Controllers\CollaborationAgreement\StoreAction as CollaborationStoreAction;
+use App\Http\Controllers\CollaborationAgreement\UpdateAction as CollaborationUpdateAction;
 use App\Http\Controllers\ConsentForm\StoreAction as ConsentFormStoreAction;
 use App\Http\Controllers\ConsentForm\UpdateAction as ConsentFormUpdateAction;
 use App\Http\Controllers\Dashboard\IndexAction as DashboardIndexAction;
@@ -82,6 +75,10 @@ use App\Http\Controllers\Portal\Message\IndexAction as PortalMessageIndexAction;
 use App\Http\Controllers\Portal\Message\StoreAction as PortalMessageStoreAction;
 use App\Http\Controllers\Portal\Profile\ShowAction as PortalProfileShowAction;
 use App\Http\Controllers\Portal\Profile\UpdateAction as PortalProfileUpdateAction;
+use App\Http\Controllers\Referral\DestroyAction as ReferralDestroyAction;
+use App\Http\Controllers\Referral\IndexAction as ReferralIndexAction;
+use App\Http\Controllers\Referral\StoreAction as ReferralStoreAction;
+use App\Http\Controllers\Referral\UpdateAction as ReferralUpdateAction;
 use App\Http\Controllers\Schedule\Availability\DestroyAction as AvailabilityDestroyAction;
 use App\Http\Controllers\Schedule\Availability\IndexAction as AvailabilityIndexAction;
 use App\Http\Controllers\Schedule\Availability\StoreAction as AvailabilityStoreAction;
@@ -89,6 +86,17 @@ use App\Http\Controllers\Schedule\Availability\UpdateAction as AvailabilityUpdat
 use App\Http\Controllers\Schedule\IndexAction as ScheduleIndexAction;
 use App\Http\Controllers\Settings\IndexAction as SettingsIndexAction;
 use App\Http\Controllers\Settings\UpdateAction as SettingsUpdateAction;
+use App\Http\Controllers\Workspace\Analytics\IndexAction as WorkspaceAnalyticsIndexAction;
+use App\Http\Controllers\Workspace\Services\DestroyAction as WorkspaceServiceDestroyAction;
+use App\Http\Controllers\Workspace\Services\IndexAction as WorkspaceServiceIndexAction;
+use App\Http\Controllers\Workspace\Services\StoreAction as WorkspaceServiceStoreAction;
+use App\Http\Controllers\Workspace\Services\UpdateAction as WorkspaceServiceUpdateAction;
+use App\Http\Controllers\Workspace\Settings\IndexAction as WorkspaceSettingsIndexAction;
+use App\Http\Controllers\Workspace\Settings\UpdateAction as WorkspaceSettingsUpdateAction;
+use App\Http\Controllers\Workspace\Team\DestroyAction as WorkspaceTeamDestroyAction;
+use App\Http\Controllers\Workspace\Team\IndexAction as WorkspaceTeamIndexAction;
+use App\Http\Controllers\Workspace\Team\InviteAction as WorkspaceTeamInviteAction;
+use App\Http\Controllers\Workspace\Team\UpdatePermissionsAction as WorkspaceTeamUpdatePermissionsAction;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -97,108 +105,122 @@ Route::get('/', fn () => Inertia::render('welcome'))->name('home');
 // ─── Professional routes ───────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'professional'])->group(function () {
 
-    Route::get('/dashboard',  DashboardIndexAction::class)->name('dashboard');
+    Route::get('/dashboard', DashboardIndexAction::class)->name('dashboard');
     Route::get('/onboarding', OnboardingIndexAction::class)->name('onboarding');
     Route::post('/onboarding', OnboardingStoreAction::class);
 
     // Patients
-    Route::get('/patients',                PatientIndexAction::class)->name('patients.index');
-    Route::get('/patients/create',         PatientCreateAction::class)->name('patients.create');
-    Route::post('/patients',               PatientStoreAction::class)->name('patients.store');
-    Route::get('/patients/{patient}',      PatientShowAction::class)->name('patients.show');
+    Route::get('/patients', PatientIndexAction::class)->name('patients.index');
+    Route::get('/patients/create', PatientCreateAction::class)->name('patients.create');
+    Route::post('/patients', PatientStoreAction::class)->name('patients.store');
+    Route::get('/patients/{patient}', PatientShowAction::class)->name('patients.show');
     Route::get('/patients/{patient}/edit', PatientEditAction::class)->name('patients.edit');
-    Route::put('/patients/{patient}',      PatientUpdateAction::class)->name('patients.update');
-    Route::patch('/patients/{patient}',    PatientUpdateAction::class);
-    Route::delete('/patients/{patient}',   PatientDestroyAction::class)->name('patients.destroy');
+    Route::put('/patients/{patient}', PatientUpdateAction::class)->name('patients.update');
+    Route::patch('/patients/{patient}', PatientUpdateAction::class);
+    Route::delete('/patients/{patient}', PatientDestroyAction::class)->name('patients.destroy');
 
-    Route::get('/patients/{patient}/pre-session',  PatientPreSessionAction::class)->name('patients.pre-session');
+    Route::get('/patients/{patient}/pre-session', PatientPreSessionAction::class)->name('patients.pre-session');
     Route::get('/patients/{patient}/post-session', PatientPostSessionAction::class)->name('patients.post-session');
-    Route::post('/patients/{patient}/invite',      PatientInviteAction::class)->name('patients.invite');
+    Route::post('/patients/{patient}/invite', PatientInviteAction::class)->name('patients.invite');
 
     // Patient sub-resources: Notes
-    Route::post('/patients/{patient}/notes',          NoteStoreAction::class)->name('patients.notes.store');
-    Route::put('/patients/{patient}/notes/{note}',    NoteUpdateAction::class)->name('patients.notes.update');
-    Route::patch('/patients/{patient}/notes/{note}',  NoteUpdateAction::class);
+    Route::post('/patients/{patient}/notes', NoteStoreAction::class)->name('patients.notes.store');
+    Route::put('/patients/{patient}/notes/{note}', NoteUpdateAction::class)->name('patients.notes.update');
+    Route::patch('/patients/{patient}/notes/{note}', NoteUpdateAction::class);
     Route::delete('/patients/{patient}/notes/{note}', NoteDestroyAction::class)->name('patients.notes.destroy');
 
     // Patient sub-resources: Agreements
-    Route::post('/patients/{patient}/agreements',               AgreementStoreAction::class)->name('patients.agreements.store');
-    Route::put('/patients/{patient}/agreements/{agreement}',    AgreementUpdateAction::class)->name('patients.agreements.update');
-    Route::patch('/patients/{patient}/agreements/{agreement}',  AgreementUpdateAction::class);
+    Route::post('/patients/{patient}/agreements', AgreementStoreAction::class)->name('patients.agreements.store');
+    Route::put('/patients/{patient}/agreements/{agreement}', AgreementUpdateAction::class)->name('patients.agreements.update');
+    Route::patch('/patients/{patient}/agreements/{agreement}', AgreementUpdateAction::class);
     Route::delete('/patients/{patient}/agreements/{agreement}', AgreementDestroyAction::class)->name('patients.agreements.destroy');
 
     // Patient sub-resources: Invoices (replaces old payments routes)
-    Route::post('/patients/{patient}/invoices',             InvoiceStoreAction::class)->name('patients.invoices.store');
-    Route::put('/patients/{patient}/invoices/{invoice}',    InvoiceUpdateAction::class)->name('patients.invoices.update');
-    Route::patch('/patients/{patient}/invoices/{invoice}',  InvoiceUpdateAction::class);
+    Route::post('/patients/{patient}/invoices', InvoiceStoreAction::class)->name('patients.invoices.store');
+    Route::put('/patients/{patient}/invoices/{invoice}', InvoiceUpdateAction::class)->name('patients.invoices.update');
+    Route::patch('/patients/{patient}/invoices/{invoice}', InvoiceUpdateAction::class);
     Route::delete('/patients/{patient}/invoices/{invoice}', InvoiceDestroyAction::class)->name('patients.invoices.destroy');
 
     // Patient sub-resources: Documents
-    Route::post('/patients/{patient}/documents',              DocumentStoreAction::class)->name('patients.documents.store');
+    Route::post('/patients/{patient}/documents', DocumentStoreAction::class)->name('patients.documents.store');
     Route::delete('/patients/{patient}/documents/{document}', DocumentDestroyAction::class)->name('patients.documents.destroy');
 
     // Patient sub-resources: Consent Forms
-    Route::post('/patients/{patient}/consent-forms',                ConsentFormStoreAction::class)->name('patients.consent-forms.store');
-    Route::put('/patients/{patient}/consent-forms/{consentForm}',   ConsentFormUpdateAction::class)->name('patients.consent-forms.update');
+    Route::post('/patients/{patient}/consent-forms', ConsentFormStoreAction::class)->name('patients.consent-forms.store');
+    Route::put('/patients/{patient}/consent-forms/{consentForm}', ConsentFormUpdateAction::class)->name('patients.consent-forms.update');
     Route::patch('/patients/{patient}/consent-forms/{consentForm}', ConsentFormUpdateAction::class);
 
     // Invoices
-    Route::get('/invoices',              InvoiceIndexAction::class)->name('invoices.index');
-    Route::get('/invoices/{invoice}',    InvoiceShowAction::class)->name('invoices.show');
-    Route::post('/invoices/{invoice}/send',       InvoiceSendAction::class)->name('invoices.send');
-    Route::get('/invoices/{invoice}/export-pdf',  InvoiceExportPdfAction::class)->name('invoices.export-pdf');
+    Route::get('/invoices', InvoiceIndexAction::class)->name('invoices.index');
+    Route::get('/invoices/{invoice}', InvoiceShowAction::class)->name('invoices.show');
+    Route::post('/invoices/{invoice}/send', InvoiceSendAction::class)->name('invoices.send');
+    Route::get('/invoices/{invoice}/export-pdf', InvoiceExportPdfAction::class)->name('invoices.export-pdf');
 
     // Appointments
-    Route::get('/appointments',                         AppointmentIndexAction::class)->name('appointments.index');
-    Route::post('/appointments',                        AppointmentStoreAction::class)->name('appointments.store');
-    Route::get('/appointments/{appointment}',           AppointmentShowAction::class)->name('appointments.show');
-    Route::put('/appointments/{appointment}',           AppointmentUpdateAction::class)->name('appointments.update');
-    Route::patch('/appointments/{appointment}',         AppointmentUpdateAction::class);
-    Route::patch('/appointments/{appointment}/status',  UpdateStatusAction::class)->name('appointments.status');
-    Route::post('/appointments/{appointment}/start-call',    StartCallAction::class)->name('appointments.start-call');
-    Route::post('/appointments/{appointment}/end-call',      EndCallAction::class)->name('appointments.end-call');
-    Route::post('/appointments/{appointment}/transcribe',    TranscribeAction::class)->name('appointments.transcribe');
-    Route::post('/appointments/{appointment}/summarize',     SummarizeAction::class)->name('appointments.summarize');
+    Route::get('/appointments', AppointmentIndexAction::class)->name('appointments.index');
+    Route::post('/appointments', AppointmentStoreAction::class)->name('appointments.store');
+    Route::get('/appointments/{appointment}', AppointmentShowAction::class)->name('appointments.show');
+    Route::put('/appointments/{appointment}', AppointmentUpdateAction::class)->name('appointments.update');
+    Route::patch('/appointments/{appointment}', AppointmentUpdateAction::class);
+    Route::patch('/appointments/{appointment}/status', UpdateStatusAction::class)->name('appointments.status');
+    Route::post('/appointments/{appointment}/start-call', StartCallAction::class)->name('appointments.start-call');
+    Route::post('/appointments/{appointment}/end-call', EndCallAction::class)->name('appointments.end-call');
+    Route::post('/appointments/{appointment}/transcribe', TranscribeAction::class)->name('appointments.transcribe');
+    Route::post('/appointments/{appointment}/summarize', SummarizeAction::class)->name('appointments.summarize');
     Route::post('/appointments/{appointment}/generate-invoice', GenerateInvoiceAction::class)->name('appointments.generate-invoice');
 
     // Schedule
     Route::get('/schedule', ScheduleIndexAction::class)->name('schedule.index');
-    Route::get('/schedule/availability',               AvailabilityIndexAction::class)->name('schedule.availability.index');
-    Route::post('/schedule/availability',              AvailabilityStoreAction::class)->name('schedule.availability.store');
-    Route::put('/schedule/availability/{availability}',    AvailabilityUpdateAction::class)->name('schedule.availability.update');
-    Route::patch('/schedule/availability/{availability}',  AvailabilityUpdateAction::class);
+    Route::get('/schedule/availability', AvailabilityIndexAction::class)->name('schedule.availability.index');
+    Route::post('/schedule/availability', AvailabilityStoreAction::class)->name('schedule.availability.store');
+    Route::put('/schedule/availability/{availability}', AvailabilityUpdateAction::class)->name('schedule.availability.update');
+    Route::patch('/schedule/availability/{availability}', AvailabilityUpdateAction::class);
     Route::delete('/schedule/availability/{availability}', AvailabilityDestroyAction::class)->name('schedule.availability.destroy');
 
     // Workspace management
     Route::prefix('workspace')->name('workspace.')->group(function () {
-        Route::get('/settings',  WorkspaceSettingsIndexAction::class)->name('settings.index');
-        Route::put('/settings',  WorkspaceSettingsUpdateAction::class)->name('settings.update');
+        Route::get('/settings', WorkspaceSettingsIndexAction::class)->name('settings.index');
+        Route::put('/settings', WorkspaceSettingsUpdateAction::class)->name('settings.update');
         Route::get('/analytics', WorkspaceAnalyticsIndexAction::class)->name('analytics.index');
 
-        Route::get('/team',                        WorkspaceTeamIndexAction::class)->name('team.index');
-        Route::post('/team/invite',                WorkspaceTeamInviteAction::class)->name('team.invite');
-        Route::put('/team/{user}/permissions',     WorkspaceTeamUpdatePermissionsAction::class)->name('team.permissions');
-        Route::delete('/team/{user}',              WorkspaceTeamDestroyAction::class)->name('team.destroy');
+        Route::get('/team', WorkspaceTeamIndexAction::class)->name('team.index');
+        Route::post('/team/invite', WorkspaceTeamInviteAction::class)->name('team.invite');
+        Route::put('/team/{user}/permissions', WorkspaceTeamUpdatePermissionsAction::class)->name('team.permissions');
+        Route::delete('/team/{user}', WorkspaceTeamDestroyAction::class)->name('team.destroy');
 
-        Route::get('/services',              WorkspaceServiceIndexAction::class)->name('services.index');
-        Route::post('/services',             WorkspaceServiceStoreAction::class)->name('services.store');
-        Route::put('/services/{service}',    WorkspaceServiceUpdateAction::class)->name('services.update');
-        Route::patch('/services/{service}',  WorkspaceServiceUpdateAction::class);
+        Route::get('/services', WorkspaceServiceIndexAction::class)->name('services.index');
+        Route::post('/services', WorkspaceServiceStoreAction::class)->name('services.store');
+        Route::put('/services/{service}', WorkspaceServiceUpdateAction::class)->name('services.update');
+        Route::patch('/services/{service}', WorkspaceServiceUpdateAction::class);
         Route::delete('/services/{service}', WorkspaceServiceDestroyAction::class)->name('services.destroy');
+
+        // Collaboration agreements
+        Route::get('/collaborations', CollaborationIndexAction::class)->name('collaborations.index');
+        Route::post('/collaborations', CollaborationStoreAction::class)->name('collaborations.store');
+        Route::put('/collaborations/{collaboration}', CollaborationUpdateAction::class)->name('collaborations.update');
+        Route::patch('/collaborations/{collaboration}', CollaborationUpdateAction::class);
+        Route::delete('/collaborations/{collaboration}', CollaborationDestroyAction::class)->name('collaborations.destroy');
     });
 
     // Messages
-    Route::get('/messages',                  MessageIndexAction::class)->name('messages.index');
-    Route::post('/messages',                 MessageStoreAction::class)->name('messages.store');
-    Route::get('/messages/{user}',           MessageConversationAction::class)->name('messages.conversation');
+    Route::get('/messages', MessageIndexAction::class)->name('messages.index');
+    Route::post('/messages', MessageStoreAction::class)->name('messages.store');
+    Route::get('/messages/{user}', MessageConversationAction::class)->name('messages.conversation');
 
     // Kosmo AI
-    Route::get('/kosmo',                            KosmoIndexAction::class)->name('kosmo');
-    Route::post('/kosmo/chat',                      KosmoChatAction::class)->name('kosmo.chat');
+    Route::get('/kosmo', KosmoIndexAction::class)->name('kosmo');
+    Route::post('/kosmo/chat', KosmoChatAction::class)->name('kosmo.chat');
     Route::post('/kosmo/briefings/{briefing}/read', KosmoMarkReadAction::class)->name('kosmo.briefings.read');
 
     Route::get('/settings', SettingsIndexAction::class)->name('settings');
     Route::put('/settings', SettingsUpdateAction::class);
+
+    // Referrals
+    Route::get('/referrals', ReferralIndexAction::class)->name('referrals.index');
+    Route::post('/referrals', ReferralStoreAction::class)->name('referrals.store');
+    Route::put('/referrals/{referral}', ReferralUpdateAction::class)->name('referrals.update');
+    Route::patch('/referrals/{referral}', ReferralUpdateAction::class);
+    Route::delete('/referrals/{referral}', ReferralDestroyAction::class)->name('referrals.destroy');
 });
 
 // ─── Admin routes ──────────────────────────────────────────────────────────────
@@ -206,14 +228,14 @@ Route::middleware(['auth', 'verified', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/users',              AdminUserIndexAction::class)->name('users.index');
-        Route::get('/users/create',       AdminUserCreateAction::class)->name('users.create');
-        Route::post('/users',             AdminUserStoreAction::class)->name('users.store');
-        Route::get('/users/{user}',       AdminUserShowAction::class)->name('users.show');
-        Route::put('/users/{user}/role',  AdminUserUpdateRoleAction::class)->name('users.role');
-        Route::delete('/users/{user}',    AdminUserDestroyAction::class)->name('users.destroy');
+        Route::get('/users', AdminUserIndexAction::class)->name('users.index');
+        Route::get('/users/create', AdminUserCreateAction::class)->name('users.create');
+        Route::post('/users', AdminUserStoreAction::class)->name('users.store');
+        Route::get('/users/{user}', AdminUserShowAction::class)->name('users.show');
+        Route::put('/users/{user}/role', AdminUserUpdateRoleAction::class)->name('users.role');
+        Route::delete('/users/{user}', AdminUserDestroyAction::class)->name('users.destroy');
 
-        Route::get('/workspaces',         AdminWorkspaceIndexAction::class)->name('workspaces.index');
+        Route::get('/workspaces', AdminWorkspaceIndexAction::class)->name('workspaces.index');
         Route::get('/workspaces/{workspace}', AdminWorkspaceShowAction::class)->name('workspaces.show');
     });
 
@@ -222,29 +244,29 @@ Route::middleware(['auth', 'verified'])
     ->prefix('portal')
     ->name('portal.')
     ->group(function () {
-        Route::get('/',         PortalDashboardIndexAction::class)->name('dashboard');
+        Route::get('/', PortalDashboardIndexAction::class)->name('dashboard');
 
-        Route::get('/appointments',                            PortalAppointmentIndexAction::class)->name('appointments.index');
-        Route::get('/appointments/book',                       PortalAppointmentBookAction::class)->name('appointments.book');
-        Route::post('/appointments',                           PortalAppointmentStoreAction::class)->name('appointments.store');
-        Route::get('/appointments/{appointment}',              PortalAppointmentShowAction::class)->name('appointments.show');
-        Route::post('/appointments/{appointment}/cancel',      PortalAppointmentCancelAction::class)->name('appointments.cancel');
-        Route::get('/appointments/{appointment}/join',         PortalAppointmentJoinCallAction::class)->name('appointments.join');
+        Route::get('/appointments', PortalAppointmentIndexAction::class)->name('appointments.index');
+        Route::get('/appointments/book', PortalAppointmentBookAction::class)->name('appointments.book');
+        Route::post('/appointments', PortalAppointmentStoreAction::class)->name('appointments.store');
+        Route::get('/appointments/{appointment}', PortalAppointmentShowAction::class)->name('appointments.show');
+        Route::post('/appointments/{appointment}/cancel', PortalAppointmentCancelAction::class)->name('appointments.cancel');
+        Route::get('/appointments/{appointment}/join', PortalAppointmentJoinCallAction::class)->name('appointments.join');
 
-        Route::get('/invoices',                   PortalInvoiceIndexAction::class)->name('invoices.index');
-        Route::get('/invoices/{invoice}',         PortalInvoiceShowAction::class)->name('invoices.show');
+        Route::get('/invoices', PortalInvoiceIndexAction::class)->name('invoices.index');
+        Route::get('/invoices/{invoice}', PortalInvoiceShowAction::class)->name('invoices.show');
         Route::get('/invoices/{invoice}/download', PortalInvoiceDownloadPdfAction::class)->name('invoices.download');
 
         Route::get('/documents', PortalDocumentIndexAction::class)->name('documents.index');
 
-        Route::get('/consent-forms',                    PortalConsentFormIndexAction::class)->name('consent-forms.index');
+        Route::get('/consent-forms', PortalConsentFormIndexAction::class)->name('consent-forms.index');
         Route::post('/consent-forms/{consentForm}/sign', PortalConsentFormSignAction::class)->name('consent-forms.sign');
 
-        Route::get('/messages',  PortalMessageIndexAction::class)->name('messages.index');
+        Route::get('/messages', PortalMessageIndexAction::class)->name('messages.index');
         Route::post('/messages', PortalMessageStoreAction::class)->name('messages.store');
 
-        Route::get('/profile',  PortalProfileShowAction::class)->name('profile.show');
-        Route::put('/profile',  PortalProfileUpdateAction::class)->name('profile.update');
+        Route::get('/profile', PortalProfileShowAction::class)->name('profile.show');
+        Route::put('/profile', PortalProfileUpdateAction::class)->name('profile.update');
         Route::patch('/profile', PortalProfileUpdateAction::class);
     });
 

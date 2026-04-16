@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Workspace;
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -52,6 +52,22 @@ class AppointmentFactory extends Factory
         return $this->state([
             'status' => 'cancelled',
             'cancellation_reason' => fake()->sentence(),
+        ]);
+    }
+
+    public function inProgress(): static
+    {
+        return $this->state([
+            'status' => 'in_progress',
+            'starts_at' => now()->subMinutes(20),
+        ]);
+    }
+
+    public function noShow(): static
+    {
+        return $this->state([
+            'status' => 'no_show',
+            'starts_at' => fake()->dateTimeBetween('-2 months', '-1 day'),
         ]);
     }
 

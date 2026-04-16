@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { UserPlus, User, Mail, Lock, KeyRound } from 'lucide-react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -10,15 +11,16 @@ import AuthLayout from '@/layouts/auth-layout';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
+const layoutTitle = 'Crear una cuenta';
+const layoutDescription = 'Introduce tus datos para registrarte';
+
 export default function Register() {
     return (
-        <AuthLayout
-            title="Crear una cuenta"
-            description="Introduce tus datos para registrarte"
-        >
+        <>
             <Head title="Registro" />
             <Form
-                {...store.form()}
+                action={store.url()}
+                method="post"
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
@@ -126,6 +128,10 @@ export default function Register() {
                     </>
                 )}
             </Form>
-        </AuthLayout>
+        </>
     );
 }
+
+Register.layout = (page: ReactNode) => (
+    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+);

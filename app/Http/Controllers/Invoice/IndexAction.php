@@ -23,7 +23,7 @@ class IndexAction extends Controller
             ->withQueryString();
 
         $stats = [
-            'total_paid'    => Invoice::where('professional_id', $user->id)
+            'total_paid' => Invoice::where('professional_id', $user->id)
                 ->where('status', 'paid')
                 ->whereYear('paid_at', now()->year)
                 ->whereMonth('paid_at', now()->month)
@@ -38,8 +38,8 @@ class IndexAction extends Controller
 
         return Inertia::render('invoices/index', [
             'invoices' => $invoices,
-            'stats'    => $stats,
-            'filters'  => $request->only(['status', 'patient_id']),
+            'stats' => $stats,
+            'filters' => $request->only(['status', 'patient_id']),
         ]);
     }
 }

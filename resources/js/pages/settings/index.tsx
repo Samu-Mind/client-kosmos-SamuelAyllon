@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,11 +28,11 @@ export default function SettingsIndex({ user }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put('/settings');
+        put(route('settings'));
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Ajustes — ClientKosmos" />
 
             <div className="flex flex-col gap-8 p-6 lg:p-8 max-w-2xl">
@@ -149,6 +150,8 @@ export default function SettingsIndex({ user }: Props) {
                     </div>
                 </form>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+SettingsIndex.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

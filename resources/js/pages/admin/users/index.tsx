@@ -1,4 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { Users, Plus, Trash2 } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,7 @@ export default function AdminUsersIndex({ users }: Props) {
     };
 
     return (
-        <AdminLayout>
+        <>
             <Head title="Usuarios — Admin — ClientKosmos" />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -51,7 +52,7 @@ export default function AdminUsersIndex({ users }: Props) {
                             {users.total} profesionales registrados
                         </p>
                     </div>
-                    <Link href="/admin/users/create">
+                    <Link href={route('admin.users.create')}>
                         <Button variant="primary">
                             <Plus size={16} />
                             Nuevo profesional
@@ -135,6 +136,8 @@ export default function AdminUsersIndex({ users }: Props) {
                     )}
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+AdminUsersIndex.layout = (page: ReactNode) => <AdminLayout>{page}</AdminLayout>;

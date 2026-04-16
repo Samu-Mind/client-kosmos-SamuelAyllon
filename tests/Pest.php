@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CaseAssignment;
 use App\Models\PatientProfile;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
@@ -84,10 +85,21 @@ function createPatientProfileFor(User $professional, array $overrides = []): Pat
     $portalUser = User::factory()->create();
     $portalUser->assignRole('patient');
 
-    return PatientProfile::factory()->create(array_merge([
+    $profile = PatientProfile::factory()->create(array_merge([
         'user_id' => $portalUser->id,
         'professional_id' => $professional->id,
         'workspace_id' => null,
         'is_active' => true,
     ], $overrides));
+
+    CaseAssignment::create([
+        'patient_id' => $portalUser->id,
+        'professional_id' => $professional->id,
+        'is_primary' => true,
+        'role' => 'primary',
+        'status' => 'active',
+        'started_at' => now(),
+    ]);
+
+    return $profile;
 }

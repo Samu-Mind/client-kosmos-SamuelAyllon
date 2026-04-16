@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { LogIn, Mail, Lock, CheckCircle2 } from 'lucide-react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -12,6 +13,9 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
+const layoutTitle = 'Iniciar sesión';
+const layoutDescription = 'Introduce tu email y contraseña para acceder';
+
 type Props = {
     status?: string;
     canResetPassword: boolean;
@@ -24,10 +28,7 @@ export default function Login({
     canRegister,
 }: Props) {
     return (
-        <AuthLayout
-            title="Iniciar sesión"
-            description="Introduce tu email y contraseña para acceder"
-        >
+        <>
             <Head title="Iniciar sesión" />
 
             {status && (
@@ -40,7 +41,8 @@ export default function Login({
             )}
 
             <Form
-                {...store.form()}
+                action={store.url()}
+                method="post"
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >
@@ -128,6 +130,10 @@ export default function Login({
                     </>
                 )}
             </Form>
-        </AuthLayout>
+        </>
     );
 }
+
+Login.layout = (page: ReactNode) => (
+    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+);

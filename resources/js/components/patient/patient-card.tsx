@@ -21,7 +21,7 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient, className = '
                     <img src={patient.avatar_path} alt={patient.project_name} className="h-10 w-10 rounded-full object-cover shrink-0" />
                 ) : (
                     <div className="h-10 w-10 rounded-full bg-[var(--color-primary-subtle)] flex items-center justify-center shrink-0 text-[var(--color-primary)] font-semibold text-sm">
-                        {patient.project_name.substring(0, 2).toUpperCase()}
+                        {patient.project_name?.substring(0, 2).toUpperCase() ?? '?'}
                     </div>
                 )}
                 <div className="flex-1 min-w-0">

@@ -1,4 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import { index as patientsIndex } from '@/routes/patients';
+import type { ReactNode } from 'react';
 import { AlertTriangle, CalendarDays, Sparkles } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
@@ -8,18 +10,18 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import type { Auth, KosmoBriefing, Patient } from '@/types';
 
 interface DashboardStats {
-    sessions_this_week: number;
-    pending_payments: number;
+    appointments_this_week: number;
+    pending_invoices: number;
     active_patients: number;
     collection_rate: number;
 }
 
 interface DashboardAlerts {
-    payment: Pick<Patient, 'id' | 'project_name' | 'payment_status'>[];
+    invoice: Pick<Patient, 'id' | 'project_name' | 'payment_status'>[];
     consent: Pick<Patient, 'id' | 'project_name'>[];
 }
 
-interface TodaySession {
+interface TodayAppointment {
     id: number;
     scheduled_at: string;
     patient: Pick<Patient, 'id' | 'project_name' | 'brand_tone' | 'payment_status' | 'has_valid_consent' | 'has_open_agreement' | 'statuses'>;
@@ -27,7 +29,7 @@ interface TodaySession {
 
 interface Props {
     activePatients: Patient[];
-    todaySessions: TodaySession[];
+    todayAppointments: TodayAppointment[];
     alerts: DashboardAlerts;
     dailyBriefing: KosmoBriefing | null;
     stats: DashboardStats;
@@ -46,13 +48,13 @@ const formatDate = (): string =>
 const formatTime = (dt: string): string =>
     new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' }).format(new Date(dt));
 
-export default function Dashboard({ activePatients, todaySessions, alerts, dailyBriefing, stats }: Props) {
+export default function Dashboard({ activePatients, todayAppointments, alerts, dailyBriefing, stats }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
-    const hasAlerts = alerts.payment.length > 0 || alerts.consent.length > 0;
+    const hasAlerts = alerts.invoice.length > 0 || alerts.consent.length > 0;
 
     return (
-        <AppLayout>
+        <>
             <Head title="Hoy — ClientKosmos" />
 
             <div className="flex flex-col gap-8 p-6 lg:p-8">
@@ -92,7 +94,7 @@ export default function Dashboard({ activePatients, todaySessions, alerts, daily
                                 <CalendarDays size={20} className="text-[var(--color-primary)]" />
                                 Agenda de hoy
                             </h2>
-                            {todaySessions.length === 0 ? (
+                            {todayAppointments.length === 0 ? (
                                 <div className="rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-8 text-center">
                                     <p className="text-sm text-[var(--color-text-secondary)]">
                                         No hay sesiones programadas para hoy. ¡Disfruta el descanso!
@@ -100,7 +102,7 @@ export default function Dashboard({ activePatients, todaySessions, alerts, daily
                                 </div>
                             ) : (
                                 <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)] divide-y divide-[var(--color-border-subtle)]">
-                                    {todaySessions.map((session) => (
+                                    {todayAppointments.map((session) => (
                                         <div key={session.id} className="flex items-center justify-between p-4 hover:bg-[var(--color-surface-alt)] transition-colors duration-[var(--duration-normal)]">
                                             <div className="flex items-center gap-3">
                                                 <span className="text-sm font-semibold text-[var(--color-text-secondary)] w-12 shrink-0">
@@ -147,7 +149,7 @@ export default function Dashboard({ activePatients, todaySessions, alerts, daily
                                     Necesita atención
                                 </h2>
                                 <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)] divide-y divide-[var(--color-border-subtle)]">
-                                    {alerts.payment.map((p) => (
+                                    {alerts.invoice.map((p) => (
                                         <Link key={p.id} href={`/patients/${p.id}`} className="flex items-center justify-between p-3 hover:bg-[var(--color-surface-alt)] transition-colors">
                                             <span className="text-sm text-[var(--color-text)]">{p.project_name}</span>
                                             <StatusBadge status={p.payment_status as 'pending' | 'overdue'} variant="subtle" />
@@ -170,8 +172,8 @@ export default function Dashboard({ activePatients, todaySessions, alerts, daily
                                 Esta semana
                             </h2>
                             <div className="grid grid-cols-2 gap-3">
-                                <KPICard label="Sesiones" value={stats.sessions_this_week} />
-                                <KPICard label="Cobros pendientes" value={`€${stats.pending_payments.toLocaleString('es-ES')}`} />
+                                <KPICard label="Sesiones" value={stats.appointments_this_week} />
+                                <KPICard label="Cobros pendientes" value={`€${stats.pending_invoices.toLocaleString('es-ES')}`} />
                                 <KPICard label="Pacientes activos" value={stats.active_patients} />
                                 <KPICard label="Tasa de cobro" value={`${stats.collection_rate}%`} />
                             </div>
@@ -185,7 +187,7 @@ export default function Dashboard({ activePatients, todaySessions, alerts, daily
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-display-lg text-[var(--color-text)]">Mis pacientes</h2>
-                            <Link href="/patients" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
+                            <Link href={patientsIndex().url} className="text-sm font-medium text-[var(--color-primary)] hover:underline">
                                 Ver todos →
                             </Link>
                         </div>
@@ -197,6 +199,8 @@ export default function Dashboard({ activePatients, todaySessions, alerts, daily
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+Dashboard.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

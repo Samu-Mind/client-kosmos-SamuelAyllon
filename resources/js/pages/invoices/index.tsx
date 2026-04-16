@@ -1,4 +1,6 @@
 import { Head, router } from '@inertiajs/react';
+import { index as invoicesIndex } from '@/routes/invoices';
+import type { ReactNode } from 'react';
 import { Receipt } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { KPICard } from '@/components/patient/kpi-card';
@@ -27,8 +29,8 @@ interface Props {
     filters: { status?: string; patient_id?: string };
 }
 
-const formatDate = (d: string) =>
-    new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d));
+const formatDate = (d: string | null | undefined) =>
+    d ? new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d)) : '—';
 
 const statusLabels: Record<string, string> = {
     pending: 'Pendiente',
@@ -39,7 +41,7 @@ const statusLabels: Record<string, string> = {
 
 export default function BillingIndex({ payments, stats, filters }: Props) {
     return (
-        <AppLayout>
+        <>
             <Head title="Cobros — ClientKosmos" />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -73,7 +75,7 @@ export default function BillingIndex({ payments, stats, filters }: Props) {
                     {['', 'paid', 'pending', 'overdue', 'claimed'].map((s) => (
                         <button
                             key={s}
-                            onClick={() => router.get('/billing', { status: s || undefined }, { preserveState: true })}
+                            onClick={() => router.get(invoicesIndex.url(), { status: s || undefined }, { preserveState: true })}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                                 (filters.status ?? '') === s
                                     ? 'bg-[var(--color-primary)] text-[var(--color-primary-fg)]'
@@ -158,6 +160,8 @@ export default function BillingIndex({ payments, stats, filters }: Props) {
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+BillingIndex.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

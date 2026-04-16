@@ -1,4 +1,5 @@
 import { Head, router } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { UserPlus, Search } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
@@ -25,7 +26,7 @@ export default function PatientsIndex({ patients }: Props) {
     const [activeFilter, setActiveFilter] = useState<PatientStatus | 'all'>('all');
 
     const filtered = patients.filter((p) => {
-        const matchesSearch = p.project_name.toLowerCase().includes(search.toLowerCase())
+        const matchesSearch = (p.project_name ?? '').toLowerCase().includes(search.toLowerCase())
             || (p.brand_tone ?? '').toLowerCase().includes(search.toLowerCase());
 
         const matchesFilter = activeFilter === 'all'
@@ -37,7 +38,7 @@ export default function PatientsIndex({ patients }: Props) {
     });
 
     return (
-        <AppLayout>
+        <>
             <Head title="Pacientes — ClientKosmos" />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -102,6 +103,8 @@ export default function PatientsIndex({ patients }: Props) {
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+PatientsIndex.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

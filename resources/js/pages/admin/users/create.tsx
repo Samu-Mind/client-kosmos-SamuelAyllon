@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { ArrowLeft, UserPlus } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import { Button } from '@/components/ui/button';
@@ -12,17 +13,17 @@ export default function AdminUserCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/users');
+        post(route('admin.users.store'));
     };
 
     return (
-        <AdminLayout>
+        <>
             <Head title="Nuevo profesional — Admin — ClientKosmos" />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-2xl">
                 <div>
                     <Link
-                        href="/admin/users"
+                        href={route('admin.users.index')}
                         className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] mb-4"
                     >
                         <ArrowLeft size={16} />
@@ -93,7 +94,7 @@ export default function AdminUserCreate() {
                     </div>
 
                     <div className="flex items-center justify-end gap-3 pt-2 border-t border-[var(--color-border-subtle)]">
-                        <Link href="/admin/users">
+                        <Link href={route('admin.users.index')}>
                             <Button type="button" variant="secondary">
                                 Cancelar
                             </Button>
@@ -105,6 +106,8 @@ export default function AdminUserCreate() {
                     </div>
                 </form>
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+AdminUserCreate.layout = (page: ReactNode) => <AdminLayout>{page}</AdminLayout>;

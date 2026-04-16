@@ -1,5 +1,6 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { Mail, CheckCircle2, LogOut, MailCheck } from 'lucide-react';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -8,12 +9,12 @@ import AuthLayout from '@/layouts/auth-layout';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
+const layoutTitle = 'Verifica tu email';
+const layoutDescription = 'Por favor verifica tu dirección de correo electrónico haciendo clic en el enlace que te enviamos.';
+
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
-        <AuthLayout
-            title="Verifica tu email"
-            description="Por favor verifica tu dirección de correo electrónico haciendo clic en el enlace que te enviamos."
-        >
+        <>
             <Head title="Verificar email" />
 
             {status === 'verification-link-sent' && (
@@ -33,7 +34,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             </div>
 
-            <Form {...send.form()} className="space-y-6 text-center">
+            <Form action={send.url()} method="post" className="space-y-6 text-center">
                 {({ processing }) => (
                     <>
                         <Button
@@ -55,6 +56,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     </>
                 )}
             </Form>
-        </AuthLayout>
+        </>
     );
 }
+
+VerifyEmail.layout = (page: ReactNode) => (
+    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+);

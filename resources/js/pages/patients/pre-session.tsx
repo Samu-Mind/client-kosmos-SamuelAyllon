@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
@@ -28,7 +29,7 @@ const formatDateTime = (d: string) =>
 
 export default function PreSession({ patient, context, briefing }: Props) {
     return (
-        <AppLayout>
+        <>
             <Head title={`Pre-sesión: ${patient.project_name} — ClientKosmos`} />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-4xl">
@@ -176,6 +177,8 @@ export default function PreSession({ patient, context, briefing }: Props) {
                     </Link>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+PreSession.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

@@ -1,5 +1,6 @@
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { Lock, KeyRound, CheckCircle2 } from 'lucide-react';
 import { useRef } from 'react';
 import PasswordActions from '@/actions/App/Http/Controllers/Settings/Password';
@@ -25,7 +26,7 @@ export default function Password() {
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Ajustes de contraseña" />
 
             <h1 className="sr-only">Ajustes de Contraseña</h1>
@@ -43,7 +44,8 @@ export default function Password() {
                     </CardHeader>
                     <CardContent className="pt-6">
                         <Form
-                            {...PasswordActions.UpdateAction.form()}
+                            action={PasswordActions.UpdateAction.url()}
+                            method="put"
                             options={{
                                 preserveScroll: true,
                             }}
@@ -152,6 +154,10 @@ export default function Password() {
                     </CardContent>
                 </Card>
             </SettingsLayout>
-        </AppLayout>
+        </>
     );
 }
+
+Password.layout = (page: ReactNode) => (
+    <AppLayout breadcrumbs={breadcrumbs}>{page}</AppLayout>
+);

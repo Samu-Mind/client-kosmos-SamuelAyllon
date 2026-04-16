@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { Mail, Lock, KeyRound, ShieldCheck } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,9 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { update } from '@/routes/password';
 
+const layoutTitle = 'Nueva contraseña';
+const layoutDescription = 'Introduce tu nueva contraseña para continuar';
+
 type Props = {
     token: string;
     email: string;
@@ -15,10 +19,7 @@ type Props = {
 
 export default function ResetPassword({ token, email }: Props) {
     return (
-        <AuthLayout
-            title="Nueva contraseña"
-            description="Introduce tu nueva contraseña para continuar"
-        >
+        <>
             <Head title="Restablecer contraseña" />
 
             <div className="flex justify-center mb-6">
@@ -28,7 +29,8 @@ export default function ResetPassword({ token, email }: Props) {
             </div>
 
             <Form
-                {...update.form()}
+                action={update.url()}
+                method="post"
                 transform={(data) => ({ ...data, token, email })}
                 resetOnSuccess={['password', 'password_confirmation']}
             >
@@ -96,6 +98,10 @@ export default function ResetPassword({ token, email }: Props) {
                     </div>
                 )}
             </Form>
-        </AuthLayout>
+        </>
     );
 }
+
+ResetPassword.layout = (page: ReactNode) => (
+    <AuthLayout title={layoutTitle} description={layoutDescription}>{page}</AuthLayout>
+);

@@ -1,5 +1,6 @@
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { User, Mail, CheckCircle2 } from 'lucide-react';
 import ProfileActions from '@/actions/App/Http/Controllers/Settings/Profile';
 import DeleteUser from '@/components/delete-user';
@@ -12,7 +13,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
-import type { BreadcrumbItem } from '@/types';
+import type { Auth, BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,10 +29,10 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Ajustes de perfil" />
 
             <h1 className="sr-only">Ajustes de Perfil</h1>
@@ -49,7 +50,8 @@ export default function Profile({
                     </CardHeader>
                     <CardContent className="pt-6">
                         <Form
-                            {...ProfileActions.UpdateAction.form()}
+                            action={ProfileActions.UpdateAction.url()}
+                            method="patch"
                             options={{
                                 preserveScroll: true,
                             }}
@@ -157,6 +159,10 @@ export default function Profile({
 
                 <DeleteUser />
             </SettingsLayout>
-        </AppLayout>
+        </>
     );
 }
+
+Profile.layout = (page: ReactNode) => (
+    <AppLayout breadcrumbs={breadcrumbs}>{page}</AppLayout>
+);

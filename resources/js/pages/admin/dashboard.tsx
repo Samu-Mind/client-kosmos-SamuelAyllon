@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { Users, UserCheck, Brain, Calendar, Euro, TrendingUp } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import { KPICard } from '@/components/patient/kpi-card';
@@ -36,8 +37,12 @@ const formatDate = (d: string) =>
     new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d));
 
 export default function AdminDashboard({ stats, recentUsers }: Props) {
+    function route(arg0: string): string | import("@inertiajs/core").UrlMethodPair | undefined {
+        throw new Error('Function not implemented.');
+    }
+
     return (
-        <AdminLayout>
+        <>
             <Head title="Admin Dashboard — ClientKosmos" />
 
             <div className="flex flex-col gap-8 p-6 lg:p-8">
@@ -62,7 +67,7 @@ export default function AdminDashboard({ stats, recentUsers }: Props) {
                 <div>
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-display-lg text-[var(--color-text)]">Últimos profesionales</h2>
-                        <Link href="/admin/users" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
+                        <Link href={route('admin.users.index')} className="text-sm font-medium text-[var(--color-primary)] hover:underline">
                             Ver todos →
                         </Link>
                     </div>
@@ -95,6 +100,8 @@ export default function AdminDashboard({ stats, recentUsers }: Props) {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+AdminDashboard.layout = (page: ReactNode) => <AdminLayout>{page}</AdminLayout>;

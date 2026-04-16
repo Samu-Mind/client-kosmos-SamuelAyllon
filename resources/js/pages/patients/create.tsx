@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,11 +27,11 @@ export default function PatientCreate() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/patients');
+        post(route('patients.store'));
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Nuevo paciente — ClientKosmos" />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-2xl">
@@ -134,6 +135,8 @@ export default function PatientCreate() {
                     </div>
                 </form>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+PatientCreate.layout = (page: ReactNode) => <AppLayout>{page}</AppLayout>;

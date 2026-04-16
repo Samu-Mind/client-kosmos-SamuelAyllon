@@ -29,10 +29,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { dashboard, login, register } from '@/routes';
+import type { Auth } from '@/types';
 
 
 export default function Welcome({ canRegister = true }: { canRegister?: boolean }) {
-    const { auth } = usePage().props as { auth: { user: unknown } };
+    const { auth } = usePage<{ auth: Auth }>().props;
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
