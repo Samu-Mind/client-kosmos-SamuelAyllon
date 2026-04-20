@@ -104,6 +104,7 @@ export default function DeleteUser() {
                                         <DialogFooter className="gap-2 sm:gap-0">
                                             <DialogClose asChild>
                                                 <Button
+                                                    type="button"
                                                     variant="outline"
                                                     onClick={() =>
                                                         resetAndClearErrors()
@@ -114,22 +115,14 @@ export default function DeleteUser() {
                                             </DialogClose>
 
                                             <Button
+                                                type="submit"
                                                 variant="destructive"
                                                 disabled={processing}
-                                                asChild
+                                                data-test="confirm-delete-user-button"
+                                                loading={processing}
                                             >
-                                                <button
-                                                    type="submit"
-                                                    data-test="confirm-delete-user-button"
-                                                    className="gap-2"
-                                                >
-                                                    {processing ? (
-                                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                                    ) : (
-                                                        <Trash2 className="h-4 w-4" />
-                                                    )}
-                                                    Eliminar cuenta
-                                                </button>
+                                                <Trash2 className="h-4 w-4" />
+                                                Eliminar cuenta
                                             </Button>
                                         </DialogFooter>
                                     </>

@@ -124,6 +124,7 @@ export default function Profile({
 
                                     <div className="flex items-center gap-4 border-t pt-6">
                                         <Button
+                                            type="submit"
                                             disabled={processing}
                                             data-test="update-profile-button"
                                             className="min-w-[100px]"

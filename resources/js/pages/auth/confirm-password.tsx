@@ -45,6 +45,7 @@ export default function ConfirmPassword() {
                         </div>
 
                         <Button
+                            type="submit"
                             className="w-full h-11 text-base font-semibold rounded-xl shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
                             disabled={processing}
                             data-test="confirm-password-button"

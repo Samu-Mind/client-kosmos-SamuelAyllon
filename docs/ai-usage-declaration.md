@@ -38,3 +38,11 @@ Registro transparente del uso de herramientas de IA en el desarrollo de ClientKo
 - **Revisión humana:** pendiente — verificar visualmente en navegador (Dialog, InputOTP en flujo 2FA, StatusBadge en listas de facturas) y auditar accesibilidad con teclado.
 - **Prompt(s) relevantes:** "Continua con la transición de Tailwindcss a chakra usando su mpc y la guía de estilos que se creó: Siguiente fase sugerida: compuestos UI (dialog, alert-dialog, select, breadcrumb, navigation-menu, input-otp, status-badge)."
 - **Relación con ADR:** ADR-0002
+
+### Fase 3a — Validación visual + corrección sistémica `type="submit"`
+
+- **Fecha:** 2026-04-20
+- **Herramientas:** Claude Code (Opus 4.7), Laravel Boost MCP (`browser-logs`, `get-absolute-url`), Explore subagent (auditoría de botones en formularios)
+- **Alcance IA:** validación interactiva del Dialog (settings/delete-user) y confirmación de contraseña (Fortify); detección y corrección del bug sistémico `type="submit"` en botones Chakra dentro de formularios Inertia v2. Archivos modificados: [`delete-user.tsx`](../resources/js/components/delete-user.tsx), [`confirm-password.tsx`](../resources/js/pages/auth/confirm-password.tsx), [`forgot-password.tsx`](../resources/js/pages/auth/forgot-password.tsx), [`settings/password.tsx`](../resources/js/pages/settings/password.tsx), [`settings/profile.tsx`](../resources/js/pages/settings/profile.tsx).
+- **Revisión humana:** Samuel Ayllón validó manualmente Dialog + confirm-password en navegador. Resto del checklist (2FA InputOTP, Select, AlertDialog, NavigationMenu, StatusBadge, Sidebar) queda pendiente.
+- **Relación con ADR:** ADR-0003
