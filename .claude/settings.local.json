@@ -1,6 +1,7 @@
 {
   "enabledMcpjsonServers": [
-    "laravel-boost"
+    "laravel-boost",
+    "chakra-ui"
   ],
   "enableAllProjectMcpServers": true
 }
