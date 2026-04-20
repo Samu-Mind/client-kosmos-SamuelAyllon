@@ -1,9 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { ArrowLeft, CalendarDays, Clock, MapPin, Video, FileText, CheckSquare } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, Folder, MessageSquare, Paperclip, Play } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
-import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/empty-state';
 import DashboardIndexAction from '@/actions/App/Http/Controllers/Dashboard/IndexAction';
+import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
+import JoinWaitingRoomAction from '@/actions/App/Http/Controllers/Appointment/JoinWaitingRoomAction';
 
 interface User {
     id: number;
@@ -16,345 +19,270 @@ interface Service {
     id: number;
     name: string;
     duration_minutes: number;
-    price: string;
 }
 
-interface NoteItem {
-    id: number;
-    content: string;
-    type: string;
-    is_ai_generated: boolean;
-    created_at: string;
-}
-
-interface AgreementItem {
+interface Agreement {
     id: number;
     content: string;
     is_completed: boolean;
-    completed_at: string | null;
     created_at: string;
 }
 
-interface InvoiceItem {
+interface Document {
     id: number;
-    quantity: number;
-    unit_price: string;
-    total: string;
-    description: string | null;
-    invoice: { id: number; invoice_number: string; status: string } | null;
+    name: string;
+    storage_type: string | null;
+    gdrive_file_id: string | null;
+    gdrive_url: string | null;
+    mime_type: string | null;
+    size_bytes: number | null;
+    category: string | null;
+}
+
+interface PatientProfile {
+    id: number;
+    diagnosis: string | null;
+    clinical_notes: string | null;
+    documents: Document[];
+}
+
+interface ClinicalNote {
+    id: number;
+    content: string;
+    type: string;
+    created_at: string;
 }
 
 interface Appointment {
     id: number;
     starts_at: string;
     ends_at: string | null;
-    status: 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
-    modality: string;
-    meeting_url: string | null;
-    cancellation_reason: string | null;
-    patient: User | null;
+    status: string;
+    patient: (User & { patient_profile: PatientProfile | null }) | null;
     professional: User | null;
     service: Service | null;
-    notes: NoteItem[];
-    agreements: AgreementItem[];
-    invoice_items: InvoiceItem[];
+    agreements: Agreement[];
 }
 
 interface Props {
     appointment: Appointment;
+    lastClinicalNote: ClinicalNote | null;
 }
-
-const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
-    scheduled:   { label: 'Programada',  bg: 'bg-[var(--color-indigo-subtle)]',  text: 'text-[var(--color-indigo-fg)]' },
-    confirmed:   { label: 'Confirmada',  bg: 'bg-[var(--color-success-subtle)]', text: 'text-[var(--color-success-fg)]' },
-    in_progress: { label: 'En curso',    bg: 'bg-[var(--color-warning-subtle)]', text: 'text-[var(--color-warning-fg)]' },
-    completed:   { label: 'Completada',  bg: 'bg-[var(--color-surface-alt)]',    text: 'text-[var(--color-text-secondary)]' },
-    cancelled:   { label: 'Cancelada',   bg: 'bg-[var(--color-error-subtle)]',   text: 'text-[var(--color-error-fg)]' },
-};
-
-const modalityLabel: Record<string, string> = {
-    presencial:   'Presencial',
-    online:       'Online',
-    videollamada: 'Videollamada',
-    telefono:     'Teléfono',
-};
-
-const noteTypeLabel: Record<string, string> = {
-    quick_note:   'Nota rápida',
-    session_note: 'Nota de sesión',
-    observation:  'Observación',
-    followup:     'Seguimiento',
-};
-
-const formatDateTime = (dt: string) =>
-    new Intl.DateTimeFormat('es-ES', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
-    }).format(new Date(dt));
 
 const formatTime = (dt: string) =>
     new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' }).format(new Date(dt));
 
-const formatShort = (dt: string) =>
-    new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(dt));
+const formatSyncedAt = () => {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    return `Sincronizado hoy ${hh}:${mm}`;
+};
 
-const isOnline = (modality: string) =>
-    ['online', 'videollamada', 'telefono'].includes(modality?.toLowerCase());
+const formatRelativeDate = (dt: string) => {
+    const now = new Date();
+    const then = new Date(dt);
+    const diffMs = now.getTime() - then.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return 'hoy';
+    if (diffDays === 1) return 'ayer';
+    return `hace ${diffDays} días`;
+};
 
-export default function AppointmentShow({ appointment }: Props) {
-    const cfg = statusConfig[appointment.status] ?? statusConfig.scheduled;
-    const online = isOnline(appointment.modality);
+const formatFileSize = (bytes: number | null) => {
+    if (!bytes || bytes <= 0) return '';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let i = 0;
+    let value = bytes;
+    while (value >= 1024 && i < units.length - 1) {
+        value /= 1024;
+        i++;
+    }
+    return `${value.toFixed(value < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
+};
+
+const extFromMime = (mime: string | null) => {
+    if (!mime) return 'Archivo';
+    if (mime.includes('pdf')) return 'PDF';
+    if (mime.includes('word') || mime.includes('document')) return 'DOCX';
+    if (mime.includes('sheet') || mime.includes('excel')) return 'XLSX';
+    if (mime.startsWith('image/')) return 'Imagen';
+    if (mime.startsWith('audio/')) return 'Audio';
+    if (mime.startsWith('video/')) return 'Vídeo';
+    return 'Archivo';
+};
+
+const resourceMeta = (doc: Document): { Icon: typeof Paperclip; subtitle: string } => {
+    if (doc.gdrive_file_id || doc.storage_type === 'gdrive') {
+        return { Icon: Folder, subtitle: 'Directorio Compartido' };
+    }
+    if (doc.storage_type === 'local') {
+        const size = formatFileSize(doc.size_bytes);
+        return { Icon: Paperclip, subtitle: size ? `${extFromMime(doc.mime_type)} · ${size}` : extFromMime(doc.mime_type) };
+    }
+    return { Icon: BookOpen, subtitle: 'Recursos Externos' };
+};
+
+export default function AppointmentShow({ appointment, lastClinicalNote }: Props) {
+    const patient = appointment.patient;
+    const profile = patient?.patient_profile ?? null;
+    const resources = profile?.documents ?? [];
 
     return (
         <>
-            <Head title={`Sesión — ${appointment.patient?.name ?? 'Paciente'}`} />
+            <Head title={`Sesión — ${patient?.name ?? 'Paciente'}`} />
 
             <div className="flex flex-col gap-6 p-6 lg:p-8">
-
-                {/* Back + header */}
                 <div>
                     <Link
                         href={DashboardIndexAction.url()}
-                        className="inline-flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors mb-3"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors mb-3"
                     >
-                        <ArrowLeft size={16} />
+                        <ArrowLeft size={14} />
                         Volver al dashboard
                     </Link>
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                        <div>
-                            <h1 className="text-display-2xl text-[var(--color-text)]">
-                                Sesión con {appointment.patient?.name ?? 'Paciente'}
-                            </h1>
-                            <p className="mt-0.5 text-body-md text-[var(--color-text-secondary)] capitalize">
-                                {formatDateTime(appointment.starts_at)}
-                            </p>
-                        </div>
-                        <span className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${cfg.bg} ${cfg.text}`}>
-                            {cfg.label}
-                        </span>
+                    <div className="flex items-baseline justify-between gap-4 flex-wrap">
+                        <h1 className="text-display-2xl text-[var(--color-text)]">
+                            {patient?.name ?? 'Paciente'}
+                        </h1>
+                        <p className="text-body-md text-[var(--color-text-secondary)] tabular-nums">
+                            {formatTime(appointment.starts_at)}
+                            {appointment.ends_at && ` — ${formatTime(appointment.ends_at)}`}
+                        </p>
                     </div>
+                    <div className="mt-4 border-b border-[var(--color-border-subtle)]" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <section className="lg:col-span-2 rounded-[var(--radius-lg)] overflow-hidden shadow-[var(--shadow-sm)] bg-[var(--color-surface-alt)]">
+                        <header className="flex items-center justify-between px-5 py-3 bg-[var(--color-primary)] text-white">
+                            <div className="flex items-center gap-2">
+                                <MessageSquare size={14} />
+                                <span className="text-caption">Resumen clínico automático</span>
+                            </div>
+                            <span className="text-[10px] opacity-80">{formatSyncedAt()}</span>
+                        </header>
 
-                    {/* Main column */}
-                    <div className="lg:col-span-2 flex flex-col gap-6">
+                        <div className="px-6 py-5 flex flex-col gap-6">
+                            <div>
+                                <h2 className="text-caption text-[var(--color-text-muted)] mb-2">Diagnóstico</h2>
+                                <p className="text-body-md italic text-[var(--color-text)] leading-relaxed">
+                                    {profile?.diagnosis?.trim()
+                                        ? profile.diagnosis
+                                        : 'Sin diagnóstico registrado.'}
+                                </p>
+                            </div>
 
-                        {/* Session info card */}
-                        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                            <h2 className="text-display-lg text-[var(--color-text)] mb-4">Detalles de la sesión</h2>
-                            <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                                <div>
-                                    <dt className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
-                                        <CalendarDays size={12} /> Fecha
-                                    </dt>
-                                    <dd className="mt-1 text-sm font-medium text-[var(--color-text)]">
-                                        {formatShort(appointment.starts_at)}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
-                                        <Clock size={12} /> Hora
-                                    </dt>
-                                    <dd className="mt-1 text-sm font-medium text-[var(--color-text)]">
-                                        {formatTime(appointment.starts_at)}
-                                        {appointment.ends_at && ` – ${formatTime(appointment.ends_at)}`}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
-                                        {online ? <Video size={12} /> : <MapPin size={12} />}
-                                        Modalidad
-                                    </dt>
-                                    <dd className="mt-1">
-                                        <span
-                                            className={[
-                                                'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold uppercase tracking-wide',
-                                                online
-                                                    ? 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]'
-                                                    : 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]',
-                                            ].join(' ')}
-                                        >
-                                            {modalityLabel[appointment.modality?.toLowerCase()] ?? appointment.modality}
-                                        </span>
-                                    </dd>
-                                </div>
-                                {appointment.service && (
-                                    <div className="col-span-2 sm:col-span-3">
-                                        <dt className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
-                                            Servicio
-                                        </dt>
-                                        <dd className="mt-1 text-sm font-medium text-[var(--color-text)]">
-                                            {appointment.service.name}
-                                            {appointment.service.duration_minutes && (
-                                                <span className="ml-2 text-[var(--color-text-secondary)]">
-                                                    · {appointment.service.duration_minutes} min
+                            <div>
+                                <h2 className="text-caption text-[var(--color-text-muted)] mb-3">Acuerdos establecidos</h2>
+                                {appointment.agreements.length === 0 ? (
+                                    <p className="text-sm italic text-[var(--color-text-secondary)]">
+                                        Sin acuerdos registrados.
+                                    </p>
+                                ) : (
+                                    <ul className="flex flex-col gap-2">
+                                        {appointment.agreements.map((a) => (
+                                            <li key={a.id} className="flex items-start gap-3">
+                                                <span className="mt-[7px] w-2 h-2 shrink-0 rounded-full bg-[var(--color-primary)]" />
+                                                <span className={`text-body-md text-[var(--color-text)] ${a.is_completed ? 'line-through text-[var(--color-text-muted)]' : ''}`}>
+                                                    {a.content}
                                                 </span>
-                                            )}
-                                        </dd>
-                                    </div>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 )}
-                                {appointment.meeting_url && online && (
-                                    <div className="col-span-2 sm:col-span-3">
-                                        <dt className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide">
-                                            Enlace de videollamada
-                                        </dt>
-                                        <dd className="mt-1">
-                                            <a
-                                                href={appointment.meeting_url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm font-medium text-[var(--color-primary)] hover:underline break-all"
+                            </div>
+
+                            <div>
+                                <div className="flex items-baseline justify-between mb-2">
+                                    <h2 className="text-caption text-[var(--color-text-muted)]">Última nota clínica</h2>
+                                    {lastClinicalNote && (
+                                        <span className="text-[10px] text-[var(--color-text-muted)]">
+                                            {formatRelativeDate(lastClinicalNote.created_at)}
+                                        </span>
+                                    )}
+                                </div>
+                                {lastClinicalNote ? (
+                                    <>
+                                        <p className="text-body-md italic text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">
+                                            {lastClinicalNote.content}
+                                        </p>
+                                        {patient && (
+                                            <Link
+                                                href={PatientShowAction.url(patient.id)}
+                                                className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors"
                                             >
-                                                {appointment.meeting_url}
-                                            </a>
-                                        </dd>
-                                    </div>
+                                                Ver historial completo
+                                            </Link>
+                                        )}
+                                    </>
+                                ) : (
+                                    <p className="text-sm italic text-[var(--color-text-secondary)]">
+                                        Sin notas clínicas registradas.
+                                    </p>
                                 )}
-                                {appointment.cancellation_reason && (
-                                    <div className="col-span-2 sm:col-span-3">
-                                        <dt className="text-xs font-medium text-[var(--color-error-fg)] uppercase tracking-wide">
-                                            Motivo de cancelación
-                                        </dt>
-                                        <dd className="mt-1 text-sm text-[var(--color-text-secondary)]">
-                                            {appointment.cancellation_reason}
-                                        </dd>
-                                    </div>
-                                )}
-                            </dl>
+                            </div>
+                        </div>
+                    </section>
+
+                    <aside className="flex flex-col gap-4">
+                        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
+                            <header className="px-4 py-3 bg-[var(--color-surface-alt)] border-b border-[var(--color-border-subtle)]">
+                                <span className="text-caption text-[var(--color-text-muted)]">Recursos del cliente</span>
+                            </header>
+                            {resources.length === 0 ? (
+                                <EmptyState
+                                    icon={FileText}
+                                    title="Sin recursos"
+                                    description="Aún no has añadido recursos para este paciente."
+                                />
+                            ) : (
+                                <ul className="max-h-[360px] overflow-y-auto divide-y divide-[var(--color-border-subtle)]">
+                                    {resources.map((doc) => {
+                                        const { Icon, subtitle } = resourceMeta(doc);
+                                        return (
+                                            <li key={doc.id} className="flex items-center gap-3 px-4 py-3">
+                                                <Icon size={16} className="shrink-0 text-[var(--color-text-secondary)]" />
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-sm font-medium text-[var(--color-text)] truncate">
+                                                        {doc.name}
+                                                    </p>
+                                                    <p className="text-[11px] text-[var(--color-text-muted)] truncate">
+                                                        {subtitle}
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
                         </div>
 
-                        {/* Notes */}
-                        {appointment.notes.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                                <div className="flex items-center gap-2 px-5 py-4 border-b border-[var(--color-border-subtle)]">
-                                    <FileText size={16} className="text-[var(--color-primary)]" />
-                                    <h2 className="text-display-lg text-[var(--color-text)]">Notas</h2>
-                                </div>
-                                <div className="divide-y divide-[var(--color-border-subtle)]">
-                                    {appointment.notes.map((note) => (
-                                        <div key={note.id} className="px-5 py-4">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wide">
-                                                    {noteTypeLabel[note.type] ?? note.type}
-                                                </span>
-                                                <span className="text-xs text-[var(--color-text-muted)]">
-                                                    {formatShort(note.created_at)}
-                                                </span>
-                                            </div>
-                                            <p className="text-sm text-[var(--color-text)] whitespace-pre-wrap">
-                                                {note.content}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Agreements */}
-                        {appointment.agreements.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                                <div className="flex items-center gap-2 px-5 py-4 border-b border-[var(--color-border-subtle)]">
-                                    <CheckSquare size={16} className="text-[var(--color-primary)]" />
-                                    <h2 className="text-display-lg text-[var(--color-text)]">Acuerdos</h2>
-                                </div>
-                                <div className="divide-y divide-[var(--color-border-subtle)]">
-                                    {appointment.agreements.map((agreement) => (
-                                        <div key={agreement.id} className="flex items-start gap-3 px-5 py-4">
-                                            <span
-                                                className={[
-                                                    'mt-0.5 w-4 h-4 rounded shrink-0 border-2 flex items-center justify-center',
-                                                    agreement.is_completed
-                                                        ? 'bg-[var(--color-primary)] border-[var(--color-primary)]'
-                                                        : 'border-[var(--color-border)]',
-                                                ].join(' ')}
-                                            >
-                                                {agreement.is_completed && (
-                                                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 12 12">
-                                                        <path d="M10 3L5 8.5 2 5.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                )}
-                                            </span>
-                                            <div className="flex-1 min-w-0">
-                                                <p className={`text-sm ${agreement.is_completed ? 'line-through text-[var(--color-text-muted)]' : 'text-[var(--color-text)]'}`}>
-                                                    {agreement.content}
-                                                </p>
-                                                {agreement.completed_at && (
-                                                    <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                                                        Completado {formatShort(agreement.completed_at)}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Sidebar */}
-                    <div className="flex flex-col gap-4">
-
-                        {/* Patient card */}
-                        {appointment.patient && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-sm)]">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">
-                                    Paciente
+                        <div className="flex flex-col items-center gap-3">
+                            {appointment.service?.duration_minutes && (
+                                <p className="text-caption text-[var(--color-text-muted)] tabular-nums">
+                                    Duración: {appointment.service.duration_minutes} min
                                 </p>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center shrink-0">
-                                        <span className="text-sm font-semibold text-white">
-                                            {appointment.patient.name.split(' ').slice(0, 2).map((n) => n[0]).join('')}
-                                        </span>
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="text-sm font-semibold text-[var(--color-text)] truncate">
-                                            {appointment.patient.name}
-                                        </p>
-                                        <p className="text-xs text-[var(--color-text-secondary)] truncate">
-                                            {appointment.patient.email}
-                                        </p>
-                                    </div>
-                                </div>
-                                <Link
-                                    href={PatientShowAction.url(appointment.patient.id)}
-                                    className="mt-3 block w-full rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2 text-center text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-alt)] transition-colors"
-                                >
-                                    Ver ficha completa
-                                </Link>
-                            </div>
-                        )}
+                            )}
+                            <Form
+                                action={JoinWaitingRoomAction.url(appointment.id)}
+                                method="post"
+                                className="w-full"
+                            >
+                                <Button type="submit" variant="primary" size="lg" className="w-full">
+                                    <Play size={16} className="fill-current" />
+                                    Iniciar sesión
+                                </Button>
+                            </Form>
+                            <p className="text-xs text-center text-[var(--color-text-muted)]">
+                                Kosmo comenzará a transcribir y analizar una vez inicies la sesión.
+                            </p>
+                        </div>
+                    </aside>
+                </div>
 
-                        {/* Invoice items */}
-                        {appointment.invoice_items.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                                <div className="px-4 py-3 border-b border-[var(--color-border-subtle)]">
-                                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                                        Facturación
-                                    </p>
-                                </div>
-                                <div className="divide-y divide-[var(--color-border-subtle)]">
-                                    {appointment.invoice_items.map((item) => (
-                                        <div key={item.id} className="px-4 py-3 flex items-center justify-between gap-3">
-                                            <div className="min-w-0">
-                                                <p className="text-xs text-[var(--color-text)] truncate">
-                                                    {item.description ?? 'Servicio'}
-                                                </p>
-                                                {item.invoice && (
-                                                    <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">
-                                                        {item.invoice.invoice_number}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <p className="text-sm font-semibold text-[var(--color-text)] shrink-0 tabular-nums">
-                                                €{Number(item.total).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                <div className="text-center text-[10px] text-[var(--color-text-muted)] pt-4 border-t border-[var(--color-border-subtle)]">
+                    Kosmo IA puede cometer errores
                 </div>
             </div>
         </>

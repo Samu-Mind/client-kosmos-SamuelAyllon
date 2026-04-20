@@ -13,6 +13,8 @@ class ShowAction extends Controller
     {
         $appointment->load([
             'patient',
+            'patient.patientProfile',
+            'patient.patientProfile.documents',
             'professional',
             'service',
             'sessionRecording',
@@ -21,8 +23,13 @@ class ShowAction extends Controller
             'invoiceItems.invoice',
         ]);
 
+        $lastClinicalNote = $appointment->patient?->patientProfile?->notes()
+            ->latest('created_at')
+            ->first();
+
         return Inertia::render('appointments/show', [
             'appointment' => $appointment,
+            'lastClinicalNote' => $lastClinicalNote,
         ]);
     }
 }

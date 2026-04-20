@@ -21,6 +21,8 @@ return new class extends Migration
             $table->enum('modality', ['in_person', 'video_call'])->default('video_call');
             $table->string('meeting_room_id')->nullable();
             $table->string('meeting_url')->nullable();
+            $table->timestamp('patient_joined_at')->nullable();
+            $table->timestamp('professional_joined_at')->nullable();
             $table->text('cancellation_reason')->nullable();
             $table->foreignId('cancelled_by')->nullable()->constrained('users')->nullOnDelete();
             $table->text('notes')->nullable();

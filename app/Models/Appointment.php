@@ -14,6 +14,7 @@ class Appointment extends Model
         'workspace_id', 'patient_id', 'professional_id', 'service_id',
         'starts_at', 'ends_at', 'status', 'modality',
         'meeting_room_id', 'meeting_url',
+        'patient_joined_at', 'professional_joined_at',
         'cancellation_reason', 'cancelled_by', 'notes',
     ];
 
@@ -21,7 +22,9 @@ class Appointment extends Model
     {
         return [
             'starts_at' => 'datetime',
-            'ends_at'   => 'datetime',
+            'ends_at' => 'datetime',
+            'patient_joined_at' => 'datetime',
+            'professional_joined_at' => 'datetime',
         ];
     }
 
