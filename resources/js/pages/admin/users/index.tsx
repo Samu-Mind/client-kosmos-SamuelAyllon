@@ -1,8 +1,8 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { Users, Plus, Trash2 } from 'lucide-react';
-import AdminLayout from '@/layouts/admin-layout';
+import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
+import AdminLayout from '@/layouts/admin-layout';
 import type { Auth } from '@/types';
 
 interface UserRow {

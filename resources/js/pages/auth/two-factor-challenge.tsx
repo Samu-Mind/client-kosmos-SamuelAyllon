@@ -1,7 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { KeyRound, ShieldCheck, ArrowRight } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';

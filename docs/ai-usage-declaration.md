@@ -29,3 +29,12 @@ Registro transparente del uso de herramientas de IA en el desarrollo de ClientKo
 - **Revisión humana:** pendiente — Samuel Ayllón revisará y ajustará
 - **Prompt(s) relevantes:** "Actúa como un Lead Software Architect y QA Manager… configura el sistema de instrucciones de la IA para cumplir Criterios de Excelencia (Docs, Clean Code/DB, Escudo, DevOps, Frontend/A11y + Protocolo de Ejecución)"
 - **Relación con ADR:** ADR-0001
+
+### Fase 2 de migración Chakra UI — compuestos UI
+
+- **Fecha:** 2026-04-20
+- **Herramientas:** Claude Code (Opus 4.7), Chakra UI MCP (`get_component_example` para `dialog`), Explore subagent (inventario de estado de migración)
+- **Alcance IA:** reescritura de [resources/js/components/ui/dialog.tsx](../resources/js/components/ui/dialog.tsx), [alert-dialog.tsx](../resources/js/components/ui/alert-dialog.tsx), [select.tsx](../resources/js/components/ui/select.tsx), [navigation-menu.tsx](../resources/js/components/ui/navigation-menu.tsx), [input-otp.tsx](../resources/js/components/ui/input-otp.tsx), [status-badge.tsx](../resources/js/components/ui/status-badge.tsx). API pública preservada; consumidores (`two-factor-setup-modal.tsx`, `delete-user.tsx`) no requieren cambios.
+- **Revisión humana:** pendiente — verificar visualmente en navegador (Dialog, InputOTP en flujo 2FA, StatusBadge en listas de facturas) y auditar accesibilidad con teclado.
+- **Prompt(s) relevantes:** "Continua con la transición de Tailwindcss a chakra usando su mpc y la guía de estilos que se creó: Siguiente fase sugerida: compuestos UI (dialog, alert-dialog, select, breadcrumb, navigation-menu, input-otp, status-badge)."
+- **Relación con ADR:** ADR-0002

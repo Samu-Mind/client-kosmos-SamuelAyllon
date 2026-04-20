@@ -1,10 +1,10 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ArrowLeft, UserPlus } from 'lucide-react';
-import AdminLayout from '@/layouts/admin-layout';
-import { Button } from '@/components/ui/button';
+import type { ReactNode } from 'react';
 import IndexAction from '@/actions/App/Http/Controllers/Admin/Users/IndexAction';
 import StoreAction from '@/actions/App/Http/Controllers/Admin/Users/StoreAction';
+import { Button } from '@/components/ui/button';
+import AdminLayout from '@/layouts/admin-layout';
 
 export default function AdminUserCreate() {
     const { data, setData, post, processing, errors } = useForm({

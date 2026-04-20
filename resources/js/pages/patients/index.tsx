@@ -1,12 +1,12 @@
 import { Head, router } from '@inertiajs/react';
-import type { ReactNode } from 'react';
-import { useState } from 'react';
 import { UserPlus, Search } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { PatientCard } from '@/components/patient/patient-card';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { EmptyState } from '@/components/empty-state';
+import { PatientCard } from '@/components/patient/patient-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import AppLayout from '@/layouts/app-layout';
 import type { Patient, PatientStatus } from '@/types';
 
 interface Props {

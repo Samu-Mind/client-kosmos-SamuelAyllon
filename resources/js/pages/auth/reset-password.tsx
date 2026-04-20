@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { Mail, Lock, KeyRound, ShieldCheck } from 'lucide-react';
+import type { ReactNode } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

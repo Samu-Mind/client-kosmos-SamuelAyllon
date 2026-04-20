@@ -1,10 +1,10 @@
 import { Head, useForm } from '@inertiajs/react';
-import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import OnboardingStoreAction from '@/actions/App/Http/Controllers/Onboarding/StoreAction';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import OnboardingStoreAction from '@/actions/App/Http/Controllers/Onboarding/StoreAction';
 
 type OnboardingStep = 1 | 2 | 3;
 

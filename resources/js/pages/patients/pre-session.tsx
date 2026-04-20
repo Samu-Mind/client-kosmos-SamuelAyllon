@@ -1,10 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ArrowLeft, Sparkles } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import type { ReactNode } from 'react';
 import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
+import AppLayout from '@/layouts/app-layout';
 import type { Agreement, ConsultingSessionType, KosmoBriefing, Note, Patient, Payment, ConsentForm } from '@/types';
 
 interface SessionContext {

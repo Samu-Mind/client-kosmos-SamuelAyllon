@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';

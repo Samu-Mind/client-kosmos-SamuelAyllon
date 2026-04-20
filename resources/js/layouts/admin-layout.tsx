@@ -1,6 +1,6 @@
-import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Shield, Users, ChevronsUpDown } from 'lucide-react';
+import React from 'react';
 import { ImpersonationBanner } from '@/components/admin/impersonation-banner';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';

@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { Palette } from 'lucide-react';
+import type { ReactNode } from 'react';
 import AppearanceTabs from '@/components/appearance-tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';

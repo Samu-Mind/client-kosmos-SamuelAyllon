@@ -1,10 +1,10 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
 import type { ConsultingSessionType, Patient, Payment } from '@/types';
 
 interface Props {

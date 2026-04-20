@@ -1,11 +1,11 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ArrowLeft, Trash2 } from 'lucide-react';
-import AdminLayout from '@/layouts/admin-layout';
-import { Button } from '@/components/ui/button';
-import { KPICard } from '@/components/patient/kpi-card';
-import type { Auth } from '@/types';
+import type { ReactNode } from 'react';
 import DashboardIndexAction from '@/actions/App/Http/Controllers/Admin/DashboardIndexAction';
+import { KPICard } from '@/components/patient/kpi-card';
+import { Button } from '@/components/ui/button';
+import AdminLayout from '@/layouts/admin-layout';
+import type { Auth } from '@/types';
 
 interface UserDetail {
     id: number;

@@ -1,10 +1,10 @@
 import { Head, useForm } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import AppLayout from '@/layouts/app-layout';
+import PatientStoreAction from '@/actions/App/Http/Controllers/Patient/StoreAction';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import PatientStoreAction from '@/actions/App/Http/Controllers/Patient/StoreAction';
+import AppLayout from '@/layouts/app-layout';
 
 interface FormData {
     project_name: string;

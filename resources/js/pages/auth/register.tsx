@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
-import { useState, type ReactNode, type FormEvent } from 'react';
 import { UserPlus, User, Mail, Lock, KeyRound, Briefcase, Heart, Phone, BookOpen, Award, FileText, Calendar } from 'lucide-react';
+import { useState, type ReactNode, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import PasswordStrength from '@/components/password-strength';
 import TextLink from '@/components/text-link';

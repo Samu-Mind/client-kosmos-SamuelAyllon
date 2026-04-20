@@ -1,12 +1,12 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ArrowLeft, BookOpen, FileText, Folder, MessageSquare, Paperclip, Play } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/empty-state';
+import type { ReactNode } from 'react';
+import JoinWaitingRoomAction from '@/actions/App/Http/Controllers/Appointment/JoinWaitingRoomAction';
 import DashboardIndexAction from '@/actions/App/Http/Controllers/Dashboard/IndexAction';
 import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
-import JoinWaitingRoomAction from '@/actions/App/Http/Controllers/Appointment/JoinWaitingRoomAction';
+import { EmptyState } from '@/components/empty-state';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 
 interface User {
     id: number;

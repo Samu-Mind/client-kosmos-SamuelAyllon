@@ -1,7 +1,7 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { Mail, CheckCircle2, LogOut, MailCheck } from 'lucide-react';
+import type { ReactNode } from 'react';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';

@@ -1,6 +1,6 @@
-import React from 'react';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, Edit } from 'lucide-react';
+import React from 'react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import type { Patient, PatientStatus } from '@/types';
 

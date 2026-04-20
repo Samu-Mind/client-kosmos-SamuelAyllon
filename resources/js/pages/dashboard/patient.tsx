@@ -1,8 +1,8 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ArrowRight, CalendarDays, CheckCircle, Receipt } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import type { ReactNode } from 'react';
 import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
+import AppLayout from '@/layouts/app-layout';
 import type { Auth } from '@/types';
 
 interface UpcomingAppointment {

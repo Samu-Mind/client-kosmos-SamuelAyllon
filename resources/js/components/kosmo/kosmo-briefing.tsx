@@ -1,5 +1,6 @@
-import React, { HTMLAttributes, ReactNode } from 'react';
 import { Sparkles, X } from 'lucide-react';
+import type { HTMLAttributes, ReactNode } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 export interface KosmoBriefingProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content'> {

@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ShieldBan, ShieldCheck, Shield, Smartphone } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import TwoFactorSetupModal from '@/components/two-factor-setup-modal';

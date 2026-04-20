@@ -1,14 +1,14 @@
 import { Head, router } from '@inertiajs/react';
+import { Sparkles, Send } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Sparkles, Send } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
-import { EmptyState } from '@/components/empty-state';
-import { Button } from '@/components/ui/button';
-import type { KosmoBriefing } from '@/types';
 import ChatAction from '@/actions/App/Http/Controllers/Kosmo/ChatAction';
 import MarkReadAction from '@/actions/App/Http/Controllers/Kosmo/MarkReadAction';
+import { EmptyState } from '@/components/empty-state';
+import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
+import type { KosmoBriefing } from '@/types';
 
 interface Props {
     briefings: KosmoBriefing[];

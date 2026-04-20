@@ -1,11 +1,11 @@
 import { Head, useForm } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import AppLayout from '@/layouts/app-layout';
+import PatientUpdateAction from '@/actions/App/Http/Controllers/Patient/UpdateAction';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
 import type { Patient } from '@/types';
-import PatientUpdateAction from '@/actions/App/Http/Controllers/Patient/UpdateAction';
 
 interface Props {
     patient: Patient;

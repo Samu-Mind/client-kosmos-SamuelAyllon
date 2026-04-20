@@ -1,12 +1,12 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
+import { CheckCircle, FileText, Receipt, Shield } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { CheckCircle, FileText, Receipt, Shield } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { PatientHeader } from '@/components/patient/patient-header';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { EmptyState } from '@/components/empty-state';
+import { PatientHeader } from '@/components/patient/patient-header';
 import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
+import AppLayout from '@/layouts/app-layout';
 import type { Agreement, ConsentForm, ConsultingSessionType, Document, Note, Patient, Payment } from '@/types';
 
 interface Props {

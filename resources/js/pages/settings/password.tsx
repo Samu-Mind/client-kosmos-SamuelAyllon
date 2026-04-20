@@ -1,7 +1,7 @@
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { Lock, KeyRound, CheckCircle2 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useRef } from 'react';
 import PasswordActions from '@/actions/App/Http/Controllers/Settings/Password';
 import InputError from '@/components/input-error';

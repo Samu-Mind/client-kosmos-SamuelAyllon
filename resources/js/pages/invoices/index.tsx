@@ -1,11 +1,11 @@
 import { Head, router } from '@inertiajs/react';
-import { index as invoicesIndex } from '@/routes/invoices';
-import type { ReactNode } from 'react';
 import { Receipt } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import type { ReactNode } from 'react';
+import { EmptyState } from '@/components/empty-state';
 import { KPICard } from '@/components/patient/kpi-card';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { EmptyState } from '@/components/empty-state';
+import AppLayout from '@/layouts/app-layout';
+import { index as invoicesIndex } from '@/routes/invoices';
 import type { Payment } from '@/types';
 
 interface Stats {

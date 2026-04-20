@@ -1,11 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { CalendarDays, Clock } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { EmptyState } from '@/components/empty-state';
+import type { ReactNode } from 'react';
 import IndexAction from '@/actions/App/Http/Controllers/Appointment/IndexAction';
 import ShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
 import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
+import { EmptyState } from '@/components/empty-state';
+import AppLayout from '@/layouts/app-layout';
 
 interface AppointmentItem {
     id: number;

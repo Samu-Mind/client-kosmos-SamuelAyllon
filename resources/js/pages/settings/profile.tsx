@@ -1,7 +1,7 @@
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { User, Mail, CheckCircle2 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import ProfileActions from '@/actions/App/Http/Controllers/Settings/Profile';
 import DeleteUser from '@/components/delete-user';
 import InputError from '@/components/input-error';

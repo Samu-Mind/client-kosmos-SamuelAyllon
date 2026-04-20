@@ -1,9 +1,9 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
 import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 import type { Auth } from '@/types';
 
 interface User {

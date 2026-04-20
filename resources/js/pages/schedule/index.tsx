@@ -2,15 +2,15 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import AppLayout from '@/layouts/app-layout';
+import DestroyAction from '@/actions/App/Http/Controllers/Appointment/DestroyAction';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import DestroyAction from '@/actions/App/Http/Controllers/Appointment/DestroyAction';
-import availability from '@/routes/schedule/availability';
+import AppLayout from '@/layouts/app-layout';
 import schedule from '@/routes/schedule';
+import availability from '@/routes/schedule/availability';
 
 interface AppointmentEvent {
     id: number;

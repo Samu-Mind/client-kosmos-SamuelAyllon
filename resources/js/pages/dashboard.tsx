@@ -1,10 +1,10 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 import { ArrowRight, CalendarDays, FileText, Receipt } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
-import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
+import type { ReactNode } from 'react';
 import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
+import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
+import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
+import AppLayout from '@/layouts/app-layout';
 import type { Auth, KosmoBriefing } from '@/types';
 
 interface DashboardStats {
