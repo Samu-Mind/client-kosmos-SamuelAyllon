@@ -1,3 +1,4 @@
+import { Box, Flex, Heading, Stack, Table, Text, chakra } from '@chakra-ui/react';
 import { Head, router } from '@inertiajs/react';
 import { Receipt } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -39,23 +40,22 @@ const statusLabels: Record<string, string> = {
     claimed: 'Reclamado',
 };
 
+const FILTER_OPTIONS = ['', 'paid', 'pending', 'overdue', 'claimed'] as const;
+
 export default function BillingIndex({ payments, stats, filters }: Props) {
     return (
         <>
             <Head title="Cobros — ClientKosmos" />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
-
-                {/* Header */}
-                <div>
-                    <h1 className="text-display-2xl text-[var(--color-text)]">Cobros</h1>
-                    <p className="mt-1 text-body-md text-[var(--color-text-secondary)]">
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
+                <Box>
+                    <Heading as="h1" fontSize="3xl" color="fg">Cobros</Heading>
+                    <Text mt="1" fontSize="md" color="fg.muted">
                         Control de pagos y estado de cobros de todos tus pacientes
-                    </p>
-                </div>
+                    </Text>
+                </Box>
 
-                {/* KPIs */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <Box display="grid" gridTemplateColumns={{ base: '1fr', sm: 'repeat(3, 1fr)' }} gap="4">
                     <KPICard
                         label="Cobrado este mes"
                         value={`€${stats.total_paid.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`}
@@ -68,26 +68,31 @@ export default function BillingIndex({ payments, stats, filters }: Props) {
                         label="Vencido sin cobrar"
                         value={`€${stats.total_overdue.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`}
                     />
-                </div>
+                </Box>
 
-                {/* Filters */}
-                <div className="flex gap-2 flex-wrap">
-                    {['', 'paid', 'pending', 'overdue', 'claimed'].map((s) => (
-                        <button
-                            key={s}
-                            onClick={() => router.get(invoicesIndex.url(), { status: s || undefined }, { preserveState: true })}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                (filters.status ?? '') === s
-                                    ? 'bg-[var(--color-primary)] text-[var(--color-primary-fg)]'
-                                    : 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]'
-                            }`}
-                        >
-                            {s === '' ? 'Todos' : statusLabels[s]}
-                        </button>
-                    ))}
-                </div>
+                <Flex gap="2" flexWrap="wrap">
+                    {FILTER_OPTIONS.map((s) => {
+                        const isActive = (filters.status ?? '') === s;
+                        return (
+                            <chakra.button
+                                key={s}
+                                onClick={() => router.get(invoicesIndex.url(), { status: s || undefined }, { preserveState: true })}
+                                px="3"
+                                py="1.5"
+                                borderRadius="full"
+                                fontSize="xs"
+                                fontWeight="medium"
+                                transition="colors"
+                                bg={isActive ? 'brand.solid' : 'bg.muted'}
+                                color={isActive ? 'brand.contrast' : 'fg.muted'}
+                                _hover={!isActive ? { bg: 'border' } : undefined}
+                            >
+                                {s === '' ? 'Todos' : statusLabels[s]}
+                            </chakra.button>
+                        );
+                    })}
+                </Flex>
 
-                {/* Table */}
                 {payments.data.length === 0 ? (
                     <EmptyState
                         icon={Receipt}
@@ -95,71 +100,87 @@ export default function BillingIndex({ payments, stats, filters }: Props) {
                         description="Cuando registres cobros desde las sesiones de tus pacientes, aparecerán aquí."
                     />
                 ) : (
-                    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-alt)]">
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Paciente</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Concepto</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Vencimiento</th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Importe</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[var(--color-border-subtle)]">
+                    <Box
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        borderColor="border"
+                        bg="bg.surface"
+                        overflow="hidden"
+                        boxShadow="sm"
+                    >
+                        <Table.Root size="sm">
+                            <Table.Header bg="bg.muted">
+                                <Table.Row borderBottomWidth="1px" borderColor="border.subtle">
+                                    <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Paciente</Table.ColumnHeader>
+                                    <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Concepto</Table.ColumnHeader>
+                                    <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Vencimiento</Table.ColumnHeader>
+                                    <Table.ColumnHeader textAlign="right" fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Importe</Table.ColumnHeader>
+                                    <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Estado</Table.ColumnHeader>
+                                </Table.Row>
+                            </Table.Header>
+                            <Table.Body>
                                 {payments.data.map((payment) => (
-                                    <tr key={payment.id} className="hover:bg-[var(--color-surface-alt)] transition-colors">
-                                        <td className="px-4 py-3 text-[var(--color-text)] font-medium">
+                                    <Table.Row key={payment.id} _hover={{ bg: 'bg.muted' }} transition="colors">
+                                        <Table.Cell color="fg" fontWeight="medium">
                                             {payment.patient?.project_name ?? '—'}
-                                        </td>
-                                        <td className="px-4 py-3 text-[var(--color-text-secondary)]">
+                                        </Table.Cell>
+                                        <Table.Cell color="fg.muted">
                                             {payment.concept ?? 'Sesión'}
-                                        </td>
-                                        <td className="px-4 py-3 text-[var(--color-text-secondary)]">
+                                        </Table.Cell>
+                                        <Table.Cell color="fg.muted">
                                             {formatDate(payment.due_date)}
-                                        </td>
-                                        <td className="px-4 py-3 text-right font-medium text-[var(--color-text)] tabular-nums">
+                                        </Table.Cell>
+                                        <Table.Cell textAlign="right" fontWeight="medium" color="fg" fontVariantNumeric="tabular-nums">
                                             €{Number(payment.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                                        </td>
-                                        <td className="px-4 py-3">
+                                        </Table.Cell>
+                                        <Table.Cell>
                                             <StatusBadge
                                                 status={payment.status as 'paid' | 'pending' | 'overdue'}
                                                 variant="subtle"
                                             />
-                                        </td>
-                                    </tr>
+                                        </Table.Cell>
+                                    </Table.Row>
                                 ))}
-                            </tbody>
-                        </table>
+                            </Table.Body>
+                        </Table.Root>
 
-                        {/* Pagination */}
                         {payments.last_page > 1 && (
-                            <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-alt)]">
-                                <p className="text-xs text-[var(--color-text-secondary)]">
+                            <Flex
+                                alignItems="center"
+                                justifyContent="space-between"
+                                px="4"
+                                py="3"
+                                borderTopWidth="1px"
+                                borderColor="border.subtle"
+                                bg="bg.muted"
+                            >
+                                <Text fontSize="xs" color="fg.muted">
                                     {payments.total} cobros · Página {payments.current_page} de {payments.last_page}
-                                </p>
-                                <div className="flex gap-1">
+                                </Text>
+                                <Flex gap="1">
                                     {payments.links.map((link, i) => (
-                                        <button
+                                        <chakra.button
                                             key={i}
                                             disabled={!link.url}
                                             onClick={() => link.url && router.get(link.url)}
-                                            className={`px-3 py-1 text-xs rounded-[var(--radius-sm)] transition-colors ${
-                                                link.active
-                                                    ? 'bg-[var(--color-primary)] text-[var(--color-primary-fg)]'
-                                                    : link.url
-                                                        ? 'text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]'
-                                                        : 'text-[var(--color-text-muted)] cursor-not-allowed'
-                                            }`}
+                                            px="3"
+                                            py="1"
+                                            fontSize="xs"
+                                            borderRadius="sm"
+                                            transition="colors"
+                                            bg={link.active ? 'brand.solid' : 'transparent'}
+                                            color={link.active ? 'brand.contrast' : link.url ? 'fg.muted' : 'fg.subtle'}
+                                            cursor={link.url ? 'pointer' : 'not-allowed'}
+                                            _hover={!link.active && link.url ? { bg: 'border' } : undefined}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ))}
-                                </div>
-                            </div>
+                                </Flex>
+                            </Flex>
                         )}
-                    </div>
+                    </Box>
                 )}
-            </div>
+            </Stack>
         </>
     );
 }

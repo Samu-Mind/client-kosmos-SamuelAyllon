@@ -1,3 +1,4 @@
+import { Box, Flex, Heading, Icon, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, router, useForm } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -60,13 +61,15 @@ const HOUR_START = 7;
 const HOUR_END = 20;
 const HOUR_HEIGHT = 64;
 
-const statusConfig: Record<string, { label: string; bg: string; border: string; text: string; dot?: string }> = {
-    pending:     { label: 'Pendiente',  bg: 'bg-[var(--color-primary-subtle)]',  border: 'border-[var(--color-primary)]',  text: 'text-[var(--color-primary-fg)]' },
-    confirmed:   { label: 'Confirmada', bg: 'bg-[var(--color-success-subtle)]',  border: 'border-[var(--color-success)]',  text: 'text-[var(--color-success-fg)]' },
-    in_progress: { label: 'En curso',   bg: 'bg-[var(--color-warning-subtle)]',  border: 'border-[var(--color-warning)]',  text: 'text-[var(--color-warning-fg)]', dot: 'bg-[var(--color-warning)]' },
-    completed:   { label: 'Completada', bg: 'bg-[var(--color-surface-alt)]',     border: 'border-[var(--color-border)]',   text: 'text-[var(--color-text-secondary)]' },
-    cancelled:   { label: 'Cancelada',  bg: 'bg-[var(--color-error-subtle)]',    border: 'border-[var(--color-error)]',    text: 'text-[var(--color-error-fg)]' },
-    no_show:     { label: 'No asistió', bg: 'bg-[var(--color-surface-alt)]',     border: 'border-[var(--color-border)]',   text: 'text-[var(--color-text-muted)]' },
+type StatusCfg = { label: string; palette: string; showDot?: boolean };
+
+const statusConfig: Record<string, StatusCfg> = {
+    pending:     { label: 'Pendiente',  palette: 'brand' },
+    confirmed:   { label: 'Confirmada', palette: 'green' },
+    in_progress: { label: 'En curso',   palette: 'yellow', showDot: true },
+    completed:   { label: 'Completada', palette: 'gray' },
+    cancelled:   { label: 'Cancelada',  palette: 'red' },
+    no_show:     { label: 'No asistió', palette: 'gray' },
 };
 
 const DAYS_ES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
@@ -174,29 +177,39 @@ function EventBlock({ event, onClick }: { event: CalendarEvent; onClick: () => v
     const height     = Math.max(((endMins - startMins) / 60) * HOUR_HEIGHT, 20);
     const cfg        = event.status ? (statusConfig[event.status] ?? statusConfig.pending) : null;
     const isSlot     = event.type === 'slot';
-
-    const bg     = isSlot ? 'bg-[var(--color-primary-subtle)]' : (cfg?.bg ?? 'bg-[var(--color-primary-subtle)]');
-    const border = isSlot ? 'border-[var(--color-primary)]' : (cfg?.border ?? 'border-[var(--color-primary)]');
-    const text   = isSlot ? 'text-[var(--color-primary-fg)]' : (cfg?.text ?? 'text-[var(--color-primary-fg)]');
+    const palette    = isSlot ? 'brand' : (cfg?.palette ?? 'brand');
 
     return (
-        <button
+        <chakra.button
             onClick={onClick}
-            className={`absolute left-1 right-1 rounded-[var(--radius-sm)] border-l-2 px-1.5 py-0.5 text-left transition-opacity hover:opacity-80 ${bg} ${border} ${text}`}
+            colorPalette={palette}
+            position="absolute"
+            left="1"
+            right="1"
+            borderRadius="sm"
+            borderLeftWidth="2px"
+            borderColor="colorPalette.solid"
+            bg="colorPalette.subtle"
+            color="colorPalette.fg"
+            px="1.5"
+            py="0.5"
+            textAlign="left"
+            transition="opacity"
+            _hover={{ opacity: 0.8 }}
             style={{ top: topOffset, height, minHeight: 20, zIndex: 10 }}
         >
-            {cfg?.dot && (
-                <span className={`mr-1 inline-block size-1.5 rounded-full ${cfg.dot}`} />
+            {cfg?.showDot && (
+                <Box as="span" mr="1" display="inline-block" boxSize="1.5" borderRadius="full" bg="colorPalette.solid" />
             )}
-            {isSlot && <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide opacity-70">HUECO</span>}
+            {isSlot && <Text as="span" mr="1" fontSize="10px" fontWeight="semibold" textTransform="uppercase" letterSpacing="wide" opacity={0.7}>HUECO</Text>}
             {!isSlot && event.status && (
-                <span className="mr-1 text-[10px] font-semibold uppercase tracking-wide">
+                <Text as="span" mr="1" fontSize="10px" fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                     {statusConfig[event.status]?.label ?? event.status}
-                </span>
+                </Text>
             )}
-            <span className="block truncate text-xs font-medium leading-tight">{event.label}</span>
-            <span className="text-[10px] opacity-70">{event.startTime} - {event.endTime}</span>
-        </button>
+            <Text display="block" truncate fontSize="xs" fontWeight="medium" lineHeight="tight">{event.label}</Text>
+            <Text fontSize="10px" opacity={0.7}>{event.startTime} - {event.endTime}</Text>
+        </chakra.button>
     );
 }
 
@@ -230,8 +243,8 @@ function CreateSlotDialog({
                 <DialogHeader>
                     <DialogTitle>Nuevo hueco de disponibilidad</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-2">
-                    <div className="flex flex-col gap-1.5">
+                <chakra.form onSubmit={handleSubmit} display="flex" flexDirection="column" gap="4" pt="2">
+                    <Stack gap="1.5">
                         <Label htmlFor="slot-date">Fecha</Label>
                         <Input
                             id="slot-date"
@@ -240,11 +253,11 @@ function CreateSlotDialog({
                             onChange={(e) => setData('date', e.target.value)}
                             required
                         />
-                        {errors.date && <p className="text-xs text-[var(--color-error)]">{errors.date}</p>}
-                    </div>
+                        {errors.date && <Text fontSize="xs" color="error">{errors.date}</Text>}
+                    </Stack>
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1.5">
+                    <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap="3">
+                        <Stack gap="1.5">
                             <Label htmlFor="slot-start">Hora de inicio</Label>
                             <Input
                                 id="slot-start"
@@ -253,9 +266,9 @@ function CreateSlotDialog({
                                 onChange={(e) => setData('start_time', e.target.value)}
                                 required
                             />
-                            {errors.start_time && <p className="text-xs text-[var(--color-error)]">{errors.start_time}</p>}
-                        </div>
-                        <div className="flex flex-col gap-1.5">
+                            {errors.start_time && <Text fontSize="xs" color="error">{errors.start_time}</Text>}
+                        </Stack>
+                        <Stack gap="1.5">
                             <Label htmlFor="slot-end">Hora de fin</Label>
                             <Input
                                 id="slot-end"
@@ -264,11 +277,11 @@ function CreateSlotDialog({
                                 onChange={(e) => setData('end_time', e.target.value)}
                                 required
                             />
-                            {errors.end_time && <p className="text-xs text-[var(--color-error)]">{errors.end_time}</p>}
-                        </div>
-                    </div>
+                            {errors.end_time && <Text fontSize="xs" color="error">{errors.end_time}</Text>}
+                        </Stack>
+                    </Box>
 
-                    <div className="flex items-center gap-2.5">
+                    <Flex alignItems="center" gap="2.5">
                         <Checkbox
                             id="slot-recurring"
                             checked={data.is_recurring}
@@ -277,17 +290,17 @@ function CreateSlotDialog({
                         <Label htmlFor="slot-recurring" className="cursor-pointer font-normal">
                             Se repite cada semana
                         </Label>
-                    </div>
+                    </Flex>
 
-                    <div className="flex justify-end gap-2 pt-1">
+                    <Flex justifyContent="flex-end" gap="2" pt="1">
                         <Button type="button" variant="outline" onClick={onClose}>
                             Cancelar
                         </Button>
                         <Button type="submit" variant="default" disabled={processing}>
                             Guardar hueco
                         </Button>
-                    </div>
-                </form>
+                    </Flex>
+                </chakra.form>
             </DialogContent>
         </Dialog>
     );
@@ -313,43 +326,60 @@ function EditAppointmentForm({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
+        <chakra.form onSubmit={handleSubmit} display="flex" flexDirection="column" gap="4">
+            <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap="3">
+                <Stack gap="1.5">
                     <Label>Inicio</Label>
                     <Input type="datetime-local" value={data.starts_at} onChange={(e) => setData('starts_at', e.target.value)} required />
-                    {errors.starts_at && <p className="text-xs text-[var(--color-error)]">{errors.starts_at}</p>}
-                </div>
-                <div className="flex flex-col gap-1.5">
+                    {errors.starts_at && <Text fontSize="xs" color="error">{errors.starts_at}</Text>}
+                </Stack>
+                <Stack gap="1.5">
                     <Label>Fin</Label>
                     <Input type="datetime-local" value={data.ends_at} onChange={(e) => setData('ends_at', e.target.value)} required />
-                    {errors.ends_at && <p className="text-xs text-[var(--color-error)]">{errors.ends_at}</p>}
-                </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
+                    {errors.ends_at && <Text fontSize="xs" color="error">{errors.ends_at}</Text>}
+                </Stack>
+            </Box>
+            <Stack gap="1.5">
                 <Label>Modalidad</Label>
-                <select
-                    className="h-9 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-sm"
+                <chakra.select
                     value={data.modality}
                     onChange={(e) => setData('modality', e.target.value)}
+                    h="9"
+                    w="full"
+                    borderRadius="md"
+                    borderWidth="1px"
+                    borderColor="border"
+                    bg="bg.surface"
+                    px="3"
+                    py="1"
+                    fontSize="sm"
                 >
                     <option value="in_person">Presencial</option>
                     <option value="video_call">Videollamada</option>
-                </select>
-            </div>
-            <div className="flex flex-col gap-1.5">
+                </chakra.select>
+            </Stack>
+            <Stack gap="1.5">
                 <Label>Notas</Label>
-                <textarea
-                    className="min-h-16 w-full resize-y rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
+                <chakra.textarea
                     value={data.notes}
                     onChange={(e) => setData('notes', e.target.value)}
+                    minH="16"
+                    w="full"
+                    resize="vertical"
+                    borderRadius="md"
+                    borderWidth="1px"
+                    borderColor="border"
+                    bg="bg.surface"
+                    px="3"
+                    py="2"
+                    fontSize="sm"
                 />
-            </div>
-            <div className="flex justify-end gap-2">
+            </Stack>
+            <Flex justifyContent="flex-end" gap="2">
                 <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
                 <Button type="submit" variant="default" disabled={processing}>Guardar cambios</Button>
-            </div>
-        </form>
+            </Flex>
+        </chakra.form>
     );
 }
 
@@ -376,24 +406,24 @@ function EditSlotForm({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
+        <chakra.form onSubmit={handleSubmit} display="flex" flexDirection="column" gap="4">
+            <Stack gap="1.5">
                 <Label>Fecha</Label>
                 <Input type="date" value={data.date} onChange={(e) => setData('date', e.target.value)} required />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
+            </Stack>
+            <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap="3">
+                <Stack gap="1.5">
                     <Label>Hora de inicio</Label>
                     <Input type="time" value={data.start_time} onChange={(e) => setData('start_time', e.target.value)} required />
-                    {errors.start_time && <p className="text-xs text-[var(--color-error)]">{errors.start_time}</p>}
-                </div>
-                <div className="flex flex-col gap-1.5">
+                    {errors.start_time && <Text fontSize="xs" color="error">{errors.start_time}</Text>}
+                </Stack>
+                <Stack gap="1.5">
                     <Label>Hora de fin</Label>
                     <Input type="time" value={data.end_time} onChange={(e) => setData('end_time', e.target.value)} required />
-                    {errors.end_time && <p className="text-xs text-[var(--color-error)]">{errors.end_time}</p>}
-                </div>
-            </div>
-            <div className="flex items-center gap-2.5">
+                    {errors.end_time && <Text fontSize="xs" color="error">{errors.end_time}</Text>}
+                </Stack>
+            </Box>
+            <Flex alignItems="center" gap="2.5">
                 <Checkbox
                     id="edit-recurring"
                     checked={data.is_recurring}
@@ -402,12 +432,12 @@ function EditSlotForm({
                 <Label htmlFor="edit-recurring" className="cursor-pointer font-normal">
                     Se repite cada semana
                 </Label>
-            </div>
-            <div className="flex justify-end gap-2">
+            </Flex>
+            <Flex justifyContent="flex-end" gap="2">
                 <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
                 <Button type="submit" variant="default" disabled={processing}>Guardar cambios</Button>
-            </div>
-        </form>
+            </Flex>
+        </chakra.form>
     );
 }
 
@@ -442,39 +472,53 @@ function EventDetailDialog({
                 </DialogHeader>
 
                 {mode === 'view' && (
-                    <div className="flex flex-col gap-4">
+                    <Stack gap="4">
                         {event.type === 'appointment' && event.appointment && (
-                            <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm">
+                            <Box borderRadius="md" borderWidth="1px" borderColor="border" bg="bg.muted" p="3" fontSize="sm">
                                 {event.appointment.patient && (
-                                    <p className="font-medium text-[var(--color-text)]">{event.appointment.patient.name}</p>
+                                    <Text fontWeight="medium" color="fg">{event.appointment.patient.name}</Text>
                                 )}
                                 {event.appointment.service && (
-                                    <p className="text-[var(--color-text-secondary)]">{event.appointment.service.name}</p>
+                                    <Text color="fg.muted">{event.appointment.service.name}</Text>
                                 )}
-                                <p className="mt-1 text-[var(--color-text-secondary)]">
+                                <Text mt="1" color="fg.muted">
                                     {event.startTime} – {event.endTime}
-                                </p>
+                                </Text>
                                 {cfg && (
-                                    <span className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.text}`}>
-                                        {cfg.dot && <span className={`size-1.5 rounded-full ${cfg.dot}`} />}
+                                    <Flex
+                                        as="span"
+                                        colorPalette={cfg.palette}
+                                        mt="2"
+                                        display="inline-flex"
+                                        alignItems="center"
+                                        gap="1.5"
+                                        borderRadius="full"
+                                        px="2"
+                                        py="0.5"
+                                        fontSize="xs"
+                                        fontWeight="medium"
+                                        bg="colorPalette.subtle"
+                                        color="colorPalette.fg"
+                                    >
+                                        {cfg.showDot && <Box as="span" boxSize="1.5" borderRadius="full" bg="colorPalette.solid" />}
                                         {cfg.label}
-                                    </span>
+                                    </Flex>
                                 )}
-                            </div>
+                            </Box>
                         )}
 
                         {event.type === 'slot' && (
-                            <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm">
-                                <p className="font-medium text-[var(--color-text)]">{event.label}</p>
-                                <p className="text-[var(--color-text-secondary)]">{event.date} · {event.startTime} – {event.endTime}</p>
-                            </div>
+                            <Box borderRadius="md" borderWidth="1px" borderColor="border" bg="bg.muted" p="3" fontSize="sm">
+                                <Text fontWeight="medium" color="fg">{event.label}</Text>
+                                <Text color="fg.muted">{event.date} · {event.startTime} – {event.endTime}</Text>
+                            </Box>
                         )}
 
-                        <div className="flex justify-between">
+                        <Flex justifyContent="space-between">
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-[var(--color-error)] hover:bg-[var(--color-error-subtle)]"
+                                colorPalette="red"
                                 onClick={handleDelete}
                             >
                                 <Trash2 className="mr-1.5 size-3.5" />
@@ -483,8 +527,8 @@ function EventDetailDialog({
                             <Button variant="default" size="sm" onClick={() => setMode('edit')}>
                                 Editar
                             </Button>
-                        </div>
-                    </div>
+                        </Flex>
+                    </Stack>
                 )}
 
                 {mode === 'edit' && event.type === 'appointment' && event.appointment && (
@@ -513,68 +557,81 @@ function WeeklyCalendar({
     const dayKeys = days.map(toDateStr);
 
     return (
-        <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)]">
-            {/* Day headers */}
-            <div className="grid border-b border-[var(--color-border)]" style={{ gridTemplateColumns: `64px repeat(7, 1fr)` }}>
-                <div className="border-r border-[var(--color-border)] py-3" />
+        <Box overflowX="auto" borderRadius="lg" borderWidth="1px" borderColor="border" bg="bg.surface">
+            <Box display="grid" borderBottomWidth="1px" borderColor="border" style={{ gridTemplateColumns: `64px repeat(7, 1fr)` }}>
+                <Box borderRightWidth="1px" borderColor="border" py="3" />
                 {days.map((day, i) => {
                     const isToday = toDateStr(day) === today;
                     return (
-                        <div key={i} className={`border-r border-[var(--color-border)] py-3 text-center last:border-r-0 ${isToday ? 'bg-[var(--color-primary-subtle)]' : ''}`}>
-                            <p className={`text-xs font-medium uppercase tracking-wide ${isToday ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'}`}>
+                        <Box
+                            key={i}
+                            borderRightWidth="1px"
+                            borderColor="border"
+                            py="3"
+                            textAlign="center"
+                            _last={{ borderRightWidth: '0' }}
+                            bg={isToday ? 'brand.muted' : undefined}
+                        >
+                            <Text fontSize="xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color={isToday ? 'brand.solid' : 'fg.subtle'}>
                                 {DAYS_ES[i]}
-                            </p>
-                            <p className={`text-lg font-semibold leading-tight ${isToday ? 'text-[var(--color-primary)]' : 'text-[var(--color-text)]'}`}>
+                            </Text>
+                            <Text fontSize="lg" fontWeight="semibold" lineHeight="tight" color={isToday ? 'brand.solid' : 'fg'}>
                                 {day.getDate()}
-                            </p>
-                        </div>
+                            </Text>
+                        </Box>
                     );
                 })}
-            </div>
+            </Box>
 
-            {/* Time grid */}
-            <div className="relative grid" style={{ gridTemplateColumns: `64px repeat(7, 1fr)` }}>
-                {/* Hour labels */}
-                <div>
+            <Box position="relative" display="grid" style={{ gridTemplateColumns: `64px repeat(7, 1fr)` }}>
+                <Box>
                     {hours.map((h) => (
-                        <div
+                        <Box
                             key={h}
-                            className="border-b border-r border-[var(--color-border-subtle)] pr-2 text-right"
+                            borderBottomWidth="1px"
+                            borderRightWidth="1px"
+                            borderColor="border.subtle"
+                            pr="2"
+                            textAlign="right"
                             style={{ height: HOUR_HEIGHT }}
                         >
-                            <span className="text-[11px] text-[var(--color-text-muted)]">
+                            <Text fontSize="11px" color="fg.subtle">
                                 {String(h).padStart(2, '0')}:00
-                            </span>
-                        </div>
+                            </Text>
+                        </Box>
                     ))}
-                </div>
+                </Box>
 
-                {/* Day columns */}
                 {dayKeys.map((dateKey, colIdx) => {
                     const dayEvents = events.filter((e) => e.date === dateKey);
                     return (
-                        <div
+                        <Box
                             key={colIdx}
-                            className="relative border-r border-[var(--color-border)] last:border-r-0"
+                            position="relative"
+                            borderRightWidth="1px"
+                            borderColor="border"
+                            _last={{ borderRightWidth: '0' }}
                             style={{ height: (HOUR_END - HOUR_START + 1) * HOUR_HEIGHT }}
                         >
-                            {/* Hour lines */}
                             {hours.map((h) => (
-                                <div
+                                <Box
                                     key={h}
-                                    className="absolute left-0 right-0 border-b border-[var(--color-border-subtle)]"
+                                    position="absolute"
+                                    left="0"
+                                    right="0"
+                                    borderBottomWidth="1px"
+                                    borderColor="border.subtle"
                                     style={{ top: (h - HOUR_START) * HOUR_HEIGHT, height: HOUR_HEIGHT }}
                                 />
                             ))}
-                            {/* Events */}
                             {dayEvents.map((ev, ei) => (
                                 <EventBlock key={`${ev.type}-${ev.id}-${ei}`} event={ev} onClick={() => onEventClick(ev)} />
                             ))}
-                        </div>
+                        </Box>
                     );
                 })}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }
 
@@ -593,58 +650,106 @@ function MonthlyCalendar({
     const today = toDateStr(new Date());
 
     return (
-        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)]">
-            {/* Day names header */}
-            <div className="grid grid-cols-7 border-b border-[var(--color-border)]">
+        <Box overflow="hidden" borderRadius="lg" borderWidth="1px" borderColor="border" bg="bg.surface">
+            <Box display="grid" gridTemplateColumns="repeat(7, 1fr)" borderBottomWidth="1px" borderColor="border">
                 {DAYS_ES.map((d) => (
-                    <div key={d} className="border-r py-2 text-center text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)] last:border-r-0">
+                    <Box
+                        key={d}
+                        borderRightWidth="1px"
+                        borderColor="border"
+                        py="2"
+                        textAlign="center"
+                        fontSize="xs"
+                        fontWeight="medium"
+                        textTransform="uppercase"
+                        letterSpacing="wide"
+                        color="fg.subtle"
+                        _last={{ borderRightWidth: '0' }}
+                    >
                         {d}
-                    </div>
+                    </Box>
                 ))}
-            </div>
+            </Box>
 
-            {/* Weeks */}
-            <div className="grid grid-cols-7">
+            <Box display="grid" gridTemplateColumns="repeat(7, 1fr)">
                 {cells.map((day, i) => {
                     if (!day) {
-                        return <div key={i} className="min-h-24 border-b border-r border-[var(--color-border)] bg-[var(--color-surface-alt)] last:border-r-0" />;
+                        return (
+                            <Box
+                                key={i}
+                                minH="24"
+                                borderBottomWidth="1px"
+                                borderRightWidth="1px"
+                                borderColor="border"
+                                bg="bg.muted"
+                                _last={{ borderRightWidth: '0' }}
+                            />
+                        );
                     }
                     const dateKey  = toDateStr(day);
                     const isToday  = dateKey === today;
                     const dayEvts  = events.filter((e) => e.date === dateKey);
 
                     return (
-                        <div
+                        <Box
                             key={i}
-                            className={`min-h-24 border-b border-r border-[var(--color-border)] p-1.5 last:border-r-0 ${isToday ? 'bg-[var(--color-primary-subtle)]' : ''}`}
+                            minH="24"
+                            borderBottomWidth="1px"
+                            borderRightWidth="1px"
+                            borderColor="border"
+                            p="1.5"
+                            _last={{ borderRightWidth: '0' }}
+                            bg={isToday ? 'brand.muted' : undefined}
                         >
-                            <p className={`mb-1 w-6 rounded-full text-center text-sm font-semibold leading-6 ${isToday ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text)]'}`}>
+                            <Text
+                                mb="1"
+                                w="6"
+                                borderRadius="full"
+                                textAlign="center"
+                                fontSize="sm"
+                                fontWeight="semibold"
+                                lineHeight="6"
+                                bg={isToday ? 'brand.solid' : undefined}
+                                color={isToday ? 'brand.contrast' : 'fg'}
+                            >
                                 {day.getDate()}
-                            </p>
-                            <div className="flex flex-col gap-0.5">
+                            </Text>
+                            <Stack gap="0.5">
                                 {dayEvts.slice(0, 3).map((ev, ei) => {
                                     const cfg    = ev.status ? (statusConfig[ev.status] ?? statusConfig.pending) : null;
                                     const isSlot = ev.type === 'slot';
+                                    const palette = isSlot ? 'brand' : (cfg?.palette ?? 'brand');
                                     return (
-                                        <button
+                                        <chakra.button
                                             key={`${ev.type}-${ev.id}-${ei}`}
                                             onClick={() => onEventClick(ev)}
-                                            className={`w-full truncate rounded px-1 py-0.5 text-left text-[11px] font-medium transition-opacity hover:opacity-80
-                                                ${isSlot ? 'bg-[var(--color-primary-subtle)] text-[var(--color-primary-fg)]' : (cfg?.bg ?? '') + ' ' + (cfg?.text ?? '')}`}
+                                            colorPalette={palette}
+                                            w="full"
+                                            truncate
+                                            borderRadius="sm"
+                                            px="1"
+                                            py="0.5"
+                                            textAlign="left"
+                                            fontSize="11px"
+                                            fontWeight="medium"
+                                            transition="opacity"
+                                            bg="colorPalette.subtle"
+                                            color="colorPalette.fg"
+                                            _hover={{ opacity: 0.8 }}
                                         >
                                             {ev.startTime} {ev.label}
-                                        </button>
+                                        </chakra.button>
                                     );
                                 })}
                                 {dayEvts.length > 3 && (
-                                    <p className="text-[10px] text-[var(--color-text-muted)]">+{dayEvts.length - 3} más</p>
+                                    <Text fontSize="10px" color="fg.subtle">+{dayEvts.length - 3} más</Text>
                                 )}
-                            </div>
-                        </div>
+                            </Stack>
+                        </Box>
                     );
                 })}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }
 
@@ -691,83 +796,121 @@ export default function ScheduleIndex({ appointments, recurringSlots, specificSl
         <>
             <Head title="Calendario — ClientKosmos" />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
-                {/* Page header */}
-                <div>
-                    <h1 className="text-display-2xl text-[var(--color-text)]">Calendario</h1>
-                    <p className="mt-1 text-body-md text-[var(--color-text-secondary)]">Organiza tus horas de disponibilidad</p>
-                </div>
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
+                <Box>
+                    <Heading as="h1" fontSize="3xl" color="fg">Calendario</Heading>
+                    <Text mt="1" fontSize="md" color="fg.muted">Organiza tus horas de disponibilidad</Text>
+                </Box>
 
-                {/* Toolbar */}
-                <div className="flex flex-wrap justify-center items-center gap-3">
-                    {/* View tabs */}
-                    <div className="flex items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] p-1">
-                        <button
+                <Flex flexWrap="wrap" justifyContent="center" alignItems="center" gap="3">
+                    <Flex alignItems="center" borderRadius="full" borderWidth="1px" borderColor="border" bg="bg.surface" p="1">
+                        <chakra.button
                             onClick={() => {
                                 setView('semanal');
                                 router.get(schedule.index.url({ query: { from: toDateStr(fromDate), to, view: 'semanal' } }), {}, { preserveState: false });
                             }}
-                            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                                view === 'semanal'
-                                    ? 'bg-[var(--color-surface)] shadow-[var(--shadow-sm)] text-[var(--color-text)]'
-                                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
-                            }`}
+                            borderRadius="full"
+                            px="4"
+                            py="1.5"
+                            fontSize="sm"
+                            fontWeight="medium"
+                            transition="colors"
+                            bg={view === 'semanal' ? 'bg.surface' : 'transparent'}
+                            boxShadow={view === 'semanal' ? 'sm' : undefined}
+                            color={view === 'semanal' ? 'fg' : 'fg.muted'}
+                            _hover={view !== 'semanal' ? { color: 'fg' } : undefined}
                         >
                             Semanal
-                        </button>
-                        <button
+                        </chakra.button>
+                        <chakra.button
                             onClick={() => {
                                 setView('mensual');
                                 const newFrom = toDateStr(new Date(monthYear, monthIdx, 1));
                                 const newTo   = toDateStr(new Date(monthYear, monthIdx + 1, 0));
                                 router.get(schedule.index.url({ query: { from: newFrom, to: newTo, view: 'mensual' } }), {}, { preserveState: false });
                             }}
-                            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                                view === 'mensual'
-                                    ? 'bg-[var(--color-surface)] shadow-[var(--shadow-sm)] text-[var(--color-text)]'
-                                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
-                            }`}
+                            borderRadius="full"
+                            px="4"
+                            py="1.5"
+                            fontSize="sm"
+                            fontWeight="medium"
+                            transition="colors"
+                            bg={view === 'mensual' ? 'bg.surface' : 'transparent'}
+                            boxShadow={view === 'mensual' ? 'sm' : undefined}
+                            color={view === 'mensual' ? 'fg' : 'fg.muted'}
+                            _hover={view !== 'mensual' ? { color: 'fg' } : undefined}
                         >
                             Mensual
-                        </button>
-                    </div>
+                        </chakra.button>
+                    </Flex>
 
-                    {/* + button */}
-                    <button
+                    <chakra.button
                         onClick={() => setCreateOpen(true)}
-                        className="flex size-9 items-center justify-center rounded-full bg-[var(--color-primary)] text-white shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--color-primary-hover)]"
+                        display="flex"
+                        boxSize="9"
+                        alignItems="center"
+                        justifyContent="center"
+                        borderRadius="full"
+                        bg="brand.solid"
+                        color="brand.contrast"
+                        boxShadow="sm"
+                        transition="colors"
+                        _hover={{ bg: 'brand.emphasized' }}
                         aria-label="Añadir hueco"
                     >
-                        <Plus className="size-5" />
-                    </button>
-                </div>
+                        <Icon as={Plus} boxSize="5" />
+                    </chakra.button>
+                </Flex>
 
-                {/* Navigation bar */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <button
+                <Flex alignItems="center" justifyContent="space-between">
+                    <Flex alignItems="center" gap="2">
+                        <chakra.button
                             onClick={() => navigate(-1)}
-                            className="flex size-8 items-center justify-center rounded-full border border-[var(--color-border)] hover:bg-[var(--color-surface-alt)]"
+                            display="flex"
+                            boxSize="8"
+                            alignItems="center"
+                            justifyContent="center"
+                            borderRadius="full"
+                            borderWidth="1px"
+                            borderColor="border"
+                            _hover={{ bg: 'bg.muted' }}
                         >
-                            <ChevronLeft className="size-4" />
-                        </button>
-                        <button
+                            <Icon as={ChevronLeft} boxSize="4" />
+                        </chakra.button>
+                        <chakra.button
                             onClick={() => navigate(1)}
-                            className="flex size-8 items-center justify-center rounded-full border border-[var(--color-border)] hover:bg-[var(--color-surface-alt)]"
+                            display="flex"
+                            boxSize="8"
+                            alignItems="center"
+                            justifyContent="center"
+                            borderRadius="full"
+                            borderWidth="1px"
+                            borderColor="border"
+                            _hover={{ bg: 'bg.muted' }}
                         >
-                            <ChevronRight className="size-4" />
-                        </button>
-                        <span className="text-body-md font-semibold text-[var(--color-text)]">
+                            <Icon as={ChevronRight} boxSize="4" />
+                        </chakra.button>
+                        <Text fontSize="md" fontWeight="semibold" color="fg">
                             {view === 'semanal' ? weekLabel : monthLabel}
-                        </span>
-                    </div>
+                        </Text>
+                    </Flex>
 
-                    <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
+                    <Text
+                        borderRadius="full"
+                        borderWidth="1px"
+                        borderColor="border"
+                        px="3"
+                        py="1"
+                        fontSize="xs"
+                        fontWeight="medium"
+                        textTransform="uppercase"
+                        letterSpacing="wide"
+                        color="fg.muted"
+                    >
                         {view === 'semanal' ? `${MONTHS_ES[monthIdx].toUpperCase()} ${monthYear}` : String(monthYear)}
-                    </span>
-                </div>
+                    </Text>
+                </Flex>
 
-                {/* Calendar */}
                 {view === 'semanal' && (
                     <WeeklyCalendar
                         days={weekDays}
@@ -784,7 +927,7 @@ export default function ScheduleIndex({ appointments, recurringSlots, specificSl
                         onEventClick={setSelectedEvent}
                     />
                 )}
-            </div>
+            </Stack>
 
             <CreateSlotDialog
                 open={createOpen}
