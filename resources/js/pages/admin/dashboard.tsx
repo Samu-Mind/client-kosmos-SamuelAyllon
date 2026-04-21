@@ -46,6 +46,10 @@ export default function AdminDashboard({ users, filters }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const [search, setSearch] = useState(filters.search ?? '');
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const roleRef = useRef(filters.role);
+    useEffect(() => {
+        roleRef.current = filters.role;
+    });
 
     useEffect(() => {
         if (debounceRef.current) {
@@ -54,7 +58,7 @@ export default function AdminDashboard({ users, filters }: Props) {
         debounceRef.current = setTimeout(() => {
             router.get(
                 DashboardIndexAction.url(),
-                { search: search || undefined, role: filters.role !== 'all' ? filters.role : undefined },
+                { search: search || undefined, role: roleRef.current !== 'all' ? roleRef.current : undefined },
                 { preserveState: true, replace: true },
             );
         }, 350);

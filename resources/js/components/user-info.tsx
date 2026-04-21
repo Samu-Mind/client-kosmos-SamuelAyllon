@@ -15,7 +15,7 @@ export function UserInfo({
     return (
         <>
             <Avatar>
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={user.avatar_path ?? undefined} alt={user.name} />
                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
             </Avatar>
             <Box

@@ -1,5 +1,5 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Plus, Trash2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import DestroyAction from '@/actions/App/Http/Controllers/Appointment/DestroyAction';
@@ -116,7 +116,6 @@ function buildCalendarEvents(
     visibleDates: Date[],
 ): CalendarEvent[] {
     const events: CalendarEvent[] = [];
-    const today = new Date();
 
     for (const appt of appointments) {
         const dt   = new Date(appt.starts_at);
@@ -301,9 +300,6 @@ function EditAppointmentForm({
     appointment: AppointmentEvent;
     onClose: () => void;
 }) {
-    const startsAt = new Date(appointment.starts_at);
-    const endsAt   = new Date(appointment.ends_at);
-
     const { data, setData, put, processing, errors } = useForm({
         starts_at: appointment.starts_at.slice(0, 16),
         ends_at:   appointment.ends_at.slice(0, 16),
@@ -423,7 +419,6 @@ function EventDetailDialog({
     onClose: () => void;
 }) {
     const [mode, setMode] = useState<'view' | 'edit'>('view');
-    const [deleting, setDeleting] = useState(false);
 
     if (!event) { return null; }
 

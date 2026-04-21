@@ -1,5 +1,5 @@
+import { Box, Flex, HStack, Stack, Text } from '@chakra-ui/react';
 import { Check, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface Rule {
     label: string;
@@ -19,13 +19,15 @@ function getStrength(password: string): number {
     return rules.filter((r) => r.test(password)).length;
 }
 
-const strengthConfig = [
-    { label: '', color: 'bg-muted' },
-    { label: 'Muy débil', color: 'bg-destructive' },
-    { label: 'Débil', color: 'bg-orange-500' },
-    { label: 'Regular', color: 'bg-yellow-500' },
-    { label: 'Fuerte', color: 'bg-blue-500' },
-    { label: 'Muy fuerte', color: 'bg-green-500' },
+type Token = string;
+
+const strengthConfig: { label: string; bar: Token; text: Token }[] = [
+    { label: '', bar: 'bg.muted', text: 'fg.muted' },
+    { label: 'Muy débil', bar: 'danger.solid', text: 'danger.fg' },
+    { label: 'Débil', bar: 'orange.solid', text: 'orange.fg' },
+    { label: 'Regular', bar: 'warning.solid', text: 'warning.fg' },
+    { label: 'Fuerte', bar: 'info.solid', text: 'info.fg' },
+    { label: 'Muy fuerte', bar: 'success.solid', text: 'success.fg' },
 ];
 
 interface PasswordStrengthProps {
@@ -39,36 +41,47 @@ export default function PasswordStrength({ password }: PasswordStrengthProps) {
     const config = strengthConfig[strength];
 
     return (
-        <div className="mt-2 space-y-2">
-            <div className="flex gap-1">
+        <Stack mt="2" gap="2">
+            <Flex gap="1">
                 {[1, 2, 3, 4, 5].map((level) => (
-                    <div
+                    <Box
                         key={level}
-                        className={cn(
-                            'h-1.5 flex-1 rounded-full transition-all duration-300',
-                            strength >= level ? config.color : 'bg-muted',
-                        )}
+                        h="1.5"
+                        flex="1"
+                        rounded="full"
+                        transition="all 300ms"
+                        bg={strength >= level ? config.bar : 'bg.muted'}
                     />
                 ))}
-            </div>
+            </Flex>
 
             {config.label && (
-                <p className={cn('text-xs font-medium', strength <= 2 ? 'text-destructive' : strength <= 3 ? 'text-yellow-600' : 'text-green-600')}>
+                <Text fontSize="xs" fontWeight="medium" color={config.text}>
                     {config.label}
-                </p>
+                </Text>
             )}
 
-            <ul className="space-y-1">
+            <Stack as="ul" gap="1" listStyleType="none">
                 {rules.map((rule) => {
                     const passed = rule.test(password);
                     return (
-                        <li key={rule.label} className={cn('flex items-center gap-1.5 text-xs', passed ? 'text-green-600' : 'text-muted-foreground')}>
-                            {passed ? <Check className="h-3 w-3 shrink-0" /> : <X className="h-3 w-3 shrink-0" />}
-                            {rule.label}
-                        </li>
+                        <HStack
+                            as="li"
+                            key={rule.label}
+                            gap="1.5"
+                            fontSize="xs"
+                            color={passed ? 'success.fg' : 'fg.muted'}
+                        >
+                            {passed ? (
+                                <Check size={12} style={{ flexShrink: 0 }} />
+                            ) : (
+                                <X size={12} style={{ flexShrink: 0 }} />
+                            )}
+                            <span>{rule.label}</span>
+                        </HStack>
                     );
                 })}
-            </ul>
-        </div>
+            </Stack>
+        </Stack>
     );
 }

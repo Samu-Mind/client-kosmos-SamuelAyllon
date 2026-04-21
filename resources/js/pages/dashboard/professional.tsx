@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowRight, CalendarDays, FileText, Receipt } from 'lucide-react';
+import { ArrowRight, CalendarDays, Receipt } from 'lucide-react';
 import type { ReactNode } from 'react';
 import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
 import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';

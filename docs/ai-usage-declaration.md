@@ -55,3 +55,13 @@ Registro transparente del uso de herramientas de IA en el desarrollo de ClientKo
 - **Revisión humana:** pendiente — Samuel Ayllón debe validar visualmente mensajes de error en `/login`, hover/focus de `TextLink` en auth, y render del `UserInfo` en el menú de usuario del sidebar (light + dark).
 - **Prompt(s) relevantes:** "revisa el archivo @docs/decision-log.md y continuemos con la transición de tailwindcss a chakra".
 - **Relación con ADR:** ADR-0004
+
+### Fase 3b — Migración de componentes medianos a Chakra UI v3
+
+- **Fecha:** 2026-04-21
+- **Herramientas:** Claude Code (Opus 4.7), Explore subagent (auditoría de candidatos), Plan mode, AskUserQuestion (confirmación de paleta para `password-strength`).
+- **Alcance IA:** reescritura de [`nav-footer.tsx`](../resources/js/components/nav-footer.tsx), [`empty-state.tsx`](../resources/js/components/empty-state.tsx), [`appearance-tabs.tsx`](../resources/js/components/appearance-tabs.tsx), [`password-strength.tsx`](../resources/js/components/password-strength.tsx) y [`delete-user.tsx`](../resources/js/components/delete-user.tsx). Se eliminan `className` Tailwind, `cn()`, modificadores `dark:` y variables CSS ad-hoc de `empty-state`. Todo reemplazado por primitivos Chakra (`Flex`, `Box`, `SimpleGrid`, `Circle`, `Stack`, `HStack`, `chakra('button'|'a')`) y tokens semánticos existentes (`danger.*`, `warning.*`, `success.*`, `info.*`, `orange.*`, `brand.*`, `bg.muted`, `fg.muted`). Cero tokens nuevos. API pública preservada en los 5 componentes (11 consumidores sin cambios).
+- **Decisión humana registrada:** mantener 5 colores distintos en las barras de `password-strength` (danger → orange → warning → info → success) para preservar granularidad visual del feedback UX.
+- **Revisión humana:** pendiente — validar `/settings/profile` (delete-user dialog + warning banner), `/settings/appearance` (tabs seleccionados + hover + focus ring), `/register` (barras y lista de reglas de password-strength), sidebar abierto/colapsado (nav-footer), y cualquier página con estado vacío (empty-state). Light + dark.
+- **Prompt(s) relevantes:** "revisa el archivo @docs/decision-log.md y continuemos con la transición de tailwindcss a chakra".
+- **Relación con ADR:** ADR-0005
