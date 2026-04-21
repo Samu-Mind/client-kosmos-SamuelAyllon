@@ -4,7 +4,7 @@ Seguimiento de la migración de Tailwind CSS → Chakra UI v3 (ADR-0006).
 Actualizar este archivo manualmente cada vez que se migre un archivo.  
 Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada archivo.
 
-**Última revisión:** 2026-04-21 (Fase 4a paso 3)
+**Última revisión:** 2026-04-21 (Fase 4a paso 4)
 
 ---
 
@@ -193,8 +193,8 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | [components/heading.tsx](../resources/js/components/heading.tsx) | ✅ | Fase 4a |
 | [components/form-field.tsx](../resources/js/components/form-field.tsx) | ✅ | Fase 4a |
 | [components/alert-error.tsx](../resources/js/components/alert-error.tsx) | ✅ | Fase 4a |
-| [components/two-factor-setup-modal.tsx](../resources/js/components/two-factor-setup-modal.tsx) | ❌ | 31 |
-| [components/two-factor-recovery-codes.tsx](../resources/js/components/two-factor-recovery-codes.tsx) | ❌ | 13 |
+| [components/two-factor-setup-modal.tsx](../resources/js/components/two-factor-setup-modal.tsx) | ✅ | Fase 4a |
+| [components/two-factor-recovery-codes.tsx](../resources/js/components/two-factor-recovery-codes.tsx) | ✅ | Fase 4a |
 | [components/tutorial-chatbot.tsx](../resources/js/components/tutorial-chatbot.tsx) | ❌ | 21 |
 | [components/admin/impersonation-banner.tsx](../resources/js/components/admin/impersonation-banner.tsx) | ❌ | 5 |
 
@@ -215,10 +215,10 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Components Patient | 3 | 0 | 0 | 3 |
 | Components Kosmo | 4 | 0 | 0 | 4 |
 | Components UI | 20 | 5 | 2 | 27 |
-| Components Otros | 10 | 0 | 4 | 14 |
-| **TOTAL** | **58** | **6** | **34** | **98** |
+| Components Otros | 12 | 0 | 2 | 14 |
+| **TOTAL** | **60** | **6** | **32** | **98** |
 
-**Progreso global: ~65% migrado** (58 completos + 6 parciales de 98 archivos)
+**Progreso global: ~67% migrado** (60 completos + 6 parciales de 98 archivos)
 
 ---
 

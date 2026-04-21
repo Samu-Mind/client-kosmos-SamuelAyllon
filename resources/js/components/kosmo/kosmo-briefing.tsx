@@ -1,4 +1,6 @@
-import { Box, Flex, Text, type BoxProps } from '@chakra-ui/react';
+import { Box, Flex, Text, chakra, type BoxProps } from '@chakra-ui/react';
+
+const ChakraButton = chakra('button');
 import { Sparkles, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import React from 'react';
@@ -53,8 +55,7 @@ export const KosmoBriefing = React.forwardRef<HTMLDivElement, KosmoBriefingProps
                         </Box>
                     </Flex>
                     {isDismissible && (
-                        <Box
-                            as="button"
+                        <ChakraButton
                             type="button"
                             onClick={handleDismiss}
                             display="inline-flex"
@@ -71,7 +72,7 @@ export const KosmoBriefing = React.forwardRef<HTMLDivElement, KosmoBriefingProps
                             aria-label="Descartar"
                         >
                             <X size={14} color="var(--ck-colors-fg-muted)" />
-                        </Box>
+                        </ChakraButton>
                     )}
                 </Flex>
                 {actions && (

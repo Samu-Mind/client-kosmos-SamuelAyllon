@@ -1,4 +1,6 @@
-import { Box, Flex, type FlexProps } from '@chakra-ui/react';
+import { Box, Flex, chakra, type FlexProps } from '@chakra-ui/react';
+
+const ChakraButton = chakra('button');
 import { X } from 'lucide-react';
 import * as React from 'react';
 import { KosmoIcon } from './kosmo-icon';
@@ -32,8 +34,7 @@ const KosmoNudge = React.forwardRef<HTMLDivElement, KosmoNudgeProps>(
       <KosmoIcon size={16} style={{ flexShrink: 0 }} />
       <Box flex="1">{message}</Box>
       {action && (
-        <Box
-          as="button"
+        <ChakraButton
           type="button"
           onClick={action.onClick}
           flexShrink={0}
@@ -46,11 +47,10 @@ const KosmoNudge = React.forwardRef<HTMLDivElement, KosmoNudgeProps>(
           _hover={{ textDecoration: 'underline' }}
         >
           {action.label}
-        </Box>
+        </ChakraButton>
       )}
       {onDismiss && (
-        <Box
-          as="button"
+        <ChakraButton
           type="button"
           onClick={onDismiss}
           flexShrink={0}
@@ -67,7 +67,7 @@ const KosmoNudge = React.forwardRef<HTMLDivElement, KosmoNudgeProps>(
           aria-label="Dismiss"
         >
           <X size={12} />
-        </Box>
+        </ChakraButton>
       )}
     </Flex>
   )
