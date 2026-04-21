@@ -47,12 +47,12 @@ export default function AuthCardLayout({
                 </ChakraLink>
 
                 <Flex direction="column" gap="6">
-                    <Card className="rounded-xl">
-                        <CardHeader className="px-10 pt-8 pb-0 text-center">
-                            <CardTitle className="text-xl">{title}</CardTitle>
+                    <Card borderRadius="xl">
+                        <CardHeader px="10" pt="8" pb="0" textAlign="center">
+                            <CardTitle fontSize="xl">{title}</CardTitle>
                             <CardDescription>{description}</CardDescription>
                         </CardHeader>
-                        <CardContent className="px-10 py-8">
+                        <CardContent px="10" py="8">
                             <Box>{children}</Box>
                         </CardContent>
                     </Card>

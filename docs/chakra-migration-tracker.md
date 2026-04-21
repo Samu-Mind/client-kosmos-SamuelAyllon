@@ -4,7 +4,7 @@ Seguimiento de la migración de Tailwind CSS → Chakra UI v3 (ADR-0006).
 Actualizar este archivo manualmente cada vez que se migre un archivo.  
 Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada archivo.
 
-**Última revisión:** 2026-04-21 (Fase 4a completa + limpieza parciales UI)
+**Última revisión:** 2026-04-21 (UI 100% migrado + layouts auth al día)
 
 ---
 
@@ -24,7 +24,7 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 |---|---|---|
 | [layouts/auth/auth-split-layout.tsx](../resources/js/layouts/auth/auth-split-layout.tsx) | ✅ | |
 | [layouts/auth/auth-simple-layout.tsx](../resources/js/layouts/auth/auth-simple-layout.tsx) | ✅ | |
-| [layouts/auth/auth-card-layout.tsx](../resources/js/layouts/auth/auth-card-layout.tsx) | ⚠️ | 4 `className` restantes |
+| [layouts/auth/auth-card-layout.tsx](../resources/js/layouts/auth/auth-card-layout.tsx) | ✅ | |
 | [layouts/settings/layout.tsx](../resources/js/layouts/settings/layout.tsx) | ✅ | |
 | [layouts/app/app-sidebar-layout.tsx](../resources/js/layouts/app/app-sidebar-layout.tsx) | ❌ | 1 `className` |
 | [layouts/admin-layout.tsx](../resources/js/layouts/admin-layout.tsx) | ❌ | 12 `className` |
@@ -174,8 +174,8 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | [components/ui/dialog.tsx](../resources/js/components/ui/dialog.tsx) | ✅ | |
 | [components/ui/navigation-menu.tsx](../resources/js/components/ui/navigation-menu.tsx) | ✅ | |
 | [components/ui/sheet.tsx](../resources/js/components/ui/sheet.tsx) | ✅ | |
-| [components/ui/placeholder-pattern.tsx](../resources/js/components/ui/placeholder-pattern.tsx) | ❌ | 1 `className` |
-| [components/ui/icon.tsx](../resources/js/components/ui/icon.tsx) | ❌ | 1 `className` |
+| [components/ui/placeholder-pattern.tsx](../resources/js/components/ui/placeholder-pattern.tsx) | ✅ | |
+| [components/ui/icon.tsx](../resources/js/components/ui/icon.tsx) | ✅ | |
 
 ---
 
@@ -204,7 +204,7 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 
 | Categoría | ✅ Migrado | ⚠️ Parcial | ❌ Pendiente | Total |
 |---|---|---|---|---|
-| Layouts | 3 | 1 | 2 | 6 |
+| Layouts | 4 | 0 | 2 | 6 |
 | Pages Auth | 7 | 0 | 0 | 7 |
 | Pages Dashboard/Settings | 8 | 0 | 0 | 8 |
 | Pages Patients | 0 | 0 | 6 | 6 |
@@ -214,11 +214,11 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Components Shell/Nav | 3 | 0 | 8 | 11 |
 | Components Patient | 3 | 0 | 0 | 3 |
 | Components Kosmo | 4 | 0 | 0 | 4 |
-| Components UI | 25 | 0 | 2 | 27 |
+| Components UI | 27 | 0 | 0 | 27 |
 | Components Otros | 12 | 0 | 2 | 14 |
-| **TOTAL** | **65** | **1** | **32** | **98** |
+| **TOTAL** | **68** | **0** | **30** | **98** |
 
-**Progreso global: ~67% migrado** (65 completos + 1 parcial de 98 archivos)
+**Progreso global: ~69% migrado** (68 completos de 98 archivos, 0 parciales)
 
 ---
 
@@ -247,7 +247,7 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 12. `pages/welcome.tsx` (309 `className`)
 
 ### Parciales pendientes de limpiar
-- `layouts/auth/auth-card-layout.tsx`
+_(ninguno)_
 
 ---
 
