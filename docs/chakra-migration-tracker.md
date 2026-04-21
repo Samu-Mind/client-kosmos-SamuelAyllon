@@ -4,7 +4,7 @@ Seguimiento de la migración de Tailwind CSS → Chakra UI v3 (ADR-0006).
 Actualizar este archivo manualmente cada vez que se migre un archivo.  
 Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada archivo.
 
-**Última revisión:** 2026-04-21 (Fase 4a paso 2)
+**Última revisión:** 2026-04-21 (Fase 4a paso 3)
 
 ---
 
@@ -139,9 +139,9 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Archivo | Estado | `className` aprox. |
 |---|---|---|
 | [components/kosmo/kosmo-briefing.tsx](../resources/js/components/kosmo/kosmo-briefing.tsx) | ✅ | |
-| [components/kosmo/kosmo-chip.tsx](../resources/js/components/kosmo/kosmo-chip.tsx) | ❌ | 2 |
-| [components/kosmo/kosmo-icon.tsx](../resources/js/components/kosmo/kosmo-icon.tsx) | ❌ | 1 |
-| [components/kosmo/kosmo-nudge.tsx](../resources/js/components/kosmo/kosmo-nudge.tsx) | ❌ | 6 |
+| [components/kosmo/kosmo-chip.tsx](../resources/js/components/kosmo/kosmo-chip.tsx) | ✅ | Fase 4a |
+| [components/kosmo/kosmo-icon.tsx](../resources/js/components/kosmo/kosmo-icon.tsx) | ✅ | Fase 4a |
+| [components/kosmo/kosmo-nudge.tsx](../resources/js/components/kosmo/kosmo-nudge.tsx) | ✅ | Fase 4a |
 
 ---
 
@@ -213,12 +213,12 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Pages Otras | 0 | 0 | 5 | 5 |
 | Components Shell/Nav | 3 | 0 | 8 | 11 |
 | Components Patient | 3 | 0 | 0 | 3 |
-| Components Kosmo | 1 | 0 | 3 | 4 |
+| Components Kosmo | 4 | 0 | 0 | 4 |
 | Components UI | 20 | 5 | 2 | 27 |
 | Components Otros | 10 | 0 | 4 | 14 |
-| **TOTAL** | **55** | **6** | **37** | **98** |
+| **TOTAL** | **58** | **6** | **34** | **98** |
 
-**Progreso global: ~62% migrado** (55 completos + 6 parciales de 98 archivos)
+**Progreso global: ~65% migrado** (58 completos + 6 parciales de 98 archivos)
 
 ---
 
