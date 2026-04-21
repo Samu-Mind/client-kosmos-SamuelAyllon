@@ -182,10 +182,9 @@ export default function PostSession({ patient }: Props) {
                                 </Stack>
                                 <Stack gap="1.5">
                                     <Label>Método de pago</Label>
-                                    <Box
-                                        as="select"
+                                    <chakra.select
                                         value={paymentForm.data.payment_method}
-                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => paymentForm.setData('payment_method', e.target.value)}
+                                        onChange={(e) => paymentForm.setData('payment_method', e.target.value)}
                                         w="full"
                                         h="10"
                                         px="3"
@@ -206,7 +205,7 @@ export default function PostSession({ patient }: Props) {
                                         <option value="bizum">Bizum</option>
                                         <option value="transfer">Transferencia</option>
                                         <option value="card">Tarjeta</option>
-                                    </Box>
+                                    </chakra.select>
                                 </Stack>
                                 <Flex alignItems="flex-end">
                                     <Button

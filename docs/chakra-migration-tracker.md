@@ -4,7 +4,7 @@ Seguimiento de la migración de Tailwind CSS → Chakra UI v3 (ADR-0006).
 Actualizar este archivo manualmente cada vez que se migre un archivo.  
 Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada archivo.
 
-**Última revisión:** 2026-04-21 (Fase 4b — shell + layouts admin/sidebar migrados)
+**Última revisión:** 2026-04-21 (Fase 4c — pages patients + appointments migrados)
 
 ---
 
@@ -64,12 +64,12 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 
 | Archivo | Estado | `className` aprox. |
 |---|---|---|
-| [pages/patients/index.tsx](../resources/js/pages/patients/index.tsx) | ❌ | 11 |
-| [pages/patients/show.tsx](../resources/js/pages/patients/show.tsx) | ❌ | 67 |
-| [pages/patients/create.tsx](../resources/js/pages/patients/create.tsx) | ❌ | 29 |
-| [pages/patients/edit.tsx](../resources/js/pages/patients/edit.tsx) | ❌ | 28 |
-| [pages/patients/pre-session.tsx](../resources/js/pages/patients/pre-session.tsx) | ❌ | 41 |
-| [pages/patients/post-session.tsx](../resources/js/pages/patients/post-session.tsx) | ❌ | 28 |
+| [pages/patients/index.tsx](../resources/js/pages/patients/index.tsx) | ✅ | Fase 4c |
+| [pages/patients/show.tsx](../resources/js/pages/patients/show.tsx) | ✅ | Fase 4c |
+| [pages/patients/create.tsx](../resources/js/pages/patients/create.tsx) | ✅ | Fase 4c |
+| [pages/patients/edit.tsx](../resources/js/pages/patients/edit.tsx) | ✅ | Fase 4c |
+| [pages/patients/pre-session.tsx](../resources/js/pages/patients/pre-session.tsx) | ✅ | Fase 4c |
+| [pages/patients/post-session.tsx](../resources/js/pages/patients/post-session.tsx) | ✅ | Fase 4c |
 
 ---
 
@@ -77,9 +77,9 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 
 | Archivo | Estado | `className` aprox. |
 |---|---|---|
-| [pages/appointments/index.tsx](../resources/js/pages/appointments/index.tsx) | ❌ | 24 |
-| [pages/appointments/show.tsx](../resources/js/pages/appointments/show.tsx) | ❌ | 44 |
-| [pages/appointments/waiting.tsx](../resources/js/pages/appointments/waiting.tsx) | ❌ | 12 |
+| [pages/appointments/index.tsx](../resources/js/pages/appointments/index.tsx) | ✅ | Fase 4c |
+| [pages/appointments/show.tsx](../resources/js/pages/appointments/show.tsx) | ✅ | Fase 4c |
+| [pages/appointments/waiting.tsx](../resources/js/pages/appointments/waiting.tsx) | ✅ | Fase 4c |
 
 ---
 
@@ -207,8 +207,8 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Layouts | 6 | 0 | 0 | 6 |
 | Pages Auth | 7 | 0 | 0 | 7 |
 | Pages Dashboard/Settings | 8 | 0 | 0 | 8 |
-| Pages Patients | 0 | 0 | 6 | 6 |
-| Pages Appointments | 0 | 0 | 3 | 3 |
+| Pages Patients | 6 | 0 | 0 | 6 |
+| Pages Appointments | 3 | 0 | 0 | 3 |
 | Pages Admin | 0 | 0 | 4 | 4 |
 | Pages Otras | 0 | 0 | 5 | 5 |
 | Components Shell/Nav | 11 | 0 | 0 | 11 |
@@ -216,9 +216,9 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Components Kosmo | 4 | 0 | 0 | 4 |
 | Components UI | 27 | 0 | 0 | 27 |
 | Components Otros | 12 | 0 | 2 | 14 |
-| **TOTAL** | **78** | **0** | **20** | **98** |
+| **TOTAL** | **87** | **0** | **11** | **98** |
 
-**Progreso global: ~80% migrado** (78 completos de 98 archivos, 0 parciales)
+**Progreso global: ~89% migrado** (87 completos de 98 archivos, 0 parciales)
 
 ---
 

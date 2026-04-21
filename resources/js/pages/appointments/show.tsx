@@ -384,7 +384,7 @@ export default function AppointmentShow({ appointment, lastClinicalNote }: Props
                                 <Form
                                     action={JoinWaitingRoomAction.url(appointment.id)}
                                     method="post"
-                                    className="w-full"
+                                    style={{ width: '100%' }}
                                 >
                                     <Button type="submit" variant="primary" size="lg" w="full">
                                         <Box as={Play} w="4" h="4" fill="currentColor" />

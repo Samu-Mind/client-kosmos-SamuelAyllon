@@ -233,8 +233,7 @@ export default function PatientShow({ patient }: Props) {
                                             borderTopWidth={idx > 0 ? '1px' : undefined}
                                             borderColor="border.subtle"
                                         >
-                                            <Box
-                                                as="input"
+                                            <chakra.input
                                                 type="checkbox"
                                                 checked={agreement.is_completed}
                                                 onChange={() => router.patch(`/patients/${patient.id}/agreements/${agreement.id}`, {

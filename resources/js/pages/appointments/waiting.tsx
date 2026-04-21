@@ -49,7 +49,7 @@ export default function AppointmentWaiting({ appointment }: Props) {
 
     useEffect(() => {
         const id = setInterval(() => {
-            router.reload({ only: ['appointment'], preserveUrl: true, preserveScroll: true });
+            router.reload({ only: ['appointment'], preserveUrl: true });
         }, 4000);
         return () => clearInterval(id);
     }, []);
