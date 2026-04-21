@@ -1,9 +1,13 @@
+import { Badge, Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, CalendarDays, CheckCircle, Receipt } from 'lucide-react';
 import type { ReactNode } from 'react';
 import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { Auth } from '@/types';
+
+const ChakraLink = chakra(Link);
 
 interface UpcomingAppointment {
     id: number;
@@ -84,12 +88,12 @@ const invoiceStatusLabel: Record<string, string> = {
     cancelled: 'Cancelada',
 };
 
-const invoiceStatusClass: Record<string, string> = {
-    paid: 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]',
-    overdue: 'bg-[var(--color-error-subtle)] text-[var(--color-error-fg)]',
-    sent: 'bg-[var(--color-warning-subtle)] text-[var(--color-warning-fg)]',
-    draft: 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]',
-    cancelled: 'bg-[var(--color-surface-alt)] text-[var(--color-text-muted)]',
+const invoiceStatusColorPalette: Record<string, string> = {
+    paid: 'green',
+    overdue: 'red',
+    sent: 'orange',
+    draft: 'gray',
+    cancelled: 'gray',
 };
 
 const getInitials = (name: string): string =>
@@ -108,233 +112,337 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices,
         <>
             <Head title="Inicio — ClientKosmos" />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
 
-                {/* Header */}
-                <div>
-                    <h1 className="text-display-2xl text-[var(--color-text)]">
+                <Box>
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
                         {greeting()}, {auth.user.name.split(' ')[0]}
-                    </h1>
-                    <p className="mt-0.5 text-body-md text-[var(--color-text-secondary)] capitalize">
+                    </Heading>
+                    <Text mt="0.5" fontSize="md" color="fg.muted" textTransform="capitalize">
                         {formatDate()}
-                    </p>
-                </div>
+                    </Text>
+                </Box>
 
-                {/* Stats row */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div className="rounded-[var(--radius-lg)] bg-[var(--color-primary)] p-5 flex items-center justify-between shadow-[var(--shadow-sm)]">
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                <Grid templateColumns={{ base: '1fr', sm: 'repeat(3, 1fr)' }} gap="4">
+                    <Flex
+                        borderRadius="lg"
+                        bg="brand.solid"
+                        p="5"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        boxShadow="sm"
+                    >
+                        <Box>
+                            <Text fontSize="xs" fontWeight="semibold" textTransform="uppercase" letterSpacing="wider" color="white/70">
                                 Próximas citas
-                            </p>
-                            <p className="text-kpi font-bold text-white mt-1 leading-none">
+                            </Text>
+                            <Text fontSize="3xl" fontWeight="bold" color="white" mt="1" lineHeight="none">
                                 {stats.upcoming_appointments.toString().padStart(2, '0')}
-                            </p>
-                        </div>
-                        <div className="rounded-[var(--radius-md)] bg-white/15 p-2.5">
-                            <CalendarDays size={22} className="text-white" />
-                        </div>
-                    </div>
+                            </Text>
+                        </Box>
+                        <Flex borderRadius="md" bg="white/15" p="2.5">
+                            <Box as={CalendarDays} w="22px" h="22px" color="white" />
+                        </Flex>
+                    </Flex>
 
-                    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 flex items-center justify-between shadow-[var(--shadow-sm)]">
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
+                    <Flex
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        borderColor="border"
+                        bg="bg.surface"
+                        p="5"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        boxShadow="sm"
+                    >
+                        <Box>
+                            <Text fontSize="xs" fontWeight="semibold" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
                                 Sesiones completadas
-                            </p>
-                            <p className="text-kpi font-bold text-[var(--color-text)] mt-1 leading-none">
+                            </Text>
+                            <Text fontSize="3xl" fontWeight="bold" color="fg" mt="1" lineHeight="none">
                                 {stats.completed_sessions.toString().padStart(2, '0')}
-                            </p>
-                        </div>
-                        <div className="rounded-[var(--radius-md)] bg-[var(--color-surface-alt)] p-2.5">
-                            <CheckCircle size={22} className="text-[var(--color-text-secondary)]" />
-                        </div>
-                    </div>
+                            </Text>
+                        </Box>
+                        <Flex borderRadius="md" bg="bg.subtle" p="2.5">
+                            <Box as={CheckCircle} w="22px" h="22px" color="fg.muted" />
+                        </Flex>
+                    </Flex>
 
-                    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 flex items-center justify-between shadow-[var(--shadow-sm)]">
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
+                    <Flex
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        borderColor="border"
+                        bg="bg.surface"
+                        p="5"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        boxShadow="sm"
+                    >
+                        <Box>
+                            <Text fontSize="xs" fontWeight="semibold" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
                                 Facturas pendientes
-                            </p>
-                            <p className="text-kpi font-bold text-[var(--color-text)] mt-1 leading-none">
+                            </Text>
+                            <Text fontSize="3xl" fontWeight="bold" color="fg" mt="1" lineHeight="none">
                                 {Number(stats.pending_invoices).toLocaleString('es-ES', {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
                                 })} €
-                            </p>
-                        </div>
-                        <div className="rounded-[var(--radius-md)] bg-[var(--color-surface-alt)] p-2.5">
-                            <Receipt size={22} className="text-[var(--color-text-secondary)]" />
-                        </div>
-                    </div>
-                </div>
+                            </Text>
+                        </Box>
+                        <Flex borderRadius="md" bg="bg.subtle" p="2.5">
+                            <Box as={Receipt} w="22px" h="22px" color="fg.muted" />
+                        </Flex>
+                    </Flex>
+                </Grid>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <Grid templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} gap="6">
 
-                    {/* === MAIN: Próximas citas === */}
-                    <div className="lg:col-span-2">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-display-lg text-[var(--color-text)]">Próximas citas</h2>
-                            <Link
+                    <Box gridColumn={{ lg: 'span 2' }}>
+                        <Flex alignItems="center" justifyContent="space-between" mb="4">
+                            <Heading as="h2" fontSize="xl" fontWeight="semibold" color="fg">
+                                Próximas citas
+                            </Heading>
+                            <ChakraLink
                                 href="/appointments"
-                                className="text-sm font-medium text-[var(--color-primary)] hover:underline flex items-center gap-1"
+                                fontSize="sm"
+                                fontWeight="medium"
+                                color="brand.solid"
+                                _hover={{ textDecoration: 'underline' }}
+                                display="flex"
+                                alignItems="center"
+                                gap="1"
                             >
-                                Ver todas <ArrowRight size={14} />
-                            </Link>
-                        </div>
+                                Ver todas <Box as={ArrowRight} w="3.5" h="3.5" />
+                            </ChakraLink>
+                        </Flex>
 
                         {upcomingAppointments.length === 0 ? (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-10 text-center">
-                                <CalendarDays size={32} className="mx-auto mb-3 text-[var(--color-text-muted)]" />
-                                <p className="text-sm text-[var(--color-text-secondary)]">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                p="10"
+                                textAlign="center"
+                            >
+                                <Box as={CalendarDays} w="8" h="8" mx="auto" mb="3" color="fg.subtle" />
+                                <Text fontSize="sm" color="fg.muted">
                                     No tienes citas próximas programadas.
-                                </p>
-                            </div>
+                                </Text>
+                            </Box>
                         ) : (
-                            <div className="flex flex-col gap-3">
+                            <Stack gap="3">
                                 {upcomingAppointments.map((appointment, index) => {
                                     const isNext = index === 0;
                                     const isOnline = isOnlineModality(appointment.modality);
 
                                     return (
-                                        <div
+                                        <Flex
                                             key={appointment.id}
-                                            className={[
-                                                'flex items-center gap-4 rounded-[var(--radius-lg)] border bg-[var(--color-surface)] p-4 transition-shadow',
-                                                isNext
-                                                    ? 'border-[var(--color-primary)] shadow-[var(--shadow-sm)]'
-                                                    : 'border-[var(--color-border)] hover:shadow-[var(--shadow-sm)]',
-                                            ].join(' ')}
+                                            alignItems="center"
+                                            gap="4"
+                                            borderRadius="lg"
+                                            borderWidth="1px"
+                                            borderColor={isNext ? 'brand.solid' : 'border'}
+                                            bg="bg.surface"
+                                            p="4"
+                                            boxShadow={isNext ? 'sm' : undefined}
+                                            _hover={isNext ? undefined : { boxShadow: 'sm' }}
+                                            transition="box-shadow 0.2s"
                                         >
-                                            {/* Professional avatar */}
-                                            <div className="w-10 h-10 rounded-full bg-[var(--color-primary-subtle)] flex items-center justify-center shrink-0 text-sm font-semibold text-[var(--color-primary)]">
+                                            <Flex
+                                                w="10"
+                                                h="10"
+                                                borderRadius="full"
+                                                bg="brand.subtle"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                                flexShrink={0}
+                                                fontSize="sm"
+                                                fontWeight="semibold"
+                                                color="brand.solid"
+                                            >
                                                 {getInitials(appointment.professional.name)}
-                                            </div>
+                                            </Flex>
 
-                                            {/* Info */}
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-semibold text-[var(--color-text)] truncate">
+                                            <Box flex="1" minW={0}>
+                                                <Text fontSize="sm" fontWeight="semibold" color="fg" truncate>
                                                     {appointment.professional.name}
-                                                </p>
-                                                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                                                </Text>
+                                                <Text fontSize="xs" color="fg.muted" mt="0.5">
                                                     {appointment.professional.specialty
                                                         ? `${appointment.professional.specialty} • `
                                                         : ''}
                                                     {formatDateTime(appointment.scheduled_at)}
-                                                </p>
-                                                <div className="flex flex-wrap gap-1.5 mt-2">
-                                                    <span
-                                                        className={[
-                                                            'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
-                                                            isOnline
-                                                                ? 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]'
-                                                                : 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]',
-                                                        ].join(' ')}
+                                                </Text>
+                                                <Flex flexWrap="wrap" gap="1.5" mt="2">
+                                                    <Badge
+                                                        variant="subtle"
+                                                        colorPalette={isOnline ? 'gray' : 'green'}
+                                                        borderRadius="full"
+                                                        px="2"
+                                                        py="0.5"
+                                                        fontSize="2xs"
+                                                        fontWeight="semibold"
+                                                        textTransform="uppercase"
+                                                        letterSpacing="wider"
                                                     >
                                                         {getModalityLabel(appointment.modality)}
-                                                    </span>
+                                                    </Badge>
                                                     {appointment.service_name && (
-                                                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]">
+                                                        <Badge
+                                                            variant="subtle"
+                                                            colorPalette="gray"
+                                                            borderRadius="full"
+                                                            px="2"
+                                                            py="0.5"
+                                                            fontSize="2xs"
+                                                            fontWeight="semibold"
+                                                            textTransform="uppercase"
+                                                            letterSpacing="wider"
+                                                        >
                                                             {appointment.service_name}
-                                                        </span>
+                                                        </Badge>
                                                     )}
-                                                </div>
-                                            </div>
+                                                </Flex>
+                                            </Box>
 
-                                            {/* Action */}
                                             {isNext && (
-                                                <Link
-                                                    href={AppointmentShowAction.url(appointment.id)}
-                                                    className="shrink-0 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)] transition-colors"
-                                                >
-                                                    Ver cita
-                                                </Link>
+                                                <Button asChild variant="primary" size="sm" flexShrink={0}>
+                                                    <ChakraLink href={AppointmentShowAction.url(appointment.id)}>
+                                                        Ver cita
+                                                    </ChakraLink>
+                                                </Button>
                                             )}
-                                        </div>
+                                        </Flex>
                                     );
                                 })}
-                            </div>
+                            </Stack>
                         )}
-                    </div>
+                    </Box>
 
-                    {/* === SIDEBAR: Facturas recientes === */}
-                    <div className="flex flex-col gap-4">
+                    <Stack gap="4">
                         {recentInvoices.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                                <div className="px-4 py-3 border-b border-[var(--color-border-subtle)]">
-                                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                overflow="hidden"
+                                boxShadow="sm"
+                            >
+                                <Box px="4" py="3" borderBottomWidth="1px" borderColor="border">
+                                    <Text
+                                        fontSize="xs"
+                                        fontWeight="semibold"
+                                        textTransform="uppercase"
+                                        letterSpacing="wider"
+                                        color="fg.muted"
+                                    >
                                         Facturas recientes
-                                    </p>
-                                </div>
-                                <div className="divide-y divide-[var(--color-border-subtle)]">
-                                    {recentInvoices.map((invoice) => (
-                                        <div
-                                            key={invoice.id}
-                                            className="flex items-center justify-between px-4 py-3"
+                                    </Text>
+                                </Box>
+                                {recentInvoices.map((invoice, index) => (
+                                    <Flex
+                                        key={invoice.id}
+                                        alignItems="center"
+                                        justifyContent="space-between"
+                                        px="4"
+                                        py="3"
+                                        borderTopWidth={index > 0 ? '1px' : undefined}
+                                        borderColor="border"
+                                    >
+                                        <Box minW={0}>
+                                            <Text fontSize="sm" fontWeight="medium" color="fg">
+                                                {Number(invoice.amount).toLocaleString('es-ES', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                })} €
+                                            </Text>
+                                            {invoice.due_at && (
+                                                <Text fontSize="xs" color="fg.subtle" mt="0.5">
+                                                    Vence: {invoice.due_at}
+                                                </Text>
+                                            )}
+                                        </Box>
+                                        <Badge
+                                            variant="subtle"
+                                            colorPalette={invoiceStatusColorPalette[invoice.status] ?? 'gray'}
+                                            borderRadius="full"
+                                            px="2"
+                                            py="0.5"
+                                            fontSize="2xs"
+                                            fontWeight="semibold"
+                                            textTransform="uppercase"
+                                            letterSpacing="wider"
                                         >
-                                            <div className="min-w-0">
-                                                <p className="text-sm font-medium text-[var(--color-text)]">
-                                                    {Number(invoice.amount).toLocaleString('es-ES', {
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,
-                                                    })} €
-                                                </p>
-                                                {invoice.due_at && (
-                                                    <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                                                        Vence: {invoice.due_at}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <span
-                                                className={[
-                                                    'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
-                                                    invoiceStatusClass[invoice.status] ?? invoiceStatusClass.draft,
-                                                ].join(' ')}
-                                            >
-                                                {invoiceStatusLabel[invoice.status] ?? invoice.status}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="px-4 py-2.5 border-t border-[var(--color-border-subtle)]">
-                                    <Link
+                                            {invoiceStatusLabel[invoice.status] ?? invoice.status}
+                                        </Badge>
+                                    </Flex>
+                                ))}
+                                <Box px="4" py="2.5" borderTopWidth="1px" borderColor="border">
+                                    <ChakraLink
                                         href="/invoices"
-                                        className="text-xs font-medium text-[var(--color-primary)] hover:underline"
+                                        fontSize="xs"
+                                        fontWeight="medium"
+                                        color="brand.solid"
+                                        _hover={{ textDecoration: 'underline' }}
                                     >
                                         Ver todas las facturas
-                                    </Link>
-                                </div>
-                            </div>
+                                    </ChakraLink>
+                                </Box>
+                            </Box>
                         )}
 
-                        {/* Next appointment highlight */}
                         {nextAppointment && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] mb-3">
-                                    Tu próxima cita
-                                </p>
-                                <p className="text-sm font-semibold text-[var(--color-text)]">
-                                    {nextAppointment.professional.name}
-                                </p>
-                                {nextAppointment.professional.specialty && (
-                                    <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                                        {nextAppointment.professional.specialty}
-                                    </p>
-                                )}
-                                <p className="text-xs text-[var(--color-text-muted)] mt-2 capitalize">
-                                    {formatDateTime(nextAppointment.scheduled_at)}
-                                </p>
-                                <Link
-                                    href={AppointmentShowAction.url(nextAppointment.id)}
-                                    className="mt-3 flex items-center gap-1 text-xs font-medium text-[var(--color-primary)] hover:underline"
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                p="5"
+                                boxShadow="sm"
+                            >
+                                <Text
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    textTransform="uppercase"
+                                    letterSpacing="wider"
+                                    color="fg.muted"
+                                    mb="3"
                                 >
-                                    Ver detalles <ArrowRight size={12} />
-                                </Link>
-                            </div>
+                                    Tu próxima cita
+                                </Text>
+                                <Text fontSize="sm" fontWeight="semibold" color="fg">
+                                    {nextAppointment.professional.name}
+                                </Text>
+                                {nextAppointment.professional.specialty && (
+                                    <Text fontSize="xs" color="fg.muted" mt="0.5">
+                                        {nextAppointment.professional.specialty}
+                                    </Text>
+                                )}
+                                <Text fontSize="xs" color="fg.subtle" mt="2" textTransform="capitalize">
+                                    {formatDateTime(nextAppointment.scheduled_at)}
+                                </Text>
+                                <ChakraLink
+                                    href={AppointmentShowAction.url(nextAppointment.id)}
+                                    mt="3"
+                                    display="flex"
+                                    alignItems="center"
+                                    gap="1"
+                                    fontSize="xs"
+                                    fontWeight="medium"
+                                    color="brand.solid"
+                                    _hover={{ textDecoration: 'underline' }}
+                                >
+                                    Ver detalles <Box as={ArrowRight} w="3" h="3" />
+                                </ChakraLink>
+                            </Box>
                         )}
-                    </div>
+                    </Stack>
 
-                </div>
-            </div>
+                </Grid>
+            </Stack>
         </>
     );
 }

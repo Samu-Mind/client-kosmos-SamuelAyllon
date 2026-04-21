@@ -65,3 +65,12 @@ Registro transparente del uso de herramientas de IA en el desarrollo de ClientKo
 - **Revisión humana:** pendiente — validar `/settings/profile` (delete-user dialog + warning banner), `/settings/appearance` (tabs seleccionados + hover + focus ring), `/register` (barras y lista de reglas de password-strength), sidebar abierto/colapsado (nav-footer), y cualquier página con estado vacío (empty-state). Light + dark.
 - **Prompt(s) relevantes:** "revisa el archivo @docs/decision-log.md y continuemos con la transición de tailwindcss a chakra".
 - **Relación con ADR:** ADR-0005
+
+### Batch C — Migración de páginas de dashboard a Chakra UI v3
+
+- **Fecha:** 2026-04-21
+- **Herramientas:** Claude Code (Sonnet 4.6)
+- **Alcance IA:** reescritura de [`resources/js/pages/dashboard.tsx`](../resources/js/pages/dashboard.tsx), [`dashboard/professional.tsx`](../resources/js/pages/dashboard/professional.tsx) y [`dashboard/patient.tsx`](../resources/js/pages/dashboard/patient.tsx). Eliminadas todas las clases Tailwind con variables CSS ad-hoc (`var(--color-*)`, `text-kpi`, `text-display-*`), condicionales `join(' ')` y el Record `invoiceStatusClass`. Reemplazados por primitivos Chakra (`Stack`, `Grid`, `Flex`, `Box`, `Text`, `Heading`, `Badge`) con tokens semánticos existentes. `Badge` importado directamente de `@chakra-ui/react` con `colorPalette` para píldoras de estado/modalidad. Botones de acción migrados a `Button asChild` + `ChakraLink`. Se añade ADR-0007 al decision-log.
+- **Revisión humana:** pendiente — validar dashboard profesional (agenda del día, KPI cards, cobros pendientes) y dashboard paciente (KPI stats row, próximas citas, facturas recientes). Light + dark.
+- **Prompt(s) relevantes:** "continua Batch C — Migrate dashboard pages"
+- **Relación con ADR:** ADR-0007

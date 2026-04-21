@@ -1,11 +1,15 @@
+import { Badge, Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, CalendarDays, Receipt } from 'lucide-react';
 import type { ReactNode } from 'react';
 import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
 import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
 import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { Auth, KosmoBriefing } from '@/types';
+
+const ChakraLink = chakra(Link);
 
 interface DashboardStats {
     sessions_today: number;
@@ -108,7 +112,6 @@ const getPaymentLabel = (payment: PendingPayment): string => {
     return 'Cobro pendiente';
 };
 
-
 export default function Dashboard({
     todayAppointments,
     pendingPayments,
@@ -141,232 +144,275 @@ export default function Dashboard({
         <>
             <Head title="Hoy — ClientKosmos" />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
 
-                {/* Header */}
-                <div>
-                    <h1 className="text-display-2xl text-[var(--color-text)]">
+                <Box>
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
                         {greeting()}, {auth.user.name.split(' ')[0]}
-                    </h1>
-                    <p className="mt-0.5 text-body-md text-[var(--color-text-secondary)] capitalize">
+                    </Heading>
+                    <Text mt="0.5" fontSize="md" color="fg.muted" textTransform="capitalize">
                         {formatDate()}
-                    </p>
-                </div>
+                    </Text>
+                </Box>
 
-                {/* Kosmo Daily Briefing */}
                 {dailyBriefing && (
                     <KosmoBriefingComponent
                         title="Tu día de un vistazo"
                         content={
-                            <p className="text-sm text-[var(--color-text-secondary)]">
+                            <Text fontSize="sm" color="fg.muted">
                                 {typeof dailyBriefing.content === 'object' && 'summary' in dailyBriefing.content
                                     ? String(dailyBriefing.content.summary)
                                     : JSON.stringify(dailyBriefing.content)}
-                            </p>
+                            </Text>
                         }
                     />
                 )}
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <Grid templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} gap="6">
 
-                    {/* === MAIN COLUMN: Agenda === */}
-                    <div className="lg:col-span-2">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-display-lg text-[var(--color-text)]">Agenda del día</h2>
-                            <Link
+                    <Box gridColumn={{ lg: 'span 2' }}>
+                        <Flex alignItems="center" justifyContent="space-between" mb="4">
+                            <Heading as="h2" fontSize="xl" fontWeight="semibold" color="fg">
+                                Agenda del día
+                            </Heading>
+                            <ChakraLink
                                 href="/appointments"
-                                className="text-sm font-medium text-[var(--color-primary)] hover:underline flex items-center gap-1"
+                                fontSize="sm"
+                                fontWeight="medium"
+                                color="brand.solid"
+                                _hover={{ textDecoration: 'underline' }}
+                                display="flex"
+                                alignItems="center"
+                                gap="1"
                             >
-                                Ver todas las citas <ArrowRight size={14} />
-                            </Link>
-                        </div>
+                                Ver todas las citas <Box as={ArrowRight} w="3.5" h="3.5" />
+                            </ChakraLink>
+                        </Flex>
 
                         {todayAppointments.length === 0 ? (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-10 text-center">
-                                <CalendarDays size={32} className="mx-auto mb-3 text-[var(--color-text-muted)]" />
-                                <p className="text-sm text-[var(--color-text-secondary)]">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                p="10"
+                                textAlign="center"
+                            >
+                                <Box as={CalendarDays} w="8" h="8" mx="auto" mb="3" color="fg.subtle" />
+                                <Text fontSize="sm" color="fg.muted">
                                     No hay sesiones programadas para hoy.
-                                </p>
-                            </div>
+                                </Text>
+                            </Box>
                         ) : (
-                            <div className="flex flex-col gap-3">
+                            <Stack gap="3">
                                 {todayAppointments.map((session, index) => {
                                     const isNext = index === 0;
                                     const { time, period } = formatTime(session.scheduled_at);
                                     const isOnline = isOnlineModality(session.modality);
 
                                     return (
-                                        <div
+                                        <Flex
                                             key={session.id}
-                                            className={[
-                                                'flex items-center gap-4 rounded-[var(--radius-lg)] border bg-[var(--color-surface)] p-4 transition-shadow',
-                                                isNext
-                                                    ? 'border-[var(--color-primary)] shadow-[var(--shadow-sm)]'
-                                                    : 'border-[var(--color-border)] hover:shadow-[var(--shadow-sm)]',
-                                            ].join(' ')}
+                                            alignItems="center"
+                                            gap="4"
+                                            borderRadius="lg"
+                                            borderWidth="1px"
+                                            borderColor={isNext ? 'brand.solid' : 'border'}
+                                            bg="bg.surface"
+                                            p="4"
+                                            boxShadow={isNext ? 'sm' : undefined}
+                                            _hover={isNext ? undefined : { boxShadow: 'sm' }}
+                                            transition="box-shadow 0.2s"
                                         >
-                                            {/* Status dot */}
-                                            <span
-                                                className={[
-                                                    'w-2.5 h-2.5 rounded-full shrink-0',
-                                                    isNext
-                                                        ? 'bg-[var(--color-primary)]'
-                                                        : 'bg-[var(--color-text-muted)]',
-                                                ].join(' ')}
+                                            <Box
+                                                w="2.5"
+                                                h="2.5"
+                                                borderRadius="full"
+                                                flexShrink={0}
+                                                bg={isNext ? 'brand.solid' : 'fg.subtle'}
                                             />
 
-                                            {/* Time */}
-                                            <div className="w-14 shrink-0 text-center">
-                                                <p className="text-sm font-semibold leading-none text-[var(--color-text)]">
+                                            <Box w="14" flexShrink={0} textAlign="center">
+                                                <Text fontSize="sm" fontWeight="semibold" lineHeight="none" color="fg">
                                                     {time}
-                                                </p>
-                                                <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{period}</p>
-                                            </div>
+                                                </Text>
+                                                <Text fontSize="xs" color="fg.subtle" mt="0.5">{period}</Text>
+                                            </Box>
 
-                                            {/* Session info */}
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-semibold text-[var(--color-text)] truncate">
+                                            <Box flex="1" minW={0}>
+                                                <Text fontSize="sm" fontWeight="semibold" color="fg" truncate>
                                                     {session.patient.name}
-                                                </p>
-                                                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                                                </Text>
+                                                <Text fontSize="xs" color="fg.muted" mt="0.5">
                                                     {session.service_name
                                                         ? `${session.service_name} • Sesión ${session.session_number}/${session.total_sessions}`
                                                         : `Sesión ${session.session_number}/${session.total_sessions}`}
-                                                </p>
-                                                <div className="flex flex-wrap gap-1.5 mt-2">
-                                                    <span
-                                                        className={[
-                                                            'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
-                                                            isOnline
-                                                                ? 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]'
-                                                                : 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]',
-                                                        ].join(' ')}
+                                                </Text>
+                                                <Flex flexWrap="wrap" gap="1.5" mt="2">
+                                                    <Badge
+                                                        variant="subtle"
+                                                        colorPalette={isOnline ? 'gray' : 'green'}
+                                                        borderRadius="full"
+                                                        px="2"
+                                                        py="0.5"
+                                                        fontSize="2xs"
+                                                        fontWeight="semibold"
+                                                        textTransform="uppercase"
+                                                        letterSpacing="wider"
                                                     >
                                                         {getModalityLabel(session.modality)}
-                                                    </span>
-                                                </div>
-                                            </div>
+                                                    </Badge>
+                                                </Flex>
+                                            </Box>
 
-                                            {/* Action */}
                                             {isNext ? (
-                                                <Link
-                                                    href={AppointmentShowAction.url(session.id)}
-                                                    className="shrink-0 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)] transition-colors"
-                                                >
-                                                    Preparar sesión
-                                                </Link>
+                                                <Button asChild variant="primary" size="sm" flexShrink={0}>
+                                                    <ChakraLink href={AppointmentShowAction.url(session.id)}>
+                                                        Preparar sesión
+                                                    </ChakraLink>
+                                                </Button>
                                             ) : (
-                                                <Link
-                                                    href={PatientShowAction.url(session.patient.id)}
-                                                    className="shrink-0 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-alt)] transition-colors"
-                                                >
-                                                    Ver ficha
-                                                </Link>
+                                                <Button asChild variant="outline" size="sm" flexShrink={0}>
+                                                    <ChakraLink href={PatientShowAction.url(session.patient.id)}>
+                                                        Ver ficha
+                                                    </ChakraLink>
+                                                </Button>
                                             )}
-                                        </div>
+                                        </Flex>
                                     );
                                 })}
-                            </div>
+                            </Stack>
                         )}
-                    </div>
+                    </Box>
 
-                    {/* === SIDEBAR COLUMN === */}
-                    <div className="flex flex-col gap-4">
+                    <Stack gap="4">
 
-                        {/* Cobros pendientes */}
                         {allPendingAlerts.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                                <div className="px-4 py-3 border-b border-[var(--color-border-subtle)]">
-                                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                overflow="hidden"
+                                boxShadow="sm"
+                            >
+                                <Box px="4" py="3" borderBottomWidth="1px" borderColor="border">
+                                    <Text
+                                        fontSize="xs"
+                                        fontWeight="semibold"
+                                        textTransform="uppercase"
+                                        letterSpacing="wider"
+                                        color="fg.muted"
+                                    >
                                         Cobros pendientes
-                                    </p>
-                                </div>
-                                <div className="divide-y divide-[var(--color-border-subtle)]">
-                                    {allPendingAlerts.map((alert) => (
-                                        <Link
-                                            key={`${alert.type}-${alert.id}`}
-                                            href={PatientShowAction.url(alert.patientId)}
-                                            className="flex items-center justify-between px-4 py-3 hover:bg-[var(--color-surface-alt)] transition-colors"
-                                        >
-                                            <div className="flex items-start gap-2.5 min-w-0">
-                                                <span className="mt-1 w-2 h-2 rounded-full shrink-0 bg-[var(--color-error)]" />
-                                                <div className="min-w-0">
-                                                    <p className="text-sm font-medium text-[var(--color-text)] truncate">
-                                                        {alert.name}
-                                                    </p>
-                                                    <p
-                                                        className={[
-                                                            'text-[10px] font-semibold uppercase tracking-wide mt-0.5',
-                                                            alert.isOverdue
-                                                                ? 'text-[var(--color-error-fg)]'
-                                                                : 'text-[var(--color-warning-fg)]',
-                                                        ].join(' ')}
-                                                    >
-                                                        {alert.label}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <ArrowRight
-                                                size={16}
-                                                className="shrink-0 text-[var(--color-text-muted)] ml-2"
-                                            />
-                                        </Link>
-                                    ))}
-                                </div>
-                                <div className="px-4 py-2.5 border-t border-[var(--color-border-subtle)]">
-                                    <Link
+                                    </Text>
+                                </Box>
+                                {allPendingAlerts.map((alert, index) => (
+                                    <ChakraLink
+                                        key={`${alert.type}-${alert.id}`}
+                                        href={PatientShowAction.url(alert.patientId)}
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="space-between"
+                                        px="4"
+                                        py="3"
+                                        borderTopWidth={index > 0 ? '1px' : undefined}
+                                        borderColor="border"
+                                        _hover={{ bg: 'bg.subtle' }}
+                                        transition="background 0.2s"
+                                    >
+                                        <Flex alignItems="flex-start" gap="2.5" minW={0}>
+                                            <Box mt="1" w="2" h="2" borderRadius="full" flexShrink={0} bg="error.solid" />
+                                            <Box minW={0}>
+                                                <Text fontSize="sm" fontWeight="medium" color="fg" truncate>
+                                                    {alert.name}
+                                                </Text>
+                                                <Text
+                                                    fontSize="2xs"
+                                                    fontWeight="semibold"
+                                                    textTransform="uppercase"
+                                                    letterSpacing="wider"
+                                                    mt="0.5"
+                                                    color={alert.isOverdue ? 'error.fg' : 'warning.fg'}
+                                                >
+                                                    {alert.label}
+                                                </Text>
+                                            </Box>
+                                        </Flex>
+                                        <Box as={ArrowRight} w="4" h="4" flexShrink={0} color="fg.subtle" ml="2" />
+                                    </ChakraLink>
+                                ))}
+                                <Box px="4" py="2.5" borderTopWidth="1px" borderColor="border">
+                                    <ChakraLink
                                         href="/invoices"
-                                        className="text-xs font-medium text-[var(--color-primary)] hover:underline"
+                                        fontSize="xs"
+                                        fontWeight="medium"
+                                        color="brand.solid"
+                                        _hover={{ textDecoration: 'underline' }}
                                     >
                                         Ver todo el historial
-                                    </Link>
-                                </div>
-                            </div>
+                                    </ChakraLink>
+                                </Box>
+                            </Box>
                         )}
 
-                        {/* KPI: Sesiones hoy */}
-                        <div className="rounded-[var(--radius-lg)] bg-[var(--color-primary)] p-5 flex items-center justify-between shadow-[var(--shadow-sm)]">
-                            <div>
-                                <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                        <Flex
+                            borderRadius="lg"
+                            bg="brand.solid"
+                            p="5"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            boxShadow="sm"
+                        >
+                            <Box>
+                                <Text fontSize="xs" fontWeight="semibold" textTransform="uppercase" letterSpacing="wider" color="white/70">
                                     Sesiones hoy
-                                </p>
-                                <p className="text-kpi font-bold text-white mt-1 leading-none">
+                                </Text>
+                                <Text fontSize="3xl" fontWeight="bold" color="white" mt="1" lineHeight="none">
                                     {stats.sessions_today.toString().padStart(2, '0')}
-                                </p>
-                            </div>
-                            <div className="rounded-[var(--radius-md)] bg-white/15 p-2.5">
-                                <CalendarDays size={22} className="text-white" />
-                            </div>
-                        </div>
+                                </Text>
+                            </Box>
+                            <Flex borderRadius="md" bg="white/15" p="2.5">
+                                <Box as={CalendarDays} w="22px" h="22px" color="white" />
+                            </Flex>
+                        </Flex>
 
-                        {/* KPI: Pendientes */}
-                        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 flex items-center justify-between shadow-[var(--shadow-sm)]">
-                            <div>
-                                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
+                        <Flex
+                            borderRadius="lg"
+                            borderWidth="1px"
+                            borderColor="border"
+                            bg="bg.surface"
+                            p="5"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            boxShadow="sm"
+                        >
+                            <Box>
+                                <Text fontSize="xs" fontWeight="semibold" textTransform="uppercase" letterSpacing="wider" color="fg.muted">
                                     Pendientes
-                                </p>
-                                <p className="text-kpi font-bold text-[var(--color-text)] mt-1 leading-none">
+                                </Text>
+                                <Text fontSize="3xl" fontWeight="bold" color="fg" mt="1" lineHeight="none">
                                     {Number(stats.pending_invoices).toLocaleString('es-ES', {
                                         minimumFractionDigits: 2,
                                         maximumFractionDigits: 2,
                                     })} €
-                                </p>
+                                </Text>
                                 {allPendingAlerts.length > 0 && (
-                                    <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                                    <Text fontSize="xs" color="fg.subtle" mt="1">
                                         {allPendingAlerts.length}{' '}
                                         {allPendingAlerts.length === 1 ? 'factura' : 'facturas'}
-                                    </p>
+                                    </Text>
                                 )}
-                            </div>
-                            <div className="rounded-[var(--radius-md)] bg-[var(--color-surface-alt)] p-2.5">
-                                <Receipt size={22} className="text-[var(--color-text-secondary)]" />
-                            </div>
-                        </div>
+                            </Box>
+                            <Flex borderRadius="md" bg="bg.subtle" p="2.5">
+                                <Box as={Receipt} w="22px" h="22px" color="fg.muted" />
+                            </Flex>
+                        </Flex>
 
-                    </div>
+                    </Stack>
 
-                </div>
-            </div>
+                </Grid>
+            </Stack>
         </>
     );
 }
