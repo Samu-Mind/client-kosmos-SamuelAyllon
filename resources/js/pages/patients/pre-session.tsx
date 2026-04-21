@@ -1,3 +1,4 @@
+import { Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -6,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import AppLayout from '@/layouts/app-layout';
 import type { Agreement, ConsultingSessionType, KosmoBriefing, Note, Patient, Payment, ConsentForm } from '@/types';
+
+const ChakraLink = chakra(Link);
 
 interface SessionContext {
     lastSessions: ConsultingSessionType[];
@@ -32,151 +35,216 @@ export default function PreSession({ patient, context, briefing }: Props) {
         <>
             <Head title={`Pre-sesión: ${patient.project_name} — ClientKosmos`} />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-4xl">
+            <Stack gap="6" p={{ base: '6', lg: '8' }} maxW="4xl">
 
-                {/* Back + Header */}
-                <div>
-                    <Link
+                <Box>
+                    <ChakraLink
                         href={`/patients/${patient.id}`}
-                        className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] mb-4"
+                        display="inline-flex"
+                        alignItems="center"
+                        gap="2"
+                        fontSize="sm"
+                        color="fg.muted"
+                        mb="4"
+                        _hover={{ color: 'fg' }}
                     >
-                        <ArrowLeft size={16} />
+                        <Box as={ArrowLeft} w="4" h="4" />
                         Volver a {patient.project_name}
-                    </Link>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-display-2xl text-[var(--color-text)]">Preparar sesión</h1>
-                            <p className="text-body-md text-[var(--color-text-secondary)] mt-1">{patient.project_name}</p>
-                        </div>
-                        <div className="flex gap-2">
+                    </ChakraLink>
+                    <Flex alignItems="center" justifyContent="space-between">
+                        <Box>
+                            <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
+                                Preparar sesión
+                            </Heading>
+                            <Text fontSize="md" color="fg.muted" mt="1">
+                                {patient.project_name}
+                            </Text>
+                        </Box>
+                        <Flex gap="2">
                             {patient.statuses?.map((s) => (
                                 <StatusBadge key={s} status={s} />
                             ))}
-                        </div>
-                    </div>
-                </div>
+                        </Flex>
+                    </Flex>
+                </Box>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="6">
 
-                    {/* Left column */}
-                    <div className="space-y-5">
+                    <Stack gap="5">
 
-                        {/* Kosmo briefing */}
                         {briefing && (
                             <KosmoBriefingComponent
                                 title="Kosmo te recuerda"
                                 content={
-                                    <div className="space-y-2">
+                                    <Stack gap="2">
                                         {Object.entries(briefing.content).map(([k, v]) => (
-                                            <p key={k} className="text-sm text-[var(--color-text-secondary)]">{String(v)}</p>
+                                            <Text key={k} fontSize="sm" color="fg.muted">
+                                                {String(v)}
+                                            </Text>
                                         ))}
-                                    </div>
+                                    </Stack>
                                 }
                             />
                         )}
 
-                        {/* Last sessions */}
                         {context.lastSessions.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                                <h3 className="text-display-lg text-[var(--color-text)] mb-4">Últimas sesiones</h3>
-                                <div className="space-y-2">
-                                    {context.lastSessions.map((session) => (
-                                        <div key={session.id} className="flex items-center justify-between py-2 border-t border-[var(--color-border-subtle)] first:border-0">
-                                            <span className="text-sm font-medium text-[var(--color-text)]">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                p="5"
+                                boxShadow="sm"
+                            >
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="4">
+                                    Últimas sesiones
+                                </Heading>
+                                <Stack gap="2">
+                                    {context.lastSessions.map((session, idx) => (
+                                        <Flex
+                                            key={session.id}
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                            py="2"
+                                            borderTopWidth={idx > 0 ? '1px' : undefined}
+                                            borderColor="border.subtle"
+                                        >
+                                            <Text fontSize="sm" fontWeight="medium" color="fg">
                                                 {formatDateTime(session.scheduled_at)}
-                                            </span>
-                                            <span className="text-xs text-[var(--color-text-secondary)]">
+                                            </Text>
+                                            <Text fontSize="xs" color="fg.muted">
                                                 {session.duration_minutes ?? 50} min
-                                            </span>
-                                        </div>
+                                            </Text>
+                                        </Flex>
                                     ))}
-                                </div>
-                            </div>
+                                </Stack>
+                            </Box>
                         )}
 
-                        {/* Recent notes */}
                         {context.recentNotes.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                                <h3 className="text-display-lg text-[var(--color-text)] mb-4">Notas recientes</h3>
-                                <div className="space-y-3">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                p="5"
+                                boxShadow="sm"
+                            >
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="4">
+                                    Notas recientes
+                                </Heading>
+                                <Stack gap="3">
                                     {context.recentNotes.map((note) => (
-                                        <div key={note.id} className="border-l-2 border-[var(--color-border)] pl-3">
-                                            <p className="text-sm text-[var(--color-text)] line-clamp-3">{note.content}</p>
-                                            <p className="text-xs text-[var(--color-text-muted)] mt-1">{formatDate(note.created_at)}</p>
-                                        </div>
+                                        <Box key={note.id} borderLeftWidth="2px" borderColor="border" pl="3">
+                                            <Text fontSize="sm" color="fg" lineClamp={3}>
+                                                {note.content}
+                                            </Text>
+                                            <Text fontSize="xs" color="fg.subtle" mt="1">
+                                                {formatDate(note.created_at)}
+                                            </Text>
+                                        </Box>
                                     ))}
-                                </div>
-                            </div>
+                                </Stack>
+                            </Box>
                         )}
-                    </div>
+                    </Stack>
 
-                    {/* Right column */}
-                    <div className="space-y-5">
+                    <Stack gap="5">
 
-                        {/* Open agreements */}
                         {context.openAgreements.length > 0 && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-orange)] bg-[var(--color-orange-subtle)] p-5">
-                                <h3 className="text-display-lg text-[var(--color-text)] mb-4 flex items-center gap-2">
-                                    <span className="h-2 w-2 rounded-full bg-[var(--color-orange)]" />
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="orange.solid"
+                                bg="orange.subtle"
+                                p="5"
+                            >
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="4" display="flex" alignItems="center" gap="2">
+                                    <Box w="2" h="2" borderRadius="full" bg="orange.solid" />
                                     Acuerdos pendientes
-                                </h3>
-                                <ul className="space-y-2">
+                                </Heading>
+                                <Stack as="ul" gap="2" listStyleType="none">
                                     {context.openAgreements.map((a) => (
-                                        <li key={a.id} className="text-sm text-[var(--color-text)]">• {a.content}</li>
+                                        <Text as="li" key={a.id} fontSize="sm" color="fg">
+                                            • {a.content}
+                                        </Text>
                                     ))}
-                                </ul>
-                            </div>
+                                </Stack>
+                            </Box>
                         )}
 
-                        {/* Payment status */}
                         {context.lastPayment && context.lastPayment.status !== 'paid' && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-warning)] bg-[var(--color-warning-subtle)] p-5">
-                                <h3 className="text-display-lg text-[var(--color-text)] mb-2">Cobro pendiente</h3>
-                                <p className="text-sm text-[var(--color-text-secondary)]">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="yellow.solid"
+                                bg="yellow.subtle"
+                                p="5"
+                            >
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="2">
+                                    Cobro pendiente
+                                </Heading>
+                                <Text fontSize="sm" color="fg.muted">
                                     €{Number(context.lastPayment.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })} —
                                     vencimiento {formatDate(context.lastPayment.due_date)}
-                                </p>
-                            </div>
+                                </Text>
+                            </Box>
                         )}
 
-                        {/* No consent warning */}
                         {!patient.has_valid_consent && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-indigo)] bg-[var(--color-indigo-subtle)] p-5">
-                                <h3 className="text-display-lg text-[var(--color-text)] mb-2">Sin consentimiento RGPD</h3>
-                                <p className="text-sm text-[var(--color-text-secondary)]">
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="purple.solid"
+                                bg="purple.subtle"
+                                p="5"
+                            >
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="2">
+                                    Sin consentimiento RGPD
+                                </Heading>
+                                <Text fontSize="sm" color="fg.muted">
                                     Este paciente no tiene un consentimiento informado firmado activo.
-                                </p>
-                            </div>
+                                </Text>
+                            </Box>
                         )}
 
-                        {/* Motivo de consulta */}
                         {patient.service_scope && (
-                            <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                                <h3 className="text-display-lg text-[var(--color-text)] mb-2">Motivo de consulta</h3>
-                                <p className="text-sm text-[var(--color-text-secondary)]">{patient.service_scope}</p>
+                            <Box
+                                borderRadius="lg"
+                                borderWidth="1px"
+                                borderColor="border"
+                                bg="bg.surface"
+                                p="5"
+                                boxShadow="sm"
+                            >
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="2">
+                                    Motivo de consulta
+                                </Heading>
+                                <Text fontSize="sm" color="fg.muted">
+                                    {patient.service_scope}
+                                </Text>
                                 {patient.brand_tone && (
-                                    <p className="text-xs text-[var(--color-text-muted)] mt-2">
+                                    <Text fontSize="xs" color="fg.subtle" mt="2">
                                         Enfoque: {patient.brand_tone}
-                                    </p>
+                                    </Text>
                                 )}
-                            </div>
+                            </Box>
                         )}
-                    </div>
-                </div>
+                    </Stack>
+                </Grid>
 
-                {/* CTA */}
-                <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border-subtle)]">
-                    <p className="text-sm text-[var(--color-text-secondary)]">
+                <Flex alignItems="center" justifyContent="space-between" pt="4" borderTopWidth="1px" borderColor="border.subtle">
+                    <Text fontSize="sm" color="fg.muted">
                         Cuando la sesión termine, registra el cierre desde el botón de la derecha.
-                    </p>
-                    <Link href={`/patients/${patient.id}/post-session`}>
+                    </Text>
+                    <ChakraLink href={`/patients/${patient.id}/post-session`}>
                         <Button variant="primary">
-                            <Sparkles size={16} className="mr-2" />
+                            <Box as={Sparkles} w="4" h="4" mr="2" />
                             Cerrar sesión
                         </Button>
-                    </Link>
-                </div>
-            </div>
+                    </ChakraLink>
+                </Flex>
+            </Stack>
         </>
     );
 }

@@ -1,3 +1,5 @@
+import { Badge, Box, Flex, Heading, Stack, Text, chakra } from '@chakra-ui/react';
+
 import { Head, Link, router } from '@inertiajs/react';
 import { CalendarDays, Clock } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -6,6 +8,8 @@ import ShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
 import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
 import { EmptyState } from '@/components/empty-state';
 import AppLayout from '@/layouts/app-layout';
+
+const ChakraLink = chakra(Link);
 
 interface AppointmentItem {
     id: number;
@@ -30,12 +34,12 @@ interface Props {
     filters: { status?: string; date?: string };
 }
 
-const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-    scheduled:   { label: 'Programada',    bg: 'bg-[var(--color-indigo-subtle)]',  text: 'text-[var(--color-indigo-fg)]',  dot: 'bg-[var(--color-indigo)]' },
-    confirmed:   { label: 'Confirmada',    bg: 'bg-[var(--color-success-subtle)]', text: 'text-[var(--color-success-fg)]', dot: 'bg-[var(--color-success)]' },
-    in_progress: { label: 'En curso',      bg: 'bg-[var(--color-warning-subtle)]', text: 'text-[var(--color-warning-fg)]', dot: 'bg-[var(--color-warning)]' },
-    completed:   { label: 'Completada',    bg: 'bg-[var(--color-surface-alt)]',    text: 'text-[var(--color-text-secondary)]', dot: 'bg-[var(--color-text-muted)]' },
-    cancelled:   { label: 'Cancelada',     bg: 'bg-[var(--color-error-subtle)]',   text: 'text-[var(--color-error-fg)]',   dot: 'bg-[var(--color-error)]' },
+const statusConfig: Record<string, { label: string; palette: string }> = {
+    scheduled:   { label: 'Programada', palette: 'purple' },
+    confirmed:   { label: 'Confirmada', palette: 'green' },
+    in_progress: { label: 'En curso',   palette: 'yellow' },
+    completed:   { label: 'Completada', palette: 'gray' },
+    cancelled:   { label: 'Cancelada',  palette: 'red' },
 };
 
 const modalityLabel: Record<string, string> = {
@@ -73,35 +77,41 @@ export default function AppointmentsIndex({ appointments, filters }: Props) {
         <>
             <Head title="Citas — ClientKosmos" />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
 
-                {/* Header */}
-                <div>
-                    <h1 className="text-display-2xl text-[var(--color-text)]">Listado  de citas</h1>
-                    <p className="mt-1 text-body-md text-[var(--color-text-secondary)]">
+                <Box>
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
+                        Listado de citas
+                    </Heading>
+                    <Text mt="1" fontSize="md" color="fg.muted">
                         Historial y gestión de todas tus citas
-                    </p>
-                </div>
+                    </Text>
+                </Box>
 
-                {/* Filters */}
-                <div className="flex gap-2 flex-wrap">
-                    {statusFilters.map((f) => (
-                        <button
-                            key={f.value}
-                            onClick={() => setFilter(f.value)}
-                            className={[
-                                'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-                                (filters.status ?? '') === f.value
-                                    ? 'bg-[var(--color-primary)] text-white'
-                                    : 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]',
-                            ].join(' ')}
-                        >
-                            {f.label}
-                        </button>
-                    ))}
-                </div>
+                <Flex gap="2" flexWrap="wrap">
+                    {statusFilters.map((f) => {
+                        const isActive = (filters.status ?? '') === f.value;
+                        return (
+                            <Box
+                                as="button"
+                                key={f.value}
+                                onClick={() => setFilter(f.value)}
+                                px="3"
+                                py="1.5"
+                                borderRadius="full"
+                                fontSize="xs"
+                                fontWeight="medium"
+                                transition="colors 0.2s"
+                                bg={isActive ? 'brand.solid' : 'bg.subtle'}
+                                color={isActive ? 'brand.contrast' : 'fg.muted'}
+                                _hover={isActive ? undefined : { bg: 'border' }}
+                            >
+                                {f.label}
+                            </Box>
+                        );
+                    })}
+                </Flex>
 
-                {/* List */}
                 {appointments.data.length === 0 ? (
                     <EmptyState
                         icon={CalendarDays}
@@ -109,110 +119,153 @@ export default function AppointmentsIndex({ appointments, filters }: Props) {
                         description="No hay citas que coincidan con los filtros seleccionados."
                     />
                 ) : (
-                    <div className="flex flex-col gap-2">
+                    <Stack gap="2">
                         {appointments.data.map((appt) => {
                             const { date, time } = formatDateTime(appt.starts_at);
                             const cfg = statusConfig[appt.status] ?? statusConfig.scheduled;
                             const online = isOnline(appt.modality);
 
                             return (
-                                <div
+                                <Flex
                                     key={appt.id}
-                                    className="flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 hover:shadow-[var(--shadow-sm)] transition-shadow"
+                                    alignItems="center"
+                                    gap="4"
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor="border"
+                                    bg="bg.surface"
+                                    px="4"
+                                    py="3"
+                                    transition="box-shadow 0.2s"
+                                    _hover={{ boxShadow: 'sm' }}
                                 >
-                                    {/* Status dot */}
-                                    <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${cfg.dot}`} />
+                                    <Box
+                                        w="2.5"
+                                        h="2.5"
+                                        borderRadius="full"
+                                        flexShrink={0}
+                                        bg={`${cfg.palette}.solid`}
+                                    />
 
-                                    {/* Date + time */}
-                                    <div className="w-28 shrink-0">
-                                        <p className="text-xs font-medium text-[var(--color-text-secondary)] capitalize">{date}</p>
-                                        <p className="text-sm font-semibold text-[var(--color-text)] flex items-center gap-1 mt-0.5">
-                                            <Clock size={12} className="text-[var(--color-text-muted)]" />
-                                            {time}
-                                        </p>
-                                    </div>
+                                    <Box w="28" flexShrink={0}>
+                                        <Text fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="capitalize">
+                                            {date}
+                                        </Text>
+                                        <Flex alignItems="center" gap="1" mt="0.5">
+                                            <Box as={Clock} w="3" h="3" color="fg.subtle" />
+                                            <Text fontSize="sm" fontWeight="semibold" color="fg">
+                                                {time}
+                                            </Text>
+                                        </Flex>
+                                    </Box>
 
-                                    {/* Patient + service */}
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold text-[var(--color-text)] truncate">
+                                    <Box flex="1" minW="0">
+                                        <Text fontSize="sm" fontWeight="semibold" color="fg" truncate>
                                             {appt.patient?.name ?? 'Paciente'}
-                                        </p>
+                                        </Text>
                                         {appt.service && (
-                                            <p className="text-xs text-[var(--color-text-secondary)] truncate mt-0.5">
+                                            <Text fontSize="xs" color="fg.muted" mt="0.5" truncate>
                                                 {appt.service.name}
-                                            </p>
+                                            </Text>
                                         )}
-                                    </div>
+                                    </Box>
 
-                                    {/* Modality badge */}
-                                    <span
-                                        className={[
-                                            'shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
-                                            online
-                                                ? 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]'
-                                                : 'bg-[var(--color-success-subtle)] text-[var(--color-success-fg)]',
-                                        ].join(' ')}
+                                    <Badge
+                                        flexShrink={0}
+                                        variant="subtle"
+                                        colorPalette={online ? 'gray' : 'green'}
+                                        borderRadius="full"
+                                        px="2"
+                                        py="0.5"
+                                        fontSize="2xs"
+                                        fontWeight="semibold"
+                                        textTransform="uppercase"
+                                        letterSpacing="wider"
                                     >
                                         {modalityLabel[appt.modality?.toLowerCase()] ?? appt.modality ?? 'Presencial'}
-                                    </span>
+                                    </Badge>
 
-                                    {/* Status badge */}
-                                    <span className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.text}`}>
+                                    <Badge
+                                        flexShrink={0}
+                                        variant="subtle"
+                                        colorPalette={cfg.palette}
+                                        borderRadius="full"
+                                        px="2"
+                                        py="0.5"
+                                        fontSize="xs"
+                                        fontWeight="medium"
+                                    >
                                         {cfg.label}
-                                    </span>
+                                    </Badge>
 
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-2 shrink-0">
+                                    <Flex alignItems="center" gap="2" flexShrink={0}>
                                         {appt.status !== 'completed' && appt.status !== 'cancelled' && (
-                                            <Link
+                                            <ChakraLink
                                                 href={ShowAction.url(appt.id)}
-                                                className="rounded-[var(--radius-md)] bg-[var(--color-primary)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--color-primary-hover)] transition-colors"
+                                                borderRadius="md"
+                                                bg="brand.solid"
+                                                px="3"
+                                                py="1.5"
+                                                fontSize="xs"
+                                                fontWeight="medium"
+                                                color="brand.contrast"
+                                                transition="colors 0.2s"
+                                                _hover={{ bg: 'brand.emphasized' }}
                                             >
                                                 Ver sesión
-                                            </Link>
+                                            </ChakraLink>
                                         )}
                                         {appt.patient && (
-                                            <Link
+                                            <ChakraLink
                                                 href={PatientShowAction.url(appt.patient.id)}
-                                                className="rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-alt)] transition-colors"
+                                                borderRadius="md"
+                                                borderWidth="1px"
+                                                borderColor="border"
+                                                px="3"
+                                                py="1.5"
+                                                fontSize="xs"
+                                                fontWeight="medium"
+                                                color="fg"
+                                                transition="colors 0.2s"
+                                                _hover={{ bg: 'bg.subtle' }}
                                             >
                                                 Ver ficha
-                                            </Link>
+                                            </ChakraLink>
                                         )}
-                                    </div>
-                                </div>
+                                    </Flex>
+                                </Flex>
                             );
                         })}
-                    </div>
+                    </Stack>
                 )}
 
-                {/* Pagination */}
                 {appointments.last_page > 1 && (
-                    <div className="flex items-center justify-between">
-                        <p className="text-xs text-[var(--color-text-secondary)]">
+                    <Flex alignItems="center" justifyContent="space-between">
+                        <Text fontSize="xs" color="fg.muted">
                             {appointments.total} citas · Página {appointments.current_page} de {appointments.last_page}
-                        </p>
-                        <div className="flex gap-1">
+                        </Text>
+                        <Flex gap="1">
                             {appointments.links.map((link, i) => (
-                                <button
+                                <chakra.button
                                     key={i}
                                     disabled={!link.url}
                                     onClick={() => link.url && router.get(link.url)}
-                                    className={[
-                                        'px-3 py-1 text-xs rounded-[var(--radius-sm)] transition-colors',
-                                        link.active
-                                            ? 'bg-[var(--color-primary)] text-white'
-                                            : link.url
-                                                ? 'text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]'
-                                                : 'text-[var(--color-text-muted)] cursor-not-allowed',
-                                    ].join(' ')}
+                                    px="3"
+                                    py="1"
+                                    fontSize="xs"
+                                    borderRadius="sm"
+                                    transition="colors 0.2s"
+                                    bg={link.active ? 'brand.solid' : undefined}
+                                    color={link.active ? 'brand.contrast' : link.url ? 'fg.muted' : 'fg.subtle'}
+                                    cursor={link.url ? 'pointer' : 'not-allowed'}
+                                    _hover={link.active || !link.url ? undefined : { bg: 'border' }}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
-                        </div>
-                    </div>
+                        </Flex>
+                    </Flex>
                 )}
-            </div>
+            </Stack>
         </>
     );
 }

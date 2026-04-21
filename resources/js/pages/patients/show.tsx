@@ -1,3 +1,4 @@
+import { Box, Flex, Grid, Heading, Stack, Table, Text, Textarea, chakra } from '@chakra-ui/react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { CheckCircle, FileText, Receipt, Shield } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -8,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import AppLayout from '@/layouts/app-layout';
 import type { Agreement, ConsentForm, ConsultingSessionType, Document, Note, Patient, Payment } from '@/types';
+
+const ChakraLink = chakra(Link);
 
 interface Props {
     patient: Patient & {
@@ -55,104 +58,157 @@ export default function PatientShow({ patient }: Props) {
         <>
             <Head title={`${patient.project_name} — ClientKosmos`} />
 
-            <div className="flex flex-col">
+            <Flex direction="column">
 
-                {/* Patient Header */}
                 <PatientHeader patient={patient} />
 
-                {/* Tabs */}
-                <div className="border-b border-[var(--color-border-subtle)] bg-[var(--color-surface)] px-4 sticky top-[73px] z-[var(--z-sticky)]">
-                    <div className="flex gap-1 overflow-x-auto">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.key}
-                                onClick={() => setActiveTab(tab.key)}
-                                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-[var(--duration-normal)] ${
-                                    activeTab === tab.key
-                                        ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
-                                        : 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
-                                }`}
-                            >
-                                <tab.icon size={16} />
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                <Box
+                    borderBottomWidth="1px"
+                    borderColor="border.subtle"
+                    bg="bg.surface"
+                    px="4"
+                    position="sticky"
+                    top="73px"
+                    zIndex="sticky"
+                >
+                    <Flex gap="1" overflowX="auto">
+                        {tabs.map((tab) => {
+                            const isActive = activeTab === tab.key;
+                            return (
+                                <Flex
+                                    as="button"
+                                    key={tab.key}
+                                    onClick={() => setActiveTab(tab.key)}
+                                    alignItems="center"
+                                    gap="2"
+                                    px="4"
+                                    py="3"
+                                    fontSize="sm"
+                                    fontWeight="medium"
+                                    whiteSpace="nowrap"
+                                    borderBottomWidth="2px"
+                                    borderColor={isActive ? 'brand.solid' : 'transparent'}
+                                    color={isActive ? 'brand.solid' : 'fg.muted'}
+                                    transition="colors 0.2s"
+                                    _hover={isActive ? undefined : { color: 'fg' }}
+                                >
+                                    <Box as={tab.icon} w="4" h="4" />
+                                    {tab.label}
+                                </Flex>
+                            );
+                        })}
+                    </Flex>
+                </Box>
 
-                {/* Content */}
-                <div className="p-6 lg:p-8 max-w-4xl">
+                <Box p={{ base: '6', lg: '8' }} maxW="4xl">
 
-                    {/* Tab Resumen */}
                     {activeTab === 'resumen' && (
-                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                            <div className="space-y-4">
-                                <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                                    <h3 className="text-display-lg text-[var(--color-text)] mb-4">Datos del paciente</h3>
-                                    <dl className="space-y-3">
+                        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="6">
+                            <Stack gap="4">
+                                <Box
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor="border"
+                                    bg="bg.surface"
+                                    p="5"
+                                    boxShadow="sm"
+                                >
+                                    <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="4">
+                                        Datos del paciente
+                                    </Heading>
+                                    <Stack as="dl" gap="3">
                                         {patient.service_scope && (
-                                            <div>
-                                                <dt className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Motivo de consulta</dt>
-                                                <dd className="text-sm text-[var(--color-text)] mt-0.5">{patient.service_scope}</dd>
-                                            </div>
+                                            <Box>
+                                                <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                                    Motivo de consulta
+                                                </Text>
+                                                <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                                    {patient.service_scope}
+                                                </Text>
+                                            </Box>
                                         )}
                                         {patient.brand_tone && (
-                                            <div>
-                                                <dt className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Enfoque terapéutico</dt>
-                                                <dd className="text-sm text-[var(--color-text)] mt-0.5">{patient.brand_tone}</dd>
-                                            </div>
+                                            <Box>
+                                                <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                                    Enfoque terapéutico
+                                                </Text>
+                                                <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                                    {patient.brand_tone}
+                                                </Text>
+                                            </Box>
                                         )}
                                         {patient.next_deadline && (
-                                            <div>
-                                                <dt className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Próxima sesión</dt>
-                                                <dd className="text-sm text-[var(--color-text)] mt-0.5">{formatDate(patient.next_deadline)}</dd>
-                                            </div>
+                                            <Box>
+                                                <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                                    Próxima sesión
+                                                </Text>
+                                                <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                                    {formatDate(patient.next_deadline)}
+                                                </Text>
+                                            </Box>
                                         )}
-                                    </dl>
-                                </div>
-                                <div className="flex gap-3">
-                                    <Link href={`/patients/${patient.id}/pre-session`}>
+                                    </Stack>
+                                </Box>
+                                <Flex gap="3">
+                                    <ChakraLink href={`/patients/${patient.id}/pre-session`}>
                                         <Button variant="primary" size="md">Preparar sesión</Button>
-                                    </Link>
-                                    <Link href={`/patients/${patient.id}/post-session`}>
+                                    </ChakraLink>
+                                    <ChakraLink href={`/patients/${patient.id}/post-session`}>
                                         <Button variant="secondary" size="md">Al terminar</Button>
-                                    </Link>
-                                </div>
-                            </div>
+                                    </ChakraLink>
+                                </Flex>
+                            </Stack>
 
-                            <div className="space-y-4">
+                            <Stack gap="4">
                                 {patient.sessions.slice(0, 3).length > 0 && (
-                                    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                                        <h3 className="text-display-lg text-[var(--color-text)] px-5 pt-5 pb-3">Últimas sesiones</h3>
+                                    <Box
+                                        borderRadius="lg"
+                                        borderWidth="1px"
+                                        borderColor="border"
+                                        bg="bg.surface"
+                                        overflow="hidden"
+                                        boxShadow="sm"
+                                    >
+                                        <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" px="5" pt="5" pb="3">
+                                            Últimas sesiones
+                                        </Heading>
                                         {patient.sessions.slice(0, 3).map((session) => (
-                                            <div key={session.id} className="px-5 py-3 border-t border-[var(--color-border-subtle)]">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm font-semibold text-[var(--color-text)]">
+                                            <Box key={session.id} px="5" py="3" borderTopWidth="1px" borderColor="border.subtle">
+                                                <Flex alignItems="center" justifyContent="space-between">
+                                                    <Text fontSize="sm" fontWeight="semibold" color="fg">
                                                         {formatDateTime(session.scheduled_at)}
-                                                    </span>
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]">
+                                                    </Text>
+                                                    <Text
+                                                        fontSize="xs"
+                                                        px="2"
+                                                        py="0.5"
+                                                        borderRadius="full"
+                                                        bg="bg.subtle"
+                                                        color="fg.muted"
+                                                    >
                                                         {session.duration_minutes ?? 50} min
-                                                    </span>
-                                                </div>
+                                                    </Text>
+                                                </Flex>
                                                 {session.ai_summary && (
-                                                    <p className="text-sm text-[var(--color-text-secondary)] mt-1 line-clamp-2">
+                                                    <Text fontSize="sm" color="fg.muted" mt="1" lineClamp={2}>
                                                         {session.ai_summary}
-                                                    </p>
+                                                    </Text>
                                                 )}
-                                            </div>
+                                            </Box>
                                         ))}
-                                    </div>
+                                    </Box>
                                 )}
-                            </div>
-                        </div>
+                            </Stack>
+                        </Grid>
                     )}
 
-                    {/* Tab Acuerdos */}
                     {activeTab === 'acuerdos' && (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-display-lg text-[var(--color-text)]">Acuerdos terapéuticos</h3>
-                            </div>
+                        <Stack gap="4">
+                            <Flex alignItems="center" justifyContent="space-between">
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg">
+                                    Acuerdos terapéuticos
+                                </Heading>
+                            </Flex>
                             {patient.agreements.length === 0 ? (
                                 <EmptyState
                                     icon={CheckCircle}
@@ -160,51 +216,101 @@ export default function PatientShow({ patient }: Props) {
                                     description="Los acuerdos terapéuticos aparecerán aquí."
                                 />
                             ) : (
-                                <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)] divide-y divide-[var(--color-border-subtle)]">
-                                    {patient.agreements.map((agreement) => (
-                                        <div key={agreement.id} className="flex items-start gap-3 p-4">
-                                            <input
+                                <Box
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor="border"
+                                    bg="bg.surface"
+                                    overflow="hidden"
+                                    boxShadow="sm"
+                                >
+                                    {patient.agreements.map((agreement, idx) => (
+                                        <Flex
+                                            key={agreement.id}
+                                            alignItems="flex-start"
+                                            gap="3"
+                                            p="4"
+                                            borderTopWidth={idx > 0 ? '1px' : undefined}
+                                            borderColor="border.subtle"
+                                        >
+                                            <Box
+                                                as="input"
                                                 type="checkbox"
                                                 checked={agreement.is_completed}
                                                 onChange={() => router.patch(`/patients/${patient.id}/agreements/${agreement.id}`, {
                                                     is_completed: !agreement.is_completed,
                                                 })}
-                                                className="mt-1 h-4 w-4 rounded border-[var(--color-border)] accent-[var(--color-primary)]"
+                                                mt="1"
+                                                w="4"
+                                                h="4"
+                                                borderRadius="sm"
+                                                borderWidth="1px"
+                                                borderColor="border"
+                                                accentColor="brand.solid"
                                             />
-                                            <div className="flex-1">
-                                                <p className={`text-sm text-[var(--color-text)] ${agreement.is_completed ? 'line-through text-[var(--color-text-muted)]' : ''}`}>
+                                            <Box flex="1">
+                                                <Text
+                                                    fontSize="sm"
+                                                    color={agreement.is_completed ? 'fg.subtle' : 'fg'}
+                                                    textDecoration={agreement.is_completed ? 'line-through' : undefined}
+                                                >
                                                     {agreement.content}
-                                                </p>
-                                                <p className="text-xs text-[var(--color-text-muted)] mt-1">{formatDate(agreement.created_at)}</p>
-                                            </div>
-                                        </div>
+                                                </Text>
+                                                <Text fontSize="xs" color="fg.subtle" mt="1">
+                                                    {formatDate(agreement.created_at)}
+                                                </Text>
+                                            </Box>
+                                        </Flex>
                                     ))}
-                                </div>
+                                </Box>
                             )}
-                        </div>
+                        </Stack>
                     )}
 
-                    {/* Tab Notas */}
                     {activeTab === 'notas' && (
-                        <div className="space-y-4">
-                            <h3 className="text-display-lg text-[var(--color-text)]">Notas de sesión</h3>
+                        <Stack gap="4">
+                            <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg">
+                                Notas de sesión
+                            </Heading>
                             <form onSubmit={submitNote}>
-                                <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] transition-all duration-[var(--duration-normal)] focus-within:border-[var(--color-primary)] focus-within:ring-2 focus-within:ring-[var(--color-primary)]/20">
-                                    <textarea
+                                <Box
+                                    borderRadius="md"
+                                    borderWidth="1px"
+                                    borderColor="border"
+                                    bg="bg.surface"
+                                    transition="all 0.2s"
+                                    _focusWithin={{
+                                        borderColor: 'brand.solid',
+                                        boxShadow: '0 0 0 3px var(--ck-colors-brand-muted)',
+                                    }}
+                                >
+                                    <Textarea
                                         value={noteData.content}
                                         onChange={(e) => setNoteData('content', e.target.value)}
                                         placeholder="Escribe una nota rápida…"
-                                        className="w-full min-h-[80px] px-3 py-2 bg-transparent resize-y text-[var(--color-text)] text-base placeholder:text-[var(--color-text-muted)] focus:outline-none"
+                                        w="full"
+                                        minH="80px"
+                                        px="3"
+                                        py="2"
+                                        bg="transparent"
+                                        resize="vertical"
+                                        border="none"
+                                        color="fg"
+                                        fontSize="md"
+                                        _placeholder={{ color: 'fg.subtle' }}
+                                        _focusVisible={{ outline: 'none', boxShadow: 'none' }}
                                     />
                                     {noteData.content && (
-                                        <div className="flex items-center justify-between px-3 py-2 border-t border-[var(--color-border-subtle)]">
-                                            <span className="text-xs text-[var(--color-text-muted)]">{noteData.content.length} caracteres</span>
+                                        <Flex alignItems="center" justifyContent="space-between" px="3" py="2" borderTopWidth="1px" borderColor="border.subtle">
+                                            <Text fontSize="xs" color="fg.subtle">
+                                                {noteData.content.length} caracteres
+                                            </Text>
                                             <Button type="submit" size="sm" variant="primary" loading={savingNote}>
                                                 Guardar nota
                                             </Button>
-                                        </div>
+                                        </Flex>
                                     )}
-                                </div>
+                                </Box>
                             </form>
 
                             {patient.notes.length === 0 ? (
@@ -214,22 +320,39 @@ export default function PatientShow({ patient }: Props) {
                                     description="Aquí irán tus notas de sesión y observaciones clave."
                                 />
                             ) : (
-                                <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)] divide-y divide-[var(--color-border-subtle)]">
-                                    {patient.notes.map((note) => (
-                                        <div key={note.id} className="p-4">
-                                            <p className="text-sm text-[var(--color-text)] whitespace-pre-wrap">{note.content}</p>
-                                            <p className="text-xs text-[var(--color-text-muted)] mt-2">{formatDate(note.created_at)}</p>
-                                        </div>
+                                <Box
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor="border"
+                                    bg="bg.surface"
+                                    overflow="hidden"
+                                    boxShadow="sm"
+                                >
+                                    {patient.notes.map((note, idx) => (
+                                        <Box
+                                            key={note.id}
+                                            p="4"
+                                            borderTopWidth={idx > 0 ? '1px' : undefined}
+                                            borderColor="border.subtle"
+                                        >
+                                            <Text fontSize="sm" color="fg" whiteSpace="pre-wrap">
+                                                {note.content}
+                                            </Text>
+                                            <Text fontSize="xs" color="fg.subtle" mt="2">
+                                                {formatDate(note.created_at)}
+                                            </Text>
+                                        </Box>
                                     ))}
-                                </div>
+                                </Box>
                             )}
-                        </div>
+                        </Stack>
                     )}
 
-                    {/* Tab Documentos */}
                     {activeTab === 'documentos' && (
-                        <div className="space-y-4">
-                            <h3 className="text-display-lg text-[var(--color-text)]">Documentos</h3>
+                        <Stack gap="4">
+                            <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg">
+                                Documentos
+                            </Heading>
                             {patient.documents.length === 0 ? (
                                 <EmptyState
                                     icon={Shield}
@@ -237,31 +360,57 @@ export default function PatientShow({ patient }: Props) {
                                     description="Guarda aquí los consentimientos RGPD, informes y documentos del paciente."
                                 />
                             ) : (
-                                <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)] divide-y divide-[var(--color-border-subtle)]">
-                                    {patient.documents.map((doc) => (
-                                        <div key={doc.id} className="flex items-center justify-between p-4">
-                                            <div>
-                                                <p className="text-sm font-medium text-[var(--color-text)]">{doc.name}</p>
-                                                <p className="text-xs text-[var(--color-text-muted)]">{formatDate(doc.created_at)}</p>
-                                            </div>
+                                <Box
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor="border"
+                                    bg="bg.surface"
+                                    overflow="hidden"
+                                    boxShadow="sm"
+                                >
+                                    {patient.documents.map((doc, idx) => (
+                                        <Flex
+                                            key={doc.id}
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                            p="4"
+                                            borderTopWidth={idx > 0 ? '1px' : undefined}
+                                            borderColor="border.subtle"
+                                        >
+                                            <Box>
+                                                <Text fontSize="sm" fontWeight="medium" color="fg">
+                                                    {doc.name}
+                                                </Text>
+                                                <Text fontSize="xs" color="fg.subtle">
+                                                    {formatDate(doc.created_at)}
+                                                </Text>
+                                            </Box>
                                             {doc.is_rgpd && (
-                                                <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-indigo-subtle)] text-[var(--color-indigo-fg)]">
+                                                <Text
+                                                    fontSize="xs"
+                                                    px="2"
+                                                    py="0.5"
+                                                    borderRadius="full"
+                                                    bg="purple.subtle"
+                                                    color="purple.fg"
+                                                >
                                                     RGPD
-                                                </span>
+                                                </Text>
                                             )}
-                                        </div>
+                                        </Flex>
                                     ))}
-                                </div>
+                                </Box>
                             )}
-                        </div>
+                        </Stack>
                     )}
 
-                    {/* Tab Cobros */}
                     {activeTab === 'cobros' && (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-display-lg text-[var(--color-text)]">Cobros</h3>
-                            </div>
+                        <Stack gap="4">
+                            <Flex alignItems="center" justifyContent="space-between">
+                                <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg">
+                                    Cobros
+                                </Heading>
+                            </Flex>
                             {patient.payments.length === 0 ? (
                                 <EmptyState
                                     icon={Receipt}
@@ -269,38 +418,53 @@ export default function PatientShow({ patient }: Props) {
                                     description="Aquí verás el historial de pagos de este paciente."
                                 />
                             ) : (
-                                <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-alt)]">
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Fecha</th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Concepto</th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Importe</th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Estado</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-[var(--color-border-subtle)]">
+                                <Box
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor="border"
+                                    bg="bg.surface"
+                                    overflow="hidden"
+                                    boxShadow="sm"
+                                >
+                                    <Table.Root size="sm">
+                                        <Table.Header>
+                                            <Table.Row bg="bg.subtle">
+                                                <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                                    Fecha
+                                                </Table.ColumnHeader>
+                                                <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                                    Concepto
+                                                </Table.ColumnHeader>
+                                                <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider" textAlign="right">
+                                                    Importe
+                                                </Table.ColumnHeader>
+                                                <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                                    Estado
+                                                </Table.ColumnHeader>
+                                            </Table.Row>
+                                        </Table.Header>
+                                        <Table.Body>
                                             {patient.payments.map((payment) => (
-                                                <tr key={payment.id} className="hover:bg-[var(--color-surface-alt)] transition-colors">
-                                                    <td className="px-4 py-3 text-[var(--color-text)]">{formatDate(payment.due_date)}</td>
-                                                    <td className="px-4 py-3 text-[var(--color-text-secondary)]">{payment.concept ?? 'Sesión'}</td>
-                                                    <td className="px-4 py-3 text-right font-medium text-[var(--color-text)] font-variant-numeric: tabular-nums">
+                                                <Table.Row key={payment.id} _hover={{ bg: 'bg.subtle' }} transition="colors 0.2s">
+                                                    <Table.Cell color="fg">{formatDate(payment.due_date)}</Table.Cell>
+                                                    <Table.Cell color="fg.muted">{payment.concept ?? 'Sesión'}</Table.Cell>
+                                                    <Table.Cell textAlign="right" fontWeight="medium" color="fg" fontVariantNumeric="tabular-nums">
                                                         €{Number(payment.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                                                    </td>
-                                                    <td className="px-4 py-3">
+                                                    </Table.Cell>
+                                                    <Table.Cell>
                                                         <StatusBadge status={payment.status as 'paid' | 'pending' | 'overdue'} variant="subtle" />
-                                                    </td>
-                                                </tr>
+                                                    </Table.Cell>
+                                                </Table.Row>
                                             ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        </Table.Body>
+                                    </Table.Root>
+                                </Box>
                             )}
-                        </div>
+                        </Stack>
                     )}
 
-                </div>
-            </div>
+                </Box>
+            </Flex>
         </>
     );
 }

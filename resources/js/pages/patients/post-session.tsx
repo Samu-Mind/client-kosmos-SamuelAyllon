@@ -1,11 +1,15 @@
+import { Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { ConsultingSessionType, Patient, Payment } from '@/types';
+
+const ChakraLink = chakra(Link);
 
 interface Props {
     patient: Patient;
@@ -61,115 +65,172 @@ export default function PostSession({ patient }: Props) {
         <>
             <Head title={`Post-sesión: ${patient.project_name} — ClientKosmos`} />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-4xl">
+            <Stack gap="6" p={{ base: '6', lg: '8' }} maxW="4xl">
 
-                <div>
-                    <Link
+                <Box>
+                    <ChakraLink
                         href={`/patients/${patient.id}`}
-                        className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] mb-4"
+                        display="inline-flex"
+                        alignItems="center"
+                        gap="2"
+                        fontSize="sm"
+                        color="fg.muted"
+                        mb="4"
+                        _hover={{ color: 'fg' }}
                     >
-                        <ArrowLeft size={16} />
+                        <Box as={ArrowLeft} w="4" h="4" />
                         Volver a {patient.project_name}
-                    </Link>
-                    <h1 className="text-display-2xl text-[var(--color-text)]">Cerrar sesión</h1>
-                    <p className="text-body-md text-[var(--color-text-secondary)] mt-1">{patient.project_name}</p>
-                </div>
+                    </ChakraLink>
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
+                        Cerrar sesión
+                    </Heading>
+                    <Text fontSize="md" color="fg.muted" mt="1">
+                        {patient.project_name}
+                    </Text>
+                </Box>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="6">
 
-                    {/* Note */}
-                    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                        <h3 className="text-display-lg text-[var(--color-text)] mb-4">Nota de sesión</h3>
-                        <form onSubmit={submitNote} className="space-y-3">
-                            <textarea
-                                value={noteForm.data.content}
-                                onChange={(e) => noteForm.setData('content', e.target.value)}
-                                placeholder="¿Qué has trabajado en esta sesión? Observaciones clave, avances, puntos a seguir…"
-                                className="w-full min-h-[120px] px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] text-[var(--color-text)] text-base resize-y focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-[border-color,box-shadow] duration-[var(--duration-normal)] placeholder:text-[var(--color-text-muted)]"
-                            />
-                            <Button type="submit" variant="primary" size="sm" loading={noteForm.processing} disabled={!noteForm.data.content}>
-                                Guardar nota
-                            </Button>
-                        </form>
-                    </div>
-
-                    {/* Agreement */}
-                    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
-                        <h3 className="text-display-lg text-[var(--color-text)] mb-4">Acuerdo de la sesión</h3>
-                        <form onSubmit={submitAgreement} className="space-y-3">
-                            <textarea
-                                value={agreementForm.data.content}
-                                onChange={(e) => agreementForm.setData('content', e.target.value)}
-                                placeholder="¿Qué se acordó hacer antes de la próxima sesión? Tarea, compromiso, reflexión…"
-                                className="w-full min-h-[120px] px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] text-[var(--color-text)] text-base resize-y focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-[border-color,box-shadow] duration-[var(--duration-normal)] placeholder:text-[var(--color-text-muted)]"
-                            />
-                            <Button type="submit" variant="secondary" size="sm" loading={agreementForm.processing} disabled={!agreementForm.data.content}>
-                                Registrar acuerdo
-                            </Button>
-                        </form>
-                    </div>
-
-                    {/* Payment */}
-                    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)] lg:col-span-2">
-                        <h3 className="text-display-lg text-[var(--color-text)] mb-4">Registrar cobro</h3>
-                        <form onSubmit={submitPayment} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-label text-[var(--color-text)]">Importe (€)</Label>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    value={paymentForm.data.amount}
-                                    onChange={(e) => paymentForm.setData('amount', e.target.value)}
-                                    placeholder="60.00"
-                                    className="h-10"
+                    <Box
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        borderColor="border"
+                        bg="bg.surface"
+                        p="5"
+                        boxShadow="sm"
+                    >
+                        <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="4">
+                            Nota de sesión
+                        </Heading>
+                        <Box as="form" onSubmit={submitNote}>
+                            <Stack gap="3">
+                                <Textarea
+                                    value={noteForm.data.content}
+                                    onChange={(e) => noteForm.setData('content', e.target.value)}
+                                    placeholder="¿Qué has trabajado en esta sesión? Observaciones clave, avances, puntos a seguir…"
+                                    minH="120px"
+                                    resize="vertical"
                                 />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-label text-[var(--color-text)]">Fecha vencimiento</Label>
-                                <Input
-                                    type="date"
-                                    value={paymentForm.data.due_date}
-                                    onChange={(e) => paymentForm.setData('due_date', e.target.value)}
-                                    className="h-10"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-label text-[var(--color-text)]">Método de pago</Label>
-                                <select
-                                    value={paymentForm.data.payment_method}
-                                    onChange={(e) => paymentForm.setData('payment_method', e.target.value)}
-                                    className="w-full h-10 px-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] text-[var(--color-text)] text-base focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
-                                >
-                                    <option value="">Sin especificar</option>
-                                    <option value="cash">Efectivo</option>
-                                    <option value="bizum">Bizum</option>
-                                    <option value="transfer">Transferencia</option>
-                                    <option value="card">Tarjeta</option>
-                                </select>
-                            </div>
-                            <div className="flex items-end">
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    className="w-full h-10"
-                                    loading={paymentForm.processing}
-                                    disabled={!paymentForm.data.amount || !paymentForm.data.due_date}
-                                >
-                                    Registrar cobro
+                                <Button type="submit" variant="primary" size="sm" loading={noteForm.processing} disabled={!noteForm.data.content}>
+                                    Guardar nota
                                 </Button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                            </Stack>
+                        </Box>
+                    </Box>
 
-                {/* Done */}
-                <div className="flex justify-end pt-4 border-t border-[var(--color-border-subtle)]">
-                    <Link href={`/patients/${patient.id}`}>
+                    <Box
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        borderColor="border"
+                        bg="bg.surface"
+                        p="5"
+                        boxShadow="sm"
+                    >
+                        <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="4">
+                            Acuerdo de la sesión
+                        </Heading>
+                        <Box as="form" onSubmit={submitAgreement}>
+                            <Stack gap="3">
+                                <Textarea
+                                    value={agreementForm.data.content}
+                                    onChange={(e) => agreementForm.setData('content', e.target.value)}
+                                    placeholder="¿Qué se acordó hacer antes de la próxima sesión? Tarea, compromiso, reflexión…"
+                                    minH="120px"
+                                    resize="vertical"
+                                />
+                                <Button type="submit" variant="secondary" size="sm" loading={agreementForm.processing} disabled={!agreementForm.data.content}>
+                                    Registrar acuerdo
+                                </Button>
+                            </Stack>
+                        </Box>
+                    </Box>
+
+                    <Box
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        borderColor="border"
+                        bg="bg.surface"
+                        p="5"
+                        boxShadow="sm"
+                        gridColumn={{ lg: 'span 2' }}
+                    >
+                        <Heading as="h3" fontSize="lg" fontWeight="semibold" color="fg" mb="4">
+                            Registrar cobro
+                        </Heading>
+                        <Box as="form" onSubmit={submitPayment}>
+                            <Grid templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap="4">
+                                <Stack gap="1.5">
+                                    <Label>Importe (€)</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={paymentForm.data.amount}
+                                        onChange={(e) => paymentForm.setData('amount', e.target.value)}
+                                        placeholder="60.00"
+                                        h="10"
+                                    />
+                                </Stack>
+                                <Stack gap="1.5">
+                                    <Label>Fecha vencimiento</Label>
+                                    <Input
+                                        type="date"
+                                        value={paymentForm.data.due_date}
+                                        onChange={(e) => paymentForm.setData('due_date', e.target.value)}
+                                        h="10"
+                                    />
+                                </Stack>
+                                <Stack gap="1.5">
+                                    <Label>Método de pago</Label>
+                                    <Box
+                                        as="select"
+                                        value={paymentForm.data.payment_method}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => paymentForm.setData('payment_method', e.target.value)}
+                                        w="full"
+                                        h="10"
+                                        px="3"
+                                        bg="bg.surface"
+                                        borderWidth="1px"
+                                        borderColor="border"
+                                        borderRadius="md"
+                                        color="fg"
+                                        fontSize="md"
+                                        _focusVisible={{
+                                            outline: 'none',
+                                            borderColor: 'brand.solid',
+                                            boxShadow: '0 0 0 3px var(--ck-colors-brand-muted)',
+                                        }}
+                                    >
+                                        <option value="">Sin especificar</option>
+                                        <option value="cash">Efectivo</option>
+                                        <option value="bizum">Bizum</option>
+                                        <option value="transfer">Transferencia</option>
+                                        <option value="card">Tarjeta</option>
+                                    </Box>
+                                </Stack>
+                                <Flex alignItems="flex-end">
+                                    <Button
+                                        type="submit"
+                                        variant="primary"
+                                        w="full"
+                                        h="10"
+                                        loading={paymentForm.processing}
+                                        disabled={!paymentForm.data.amount || !paymentForm.data.due_date}
+                                    >
+                                        Registrar cobro
+                                    </Button>
+                                </Flex>
+                            </Grid>
+                        </Box>
+                    </Box>
+                </Grid>
+
+                <Flex justifyContent="flex-end" pt="4" borderTopWidth="1px" borderColor="border.subtle">
+                    <ChakraLink href={`/patients/${patient.id}`}>
                         <Button variant="secondary">Terminar y volver al paciente</Button>
-                    </Link>
-                </div>
-            </div>
+                    </ChakraLink>
+                </Flex>
+            </Stack>
         </>
     );
 }

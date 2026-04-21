@@ -1,3 +1,4 @@
+import { Box, Flex, Grid, Heading, Stack } from '@chakra-ui/react';
 import { Head, router } from '@inertiajs/react';
 import { UserPlus, Search } from 'lucide-react';
 import { useState } from 'react';
@@ -41,46 +42,64 @@ export default function PatientsIndex({ patients }: Props) {
         <>
             <Head title="Pacientes — ClientKosmos" />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
 
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <h1 className="text-display-2xl text-[var(--color-text)]">Pacientes</h1>
+                <Flex alignItems="center" justifyContent="space-between">
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
+                        Pacientes
+                    </Heading>
                     <Button variant="primary" onClick={() => router.visit('/patients/create')}>
-                        <UserPlus size={16} className="mr-2" />
+                        <Box as={UserPlus} w="4" h="4" mr="2" />
                         Añadir paciente
                     </Button>
-                </div>
+                </Flex>
 
-                {/* Search & filters */}
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <div className="relative flex-1">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]" />
+                <Flex direction={{ base: 'column', sm: 'row' }} gap="3" alignItems={{ sm: 'center' }}>
+                    <Box position="relative" flex="1">
+                        <Box
+                            as={Search}
+                            w="4"
+                            h="4"
+                            position="absolute"
+                            left="3"
+                            top="50%"
+                            transform="translateY(-50%)"
+                            color="fg.muted"
+                            pointerEvents="none"
+                        />
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Buscar paciente…"
-                            className="pl-9 h-10"
+                            pl="9"
+                            h="10"
                         />
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {filterLabels.map((f) => (
-                            <button
-                                key={f.key}
-                                onClick={() => setActiveFilter(f.key)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors duration-[var(--duration-normal)] ${
-                                    activeFilter === f.key
-                                        ? 'bg-[var(--color-primary)] text-[var(--color-primary-fg)]'
-                                        : 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]'
-                                }`}
-                            >
-                                {f.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                    </Box>
+                    <Flex flexWrap="wrap" gap="2">
+                        {filterLabels.map((f) => {
+                            const isActive = activeFilter === f.key;
+                            return (
+                                <Box
+                                    as="button"
+                                    key={f.key}
+                                    onClick={() => setActiveFilter(f.key)}
+                                    px="3"
+                                    py="1.5"
+                                    borderRadius="full"
+                                    fontSize="xs"
+                                    fontWeight="medium"
+                                    transition="colors 0.2s"
+                                    bg={isActive ? 'brand.solid' : 'bg.subtle'}
+                                    color={isActive ? 'brand.contrast' : 'fg.muted'}
+                                    _hover={isActive ? undefined : { bg: 'border' }}
+                                >
+                                    {f.label}
+                                </Box>
+                            );
+                        })}
+                    </Flex>
+                </Flex>
 
-                {/* Grid */}
                 {filtered.length === 0 ? (
                     <EmptyState
                         icon={UserPlus}
@@ -96,13 +115,13 @@ export default function PatientsIndex({ patients }: Props) {
                         } : undefined}
                     />
                 ) : (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <Grid templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap="4">
                         {filtered.map((patient) => (
                             <PatientCard key={patient.id} patient={patient} />
                         ))}
-                    </div>
+                    </Grid>
                 )}
-            </div>
+            </Stack>
         </>
     );
 }

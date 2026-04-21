@@ -1,3 +1,4 @@
+import { Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeft, BookOpen, FileText, Folder, MessageSquare, Paperclip, Play } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -7,6 +8,8 @@ import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction
 import { EmptyState } from '@/components/empty-state';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+
+const ChakraLink = chakra(Link);
 
 interface User {
     id: number;
@@ -132,104 +135,201 @@ export default function AppointmentShow({ appointment, lastClinicalNote }: Props
         <>
             <Head title={`Sesión — ${patient?.name ?? 'Paciente'}`} />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
-                <div>
-                    <Link
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
+                <Box>
+                    <ChakraLink
                         href={DashboardIndexAction.url()}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors mb-3"
+                        display="inline-flex"
+                        alignItems="center"
+                        gap="1.5"
+                        fontSize="xs"
+                        fontWeight="semibold"
+                        textTransform="uppercase"
+                        letterSpacing="wider"
+                        color="fg.muted"
+                        mb="3"
+                        transition="colors 0.2s"
+                        _hover={{ color: 'fg' }}
                     >
-                        <ArrowLeft size={14} />
+                        <Box as={ArrowLeft} w="3.5" h="3.5" />
                         Volver al dashboard
-                    </Link>
-                    <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                        <h1 className="text-display-2xl text-[var(--color-text)]">
+                    </ChakraLink>
+                    <Flex alignItems="baseline" justifyContent="space-between" gap="4" flexWrap="wrap">
+                        <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
                             {patient?.name ?? 'Paciente'}
-                        </h1>
-                        <p className="text-body-md text-[var(--color-text-secondary)] tabular-nums">
+                        </Heading>
+                        <Text fontSize="md" color="fg.muted" fontVariantNumeric="tabular-nums">
                             {formatTime(appointment.starts_at)}
                             {appointment.ends_at && ` — ${formatTime(appointment.ends_at)}`}
-                        </p>
-                    </div>
-                    <div className="mt-4 border-b border-[var(--color-border-subtle)]" />
-                </div>
+                        </Text>
+                    </Flex>
+                    <Box mt="4" borderBottomWidth="1px" borderColor="border.subtle" />
+                </Box>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    <section className="lg:col-span-2 rounded-[var(--radius-lg)] overflow-hidden shadow-[var(--shadow-sm)] bg-[var(--color-surface-alt)]">
-                        <header className="flex items-center justify-between px-5 py-3 bg-[var(--color-primary)] text-white">
-                            <div className="flex items-center gap-2">
-                                <MessageSquare size={14} />
-                                <span className="text-caption">Resumen clínico automático</span>
-                            </div>
-                            <span className="text-[10px] opacity-80">{formatSyncedAt()}</span>
-                        </header>
+                <Grid templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} gap="6">
+                    <Box
+                        as="section"
+                        gridColumn={{ lg: 'span 2' }}
+                        borderRadius="lg"
+                        overflow="hidden"
+                        boxShadow="sm"
+                        bg="bg.subtle"
+                    >
+                        <Flex
+                            as="header"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            px="5"
+                            py="3"
+                            bg="brand.solid"
+                            color="brand.contrast"
+                        >
+                            <Flex alignItems="center" gap="2">
+                                <Box as={MessageSquare} w="3.5" h="3.5" />
+                                <Text
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    textTransform="uppercase"
+                                    letterSpacing="wider"
+                                >
+                                    Resumen clínico automático
+                                </Text>
+                            </Flex>
+                            <Text fontSize="2xs" opacity={0.8}>
+                                {formatSyncedAt()}
+                            </Text>
+                        </Flex>
 
-                        <div className="px-6 py-5 flex flex-col gap-6">
-                            <div>
-                                <h2 className="text-caption text-[var(--color-text-muted)] mb-2">Diagnóstico</h2>
-                                <p className="text-body-md italic text-[var(--color-text)] leading-relaxed">
-                                    {profile?.diagnosis?.trim()
-                                        ? profile.diagnosis
-                                        : 'Sin diagnóstico registrado.'}
-                                </p>
-                            </div>
+                        <Stack gap="6" px="6" py="5">
+                            <Box>
+                                <Text
+                                    as="h2"
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    textTransform="uppercase"
+                                    letterSpacing="wider"
+                                    color="fg.subtle"
+                                    mb="2"
+                                >
+                                    Diagnóstico
+                                </Text>
+                                <Text fontSize="md" fontStyle="italic" color="fg" lineHeight="relaxed">
+                                    {profile?.diagnosis?.trim() ? profile.diagnosis : 'Sin diagnóstico registrado.'}
+                                </Text>
+                            </Box>
 
-                            <div>
-                                <h2 className="text-caption text-[var(--color-text-muted)] mb-3">Acuerdos establecidos</h2>
+                            <Box>
+                                <Text
+                                    as="h2"
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    textTransform="uppercase"
+                                    letterSpacing="wider"
+                                    color="fg.subtle"
+                                    mb="3"
+                                >
+                                    Acuerdos establecidos
+                                </Text>
                                 {appointment.agreements.length === 0 ? (
-                                    <p className="text-sm italic text-[var(--color-text-secondary)]">
+                                    <Text fontSize="sm" fontStyle="italic" color="fg.muted">
                                         Sin acuerdos registrados.
-                                    </p>
+                                    </Text>
                                 ) : (
-                                    <ul className="flex flex-col gap-2">
+                                    <Stack as="ul" gap="2" listStyleType="none">
                                         {appointment.agreements.map((a) => (
-                                            <li key={a.id} className="flex items-start gap-3">
-                                                <span className="mt-[7px] w-2 h-2 shrink-0 rounded-full bg-[var(--color-primary)]" />
-                                                <span className={`text-body-md text-[var(--color-text)] ${a.is_completed ? 'line-through text-[var(--color-text-muted)]' : ''}`}>
+                                            <Flex as="li" key={a.id} alignItems="flex-start" gap="3">
+                                                <Box mt="7px" w="2" h="2" flexShrink={0} borderRadius="full" bg="brand.solid" />
+                                                <Text
+                                                    fontSize="md"
+                                                    color={a.is_completed ? 'fg.subtle' : 'fg'}
+                                                    textDecoration={a.is_completed ? 'line-through' : undefined}
+                                                >
                                                     {a.content}
-                                                </span>
-                                            </li>
+                                                </Text>
+                                            </Flex>
                                         ))}
-                                    </ul>
+                                    </Stack>
                                 )}
-                            </div>
+                            </Box>
 
-                            <div>
-                                <div className="flex items-baseline justify-between mb-2">
-                                    <h2 className="text-caption text-[var(--color-text-muted)]">Última nota clínica</h2>
+                            <Box>
+                                <Flex alignItems="baseline" justifyContent="space-between" mb="2">
+                                    <Text
+                                        as="h2"
+                                        fontSize="xs"
+                                        fontWeight="semibold"
+                                        textTransform="uppercase"
+                                        letterSpacing="wider"
+                                        color="fg.subtle"
+                                    >
+                                        Última nota clínica
+                                    </Text>
                                     {lastClinicalNote && (
-                                        <span className="text-[10px] text-[var(--color-text-muted)]">
+                                        <Text fontSize="2xs" color="fg.subtle">
                                             {formatRelativeDate(lastClinicalNote.created_at)}
-                                        </span>
+                                        </Text>
                                     )}
-                                </div>
+                                </Flex>
                                 {lastClinicalNote ? (
                                     <>
-                                        <p className="text-body-md italic text-[var(--color-text)] leading-relaxed whitespace-pre-wrap">
+                                        <Text fontSize="md" fontStyle="italic" color="fg" lineHeight="relaxed" whiteSpace="pre-wrap">
                                             {lastClinicalNote.content}
-                                        </p>
+                                        </Text>
                                         {patient && (
-                                            <Link
+                                            <ChakraLink
                                                 href={PatientShowAction.url(patient.id)}
-                                                className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors"
+                                                mt="3"
+                                                display="inline-flex"
+                                                alignItems="center"
+                                                gap="1"
+                                                fontSize="xs"
+                                                fontWeight="semibold"
+                                                textTransform="uppercase"
+                                                letterSpacing="wider"
+                                                color="brand.solid"
+                                                transition="colors 0.2s"
+                                                _hover={{ color: 'brand.emphasized' }}
                                             >
                                                 Ver historial completo
-                                            </Link>
+                                            </ChakraLink>
                                         )}
                                     </>
                                 ) : (
-                                    <p className="text-sm italic text-[var(--color-text-secondary)]">
+                                    <Text fontSize="sm" fontStyle="italic" color="fg.muted">
                                         Sin notas clínicas registradas.
-                                    </p>
+                                    </Text>
                                 )}
-                            </div>
-                        </div>
-                    </section>
+                            </Box>
+                        </Stack>
+                    </Box>
 
-                    <aside className="flex flex-col gap-4">
-                        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                            <header className="px-4 py-3 bg-[var(--color-surface-alt)] border-b border-[var(--color-border-subtle)]">
-                                <span className="text-caption text-[var(--color-text-muted)]">Recursos del cliente</span>
-                            </header>
+                    <Stack as="aside" gap="4">
+                        <Box
+                            borderRadius="lg"
+                            borderWidth="1px"
+                            borderColor="border"
+                            bg="bg.surface"
+                            overflow="hidden"
+                            boxShadow="sm"
+                        >
+                            <Box
+                                as="header"
+                                px="4"
+                                py="3"
+                                bg="bg.subtle"
+                                borderBottomWidth="1px"
+                                borderColor="border.subtle"
+                            >
+                                <Text
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    textTransform="uppercase"
+                                    letterSpacing="wider"
+                                    color="fg.subtle"
+                                >
+                                    Recursos del cliente
+                                </Text>
+                            </Box>
                             {resources.length === 0 ? (
                                 <EmptyState
                                     icon={FileText}
@@ -237,54 +337,79 @@ export default function AppointmentShow({ appointment, lastClinicalNote }: Props
                                     description="Aún no has añadido recursos para este paciente."
                                 />
                             ) : (
-                                <ul className="max-h-[360px] overflow-y-auto divide-y divide-[var(--color-border-subtle)]">
-                                    {resources.map((doc) => {
+                                <Stack as="ul" gap="0" maxH="360px" overflowY="auto" listStyleType="none">
+                                    {resources.map((doc, idx) => {
                                         const { Icon, subtitle } = resourceMeta(doc);
                                         return (
-                                            <li key={doc.id} className="flex items-center gap-3 px-4 py-3">
-                                                <Icon size={16} className="shrink-0 text-[var(--color-text-secondary)]" />
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="text-sm font-medium text-[var(--color-text)] truncate">
+                                            <Flex
+                                                as="li"
+                                                key={doc.id}
+                                                alignItems="center"
+                                                gap="3"
+                                                px="4"
+                                                py="3"
+                                                borderTopWidth={idx > 0 ? '1px' : undefined}
+                                                borderColor="border.subtle"
+                                            >
+                                                <Box as={Icon} w="4" h="4" flexShrink={0} color="fg.muted" />
+                                                <Box minW="0" flex="1">
+                                                    <Text fontSize="sm" fontWeight="medium" color="fg" truncate>
                                                         {doc.name}
-                                                    </p>
-                                                    <p className="text-[11px] text-[var(--color-text-muted)] truncate">
+                                                    </Text>
+                                                    <Text fontSize="2xs" color="fg.subtle" truncate>
                                                         {subtitle}
-                                                    </p>
-                                                </div>
-                                            </li>
+                                                    </Text>
+                                                </Box>
+                                            </Flex>
                                         );
                                     })}
-                                </ul>
+                                </Stack>
                             )}
-                        </div>
+                        </Box>
 
-                        <div className="flex flex-col items-center gap-3">
+                        <Stack gap="3" alignItems="center">
                             {appointment.service?.duration_minutes && (
-                                <p className="text-caption text-[var(--color-text-muted)] tabular-nums">
+                                <Text
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    textTransform="uppercase"
+                                    letterSpacing="wider"
+                                    color="fg.subtle"
+                                    fontVariantNumeric="tabular-nums"
+                                >
                                     Duración: {appointment.service.duration_minutes} min
-                                </p>
+                                </Text>
                             )}
-                            <Form
-                                action={JoinWaitingRoomAction.url(appointment.id)}
-                                method="post"
-                                className="w-full"
-                            >
-                                <Button type="submit" variant="primary" size="lg" className="w-full">
-                                    <Play size={16} className="fill-current" />
-                                    Iniciar sesión
-                                </Button>
-                            </Form>
-                            <p className="text-xs text-center text-[var(--color-text-muted)]">
+                            <Box w="full">
+                                <Form
+                                    action={JoinWaitingRoomAction.url(appointment.id)}
+                                    method="post"
+                                    className="w-full"
+                                >
+                                    <Button type="submit" variant="primary" size="lg" w="full">
+                                        <Box as={Play} w="4" h="4" fill="currentColor" />
+                                        Iniciar sesión
+                                    </Button>
+                                </Form>
+                            </Box>
+                            <Text fontSize="xs" textAlign="center" color="fg.subtle">
                                 Kosmo comenzará a transcribir y analizar una vez inicies la sesión.
-                            </p>
-                        </div>
-                    </aside>
-                </div>
+                            </Text>
+                        </Stack>
+                    </Stack>
+                </Grid>
 
-                <div className="text-center text-[10px] text-[var(--color-text-muted)] pt-4 border-t border-[var(--color-border-subtle)]">
+                <Text
+                    textAlign="center"
+                    fontSize="2xs"
+                    color="fg.subtle"
+                    pt="4"
+                    borderTopWidth="1px"
+                    borderColor="border.subtle"
+                >
                     Kosmo IA puede cometer errores
-                </div>
-            </div>
+                </Text>
+            </Stack>
         </>
     );
 }

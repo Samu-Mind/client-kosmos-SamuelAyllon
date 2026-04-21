@@ -1,3 +1,4 @@
+import { Box, Flex, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
@@ -5,6 +6,8 @@ import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/Sh
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { Auth } from '@/types';
+
+const ChakraLink = chakra(Link);
 
 interface User {
     id: number;
@@ -61,37 +64,56 @@ export default function AppointmentWaiting({ appointment }: Props) {
         <>
             <Head title="Sala de espera" />
 
-            <div className="flex flex-1 items-center justify-center p-8 min-h-[70vh]">
-                <div className="flex flex-col items-center gap-6 text-center max-w-md">
-                    <div className="relative flex items-center justify-center">
-                        <span className="absolute inline-flex h-24 w-24 rounded-full bg-[var(--color-primary)] opacity-20 animate-ping" />
-                        <div className="relative w-20 h-20 rounded-full bg-[var(--color-primary)] flex items-center justify-center">
-                            <span className="text-2xl font-semibold text-white">
+            <Flex flex="1" alignItems="center" justifyContent="center" p="8" minH="70vh">
+                <Stack gap="6" alignItems="center" textAlign="center" maxW="md">
+                    <Flex position="relative" alignItems="center" justifyContent="center">
+                        <Box
+                            position="absolute"
+                            display="inline-flex"
+                            h="24"
+                            w="24"
+                            borderRadius="full"
+                            bg="brand.solid"
+                            opacity={0.2}
+                            animation="ping 1s cubic-bezier(0, 0, 0.2, 1) infinite"
+                        />
+                        <Flex
+                            position="relative"
+                            w="20"
+                            h="20"
+                            borderRadius="full"
+                            bg="brand.solid"
+                            alignItems="center"
+                            justifyContent="center"
+                        >
+                            <Text fontSize="2xl" fontWeight="semibold" color="brand.contrast">
                                 {initials(other?.name)}
-                            </span>
-                        </div>
-                    </div>
+                            </Text>
+                        </Flex>
+                    </Flex>
 
-                    <div>
-                        <h1 className="text-display-xl text-[var(--color-text)]">{message}</h1>
-                        <p className="mt-2 text-body-md text-[var(--color-text-secondary)]">
+                    <Box>
+                        <Heading as="h1" fontSize="2xl" fontWeight="bold" color="fg">
+                            {message}
+                        </Heading>
+                        <Text mt="2" fontSize="md" color="fg.muted">
                             La sesión comenzará automáticamente cuando ambos estéis presentes.
-                        </p>
-                    </div>
+                        </Text>
+                    </Box>
 
-                    <div className="flex items-center gap-1.5" aria-hidden="true">
-                        <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
-                        <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse [animation-delay:200ms]" />
-                        <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse [animation-delay:400ms]" />
-                    </div>
+                    <Flex alignItems="center" gap="1.5" aria-hidden="true">
+                        <Box w="2" h="2" borderRadius="full" bg="brand.solid" animation="pulse 1.5s ease-in-out infinite" />
+                        <Box w="2" h="2" borderRadius="full" bg="brand.solid" animation="pulse 1.5s ease-in-out infinite" style={{ animationDelay: '200ms' }} />
+                        <Box w="2" h="2" borderRadius="full" bg="brand.solid" animation="pulse 1.5s ease-in-out infinite" style={{ animationDelay: '400ms' }} />
+                    </Flex>
 
-                    <Link href={AppointmentShowAction.url(appointment.id)}>
+                    <ChakraLink href={AppointmentShowAction.url(appointment.id)}>
                         <Button variant="secondary" size="sm">
                             Cancelar
                         </Button>
-                    </Link>
-                </div>
-            </div>
+                    </ChakraLink>
+                </Stack>
+            </Flex>
         </>
     );
 }
