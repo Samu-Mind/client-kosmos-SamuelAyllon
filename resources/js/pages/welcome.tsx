@@ -327,7 +327,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                         { label: 'Carlos R. · Coaching', palette: 'green' },
                                         { label: 'Laura M. · Terapia', palette: 'yellow' },
                                     ].map((p, i) => (
-                                        <Badge key={i} colorPalette={p.palette} borderRadius="full" px="3" py="1.5" fontSize="xs" fontWeight="semibold">
+                                        <Badge key={i} borderRadius="full" px="3" py="1.5" fontSize="xs" fontWeight="semibold">
                                             {p.label}
                                         </Badge>
                                     ))}
@@ -581,7 +581,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             {/* Premium Anual */}
                             <Card display="flex" flexDirection="column" overflow="hidden" transition="all 0.5s" _hover={{ transform: 'translateY(-12px)', boxShadow: '2xl' }} position="relative">
                                 <CardHeader>
-                                    <Badge variant="subtle" position="absolute" right="4" top="4" gap="1" py="1">
+                                    <Badge variant="secondary" position="absolute" right="4" top="4" gap="1" py="1">
                                         <Flex alignItems="center" gap="1">
                                             <Zap size={14} />
                                             Ahorra 17%
@@ -817,8 +817,8 @@ function BentoCard({
                             {icon}
                         </Box>
                         <Badge
-                            variant={isPremium ? 'solid' : 'subtle'}
-                            colorPalette={isPremium ? 'brand' : 'gray'}
+                            variant={isPremium ? 'default' : 'secondary'}
+                            colorScheme={isPremium ? 'brand' : 'gray'}
                             textTransform="uppercase"
                             fontSize="11px"
                             letterSpacing="wide"
