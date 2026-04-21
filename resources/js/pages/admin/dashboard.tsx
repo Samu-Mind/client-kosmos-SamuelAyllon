@@ -1,3 +1,4 @@
+import { Box, Flex, Heading, Stack, Table, Text, chakra } from '@chakra-ui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Plus, Search, Trash2, Users } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
@@ -90,133 +91,175 @@ export default function AdminDashboard({ users, filters }: Props) {
         <>
             <Head title="Usuarios — Admin — ClientKosmos" />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8">
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                    <div>
-                        <h1 className="text-display-2xl text-[var(--color-text)] flex items-center gap-3">
+            <Stack gap="6" p={{ base: '6', lg: '8' }}>
+                <Flex alignItems="flex-start" justifyContent="space-between">
+                    <Box>
+                        <Heading as="h1" fontSize="3xl" color="fg" display="flex" alignItems="center" gap="3">
                             <Users size={28} />
                             Usuarios
-                        </h1>
-                        <p className="mt-1 text-body-md text-[var(--color-text-secondary)]">
+                        </Heading>
+                        <Text mt="1" fontSize="md" color="fg.muted">
                             {users.total} usuarios registrados
-                        </p>
-                    </div>
+                        </Text>
+                    </Box>
                     <Button variant="primary" onClick={() => router.visit(CreateAction.url())}>
                         <Plus size={16} />
                         Nuevo usuario
                     </Button>
-                </div>
+                </Flex>
 
-                {/* Search + filters */}
-                <div className="flex flex-col items-center gap-3">
-                    <div className="relative w-full max-w-xl">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] pointer-events-none" />
-                        <input
+                <Stack alignItems="center" gap="3">
+                    <Box position="relative" w="full" maxW="xl">
+                        <Box
+                            position="absolute"
+                            left="3"
+                            top="50%"
+                            transform="translateY(-50%)"
+                            color="fg.muted"
+                            pointerEvents="none"
+                        >
+                            <Search size={16} />
+                        </Box>
+                        <chakra.input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Buscar por nombre o correo…"
-                            className="w-full h-10 pl-9 pr-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] text-[var(--color-text)] text-sm placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-[border-color,box-shadow]"
+                            w="full"
+                            h="10"
+                            pl="9"
+                            pr="3"
+                            bg="bg.surface"
+                            borderWidth="1px"
+                            borderColor="border"
+                            borderRadius="md"
+                            color="fg"
+                            fontSize="sm"
+                            _placeholder={{ color: 'fg.subtle' }}
+                            _focusVisible={{
+                                outline: 'none',
+                                borderColor: 'brand.solid',
+                                boxShadow: '0 0 0 3px var(--ck-colors-brand-muted)',
+                            }}
+                            transition="border-color, box-shadow"
                         />
-                    </div>
+                    </Box>
 
-                    <div className="flex items-center gap-2">
+                    <Flex alignItems="center" gap="2">
                         {ROLE_FILTERS.map((f) => (
-                            <button
+                            <chakra.button
                                 key={f.value}
                                 onClick={() => applyRoleFilter(f.value)}
-                                className={`px-4 py-1.5 text-sm rounded-full border transition-colors ${
-                                    activeRole === f.value
-                                        ? 'bg-[var(--color-primary)] text-[var(--color-primary-fg)] border-[var(--color-primary)]'
-                                        : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:bg-[var(--color-surface-alt)]'
-                                }`}
+                                px="4"
+                                py="1.5"
+                                fontSize="sm"
+                                borderRadius="full"
+                                borderWidth="1px"
+                                transition="colors"
+                                bg={activeRole === f.value ? 'brand.solid' : 'bg.surface'}
+                                color={activeRole === f.value ? 'brand.contrast' : 'fg.muted'}
+                                borderColor={activeRole === f.value ? 'brand.solid' : 'border'}
+                                _hover={activeRole !== f.value ? { bg: 'bg.muted' } : undefined}
                             >
                                 {f.label}
-                            </button>
+                            </chakra.button>
                         ))}
-                    </div>
-                </div>
+                    </Flex>
+                </Stack>
 
-                {/* Table */}
-                <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden shadow-[var(--shadow-sm)]">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-alt)]">
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Usuario</th>
-                                <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Pacientes</th>
-                                <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Sesiones</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Facturado</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Alta</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[var(--color-border-subtle)]">
+                <Box
+                    borderRadius="lg"
+                    borderWidth="1px"
+                    borderColor="border"
+                    bg="bg.surface"
+                    overflow="hidden"
+                    boxShadow="sm"
+                >
+                    <Table.Root size="sm">
+                        <Table.Header bg="bg.muted">
+                            <Table.Row borderBottomWidth="1px" borderColor="border.subtle">
+                                <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Usuario</Table.ColumnHeader>
+                                <Table.ColumnHeader textAlign="center" fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Pacientes</Table.ColumnHeader>
+                                <Table.ColumnHeader textAlign="center" fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Sesiones</Table.ColumnHeader>
+                                <Table.ColumnHeader textAlign="right" fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Facturado</Table.ColumnHeader>
+                                <Table.ColumnHeader fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Alta</Table.ColumnHeader>
+                                <Table.ColumnHeader textAlign="right" fontSize="xs" fontWeight="medium" color="fg.muted" textTransform="uppercase" letterSpacing="wider">Acciones</Table.ColumnHeader>
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
                             {users.data.length === 0 && (
-                                <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-center text-[var(--color-text-secondary)]">
+                                <Table.Row>
+                                    <Table.Cell colSpan={6} textAlign="center" py="8" color="fg.muted">
                                         No se encontraron usuarios.
-                                    </td>
-                                </tr>
+                                    </Table.Cell>
+                                </Table.Row>
                             )}
                             {users.data.map((user) => (
-                                <tr
+                                <Table.Row
                                     key={user.id}
                                     onClick={() => router.visit(ShowAction.url({ user: user.id }))}
-                                    className="hover:bg-[var(--color-surface-alt)] transition-colors cursor-pointer"
+                                    _hover={{ bg: 'bg.muted' }}
+                                    cursor="pointer"
+                                    transition="colors"
                                 >
-                                    <td className="px-4 py-3">
-                                        <p className="font-medium text-[var(--color-text)]">{user.name}</p>
-                                        <p className="text-xs text-[var(--color-text-secondary)]">{user.email}</p>
-                                    </td>
-                                    <td className="px-4 py-3 text-center text-[var(--color-text)]">{user.patients_count}</td>
-                                    <td className="px-4 py-3 text-center text-[var(--color-text)]">{user.professional_appointments_count}</td>
-                                    <td className="px-4 py-3 text-right text-[var(--color-text)] tabular-nums">
+                                    <Table.Cell>
+                                        <Text fontWeight="medium" color="fg">{user.name}</Text>
+                                        <Text fontSize="xs" color="fg.muted">{user.email}</Text>
+                                    </Table.Cell>
+                                    <Table.Cell textAlign="center" color="fg">{user.patients_count}</Table.Cell>
+                                    <Table.Cell textAlign="center" color="fg">{user.professional_appointments_count}</Table.Cell>
+                                    <Table.Cell textAlign="right" color="fg" fontVariantNumeric="tabular-nums">
                                         €{Number(user.paid_amount ?? 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                                    </td>
-                                    <td className="px-4 py-3 text-[var(--color-text-secondary)]">{formatDate(user.created_at)}</td>
-                                    <td className="px-4 py-3 text-right">
+                                    </Table.Cell>
+                                    <Table.Cell color="fg.muted">{formatDate(user.created_at)}</Table.Cell>
+                                    <Table.Cell textAlign="right">
                                         {user.id !== auth.user.id && (
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={(e) => deleteUser(e, user)}
-                                            >
+                                            <Button variant="destructive" size="sm" onClick={(e) => deleteUser(e, user)}>
                                                 <Trash2 size={13} />
                                             </Button>
                                         )}
-                                    </td>
-                                </tr>
+                                    </Table.Cell>
+                                </Table.Row>
                             ))}
-                        </tbody>
-                    </table>
+                        </Table.Body>
+                    </Table.Root>
 
                     {users.last_page > 1 && (
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-alt)]">
-                            <p className="text-xs text-[var(--color-text-secondary)]">
+                        <Flex
+                            alignItems="center"
+                            justifyContent="space-between"
+                            px="4"
+                            py="3"
+                            borderTopWidth="1px"
+                            borderColor="border.subtle"
+                            bg="bg.muted"
+                        >
+                            <Text fontSize="xs" color="fg.muted">
                                 {users.total} usuarios · Página {users.current_page} de {users.last_page}
-                            </p>
-                            <div className="flex gap-1">
+                            </Text>
+                            <Flex gap="1">
                                 {users.links.map((link, i) => (
-                                    <button
+                                    <chakra.button
                                         key={i}
                                         disabled={!link.url}
                                         onClick={() => link.url && router.get(link.url)}
-                                        className={`px-3 py-1 text-xs rounded-[var(--radius-sm)] transition-colors ${
-                                            link.active
-                                                ? 'bg-[var(--color-primary)] text-[var(--color-primary-fg)]'
-                                                : link.url
-                                                    ? 'text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]'
-                                                    : 'text-[var(--color-text-muted)] cursor-not-allowed'
-                                        }`}
+                                        px="3"
+                                        py="1"
+                                        fontSize="xs"
+                                        borderRadius="sm"
+                                        transition="colors"
+                                        bg={link.active ? 'brand.solid' : 'transparent'}
+                                        color={link.active ? 'brand.contrast' : link.url ? 'fg.muted' : 'fg.subtle'}
+                                        cursor={link.url ? 'pointer' : 'not-allowed'}
+                                        _hover={!link.active && link.url ? { bg: 'border' } : undefined}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
-                            </div>
-                        </div>
+                            </Flex>
+                        </Flex>
                     )}
-                </div>
-            </div>
+                </Box>
+            </Stack>
         </>
     );
 }

@@ -4,7 +4,7 @@ Seguimiento de la migración de Tailwind CSS → Chakra UI v3 (ADR-0006).
 Actualizar este archivo manualmente cada vez que se migre un archivo.  
 Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada archivo.
 
-**Última revisión:** 2026-04-21 (Fase 4c — pages patients + appointments migrados)
+**Última revisión:** 2026-04-21 (Fase 4d parcial — admin/* migrado)
 
 ---
 
@@ -87,10 +87,10 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 
 | Archivo | Estado | `className` aprox. |
 |---|---|---|
-| [pages/admin/dashboard.tsx](../resources/js/pages/admin/dashboard.tsx) | ❌ | 34 |
-| [pages/admin/users/index.tsx](../resources/js/pages/admin/users/index.tsx) | ❌ | 28 |
-| [pages/admin/users/show.tsx](../resources/js/pages/admin/users/show.tsx) | ❌ | 15 |
-| [pages/admin/users/create.tsx](../resources/js/pages/admin/users/create.tsx) | ❌ | 18 |
+| [pages/admin/dashboard.tsx](../resources/js/pages/admin/dashboard.tsx) | ✅ | Fase 4d |
+| [pages/admin/users/index.tsx](../resources/js/pages/admin/users/index.tsx) | ✅ | Fase 4d |
+| [pages/admin/users/show.tsx](../resources/js/pages/admin/users/show.tsx) | ✅ | Fase 4d |
+| [pages/admin/users/create.tsx](../resources/js/pages/admin/users/create.tsx) | ✅ | Fase 4d |
 
 ---
 
@@ -209,16 +209,16 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Pages Dashboard/Settings | 8 | 0 | 0 | 8 |
 | Pages Patients | 6 | 0 | 0 | 6 |
 | Pages Appointments | 3 | 0 | 0 | 3 |
-| Pages Admin | 0 | 0 | 4 | 4 |
+| Pages Admin | 4 | 0 | 0 | 4 |
 | Pages Otras | 0 | 0 | 5 | 5 |
 | Components Shell/Nav | 11 | 0 | 0 | 11 |
 | Components Patient | 3 | 0 | 0 | 3 |
 | Components Kosmo | 4 | 0 | 0 | 4 |
 | Components UI | 27 | 0 | 0 | 27 |
 | Components Otros | 12 | 0 | 2 | 14 |
-| **TOTAL** | **87** | **0** | **11** | **98** |
+| **TOTAL** | **91** | **0** | **7** | **98** |
 
-**Progreso global: ~89% migrado** (87 completos de 98 archivos, 0 parciales)
+**Progreso global: ~93% migrado** (91 completos de 98 archivos, 0 parciales)
 
 ---
 

@@ -1,3 +1,4 @@
+import { Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -6,6 +7,8 @@ import { KPICard } from '@/components/patient/kpi-card';
 import { Button } from '@/components/ui/button';
 import AdminLayout from '@/layouts/admin-layout';
 import type { Auth } from '@/types';
+
+const ChakraLink = chakra(Link);
 
 interface UserDetail {
     id: number;
@@ -41,19 +44,29 @@ export default function AdminUserShow({ user }: Props) {
         <>
             <Head title={`${user.name} — Admin — ClientKosmos`} />
 
-            <div className="flex flex-col gap-6 p-6 lg:p-8 max-w-4xl">
-                <div className="flex items-start justify-between">
-                    <div>
-                        <Link
+            <Stack gap="6" p={{ base: '6', lg: '8' }} maxW="4xl">
+                <Flex alignItems="flex-start" justifyContent="space-between">
+                    <Box>
+                        <ChakraLink
                             href={DashboardIndexAction.url()}
-                            className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] mb-4"
+                            display="inline-flex"
+                            alignItems="center"
+                            gap="2"
+                            fontSize="sm"
+                            color="fg.muted"
+                            _hover={{ color: 'fg' }}
+                            mb="4"
                         >
                             <ArrowLeft size={16} />
                             Volver a usuarios
-                        </Link>
-                        <h1 className="text-display-2xl text-[var(--color-text)]">{user.name}</h1>
-                        <p className="mt-1 text-body-md text-[var(--color-text-secondary)]">{user.email}</p>
-                    </div>
+                        </ChakraLink>
+                        <Heading as="h1" fontSize="3xl" color="fg">
+                            {user.name}
+                        </Heading>
+                        <Text mt="1" fontSize="md" color="fg.muted">
+                            {user.email}
+                        </Text>
+                    </Box>
 
                     {!isSelf && (
                         <Button variant="destructive" size="sm" onClick={handleDelete}>
@@ -61,39 +74,61 @@ export default function AdminUserShow({ user }: Props) {
                             Eliminar usuario
                         </Button>
                     )}
-                </div>
+                </Flex>
 
-                <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <Grid gridTemplateColumns={{ base: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap="4">
                     <KPICard label="Pacientes" value={user.patients_count} />
                     <KPICard label="Sesiones" value={user.sessions_count} />
                     <KPICard label="Facturado" value={`€${Number(user.paid_amount ?? 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`} />
                     <KPICard label="Alta" value={formatDate(user.created_at)} />
-                </div>
+                </Grid>
 
-                <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-sm)] space-y-4">
-                    <h2 className="text-display-lg text-[var(--color-text)]">Información</h2>
-                    <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Stack
+                    gap="4"
+                    borderRadius="lg"
+                    borderWidth="1px"
+                    borderColor="border"
+                    bg="bg.surface"
+                    p="6"
+                    boxShadow="sm"
+                >
+                    <Heading as="h2" fontSize="xl" color="fg">
+                        Información
+                    </Heading>
+                    <Grid gridTemplateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)' }} gap="3">
                         {user.practice_name && (
-                            <div>
-                                <dt className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Consulta</dt>
-                                <dd className="text-sm text-[var(--color-text)] mt-0.5">{user.practice_name}</dd>
-                            </div>
+                            <Box>
+                                <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                    Consulta
+                                </Text>
+                                <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                    {user.practice_name}
+                                </Text>
+                            </Box>
                         )}
                         {user.specialty && (
-                            <div>
-                                <dt className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Especialidad</dt>
-                                <dd className="text-sm text-[var(--color-text)] mt-0.5">{user.specialty}</dd>
-                            </div>
+                            <Box>
+                                <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                    Especialidad
+                                </Text>
+                                <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                    {user.specialty}
+                                </Text>
+                            </Box>
                         )}
                         {user.city && (
-                            <div>
-                                <dt className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">Ciudad</dt>
-                                <dd className="text-sm text-[var(--color-text)] mt-0.5">{user.city}</dd>
-                            </div>
+                            <Box>
+                                <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                    Ciudad
+                                </Text>
+                                <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                    {user.city}
+                                </Text>
+                            </Box>
                         )}
-                    </dl>
-                </div>
-            </div>
+                    </Grid>
+                </Stack>
+            </Stack>
         </>
     );
 }
