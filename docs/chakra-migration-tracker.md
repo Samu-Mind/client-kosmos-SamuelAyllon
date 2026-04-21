@@ -4,7 +4,7 @@ Seguimiento de la migración de Tailwind CSS → Chakra UI v3 (ADR-0006).
 Actualizar este archivo manualmente cada vez que se migre un archivo.  
 Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada archivo.
 
-**Última revisión:** 2026-04-21 (UI 100% migrado + layouts auth al día)
+**Última revisión:** 2026-04-21 (Fase 4b — shell + layouts admin/sidebar migrados)
 
 ---
 
@@ -26,8 +26,8 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | [layouts/auth/auth-simple-layout.tsx](../resources/js/layouts/auth/auth-simple-layout.tsx) | ✅ | |
 | [layouts/auth/auth-card-layout.tsx](../resources/js/layouts/auth/auth-card-layout.tsx) | ✅ | |
 | [layouts/settings/layout.tsx](../resources/js/layouts/settings/layout.tsx) | ✅ | |
-| [layouts/app/app-sidebar-layout.tsx](../resources/js/layouts/app/app-sidebar-layout.tsx) | ❌ | 1 `className` |
-| [layouts/admin-layout.tsx](../resources/js/layouts/admin-layout.tsx) | ❌ | 12 `className` |
+| [layouts/app/app-sidebar-layout.tsx](../resources/js/layouts/app/app-sidebar-layout.tsx) | ✅ | Fase 4b |
+| [layouts/admin-layout.tsx](../resources/js/layouts/admin-layout.tsx) | ✅ | Fase 4b |
 
 ---
 
@@ -113,14 +113,14 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | [components/app-header.tsx](../resources/js/components/app-header.tsx) | ✅ | Fase 3c |
 | [components/bottom-bar.tsx](../resources/js/components/bottom-bar.tsx) | ✅ | Fase 3c |
 | [components/nav-footer.tsx](../resources/js/components/nav-footer.tsx) | ✅ | Fase 3c |
-| [components/app-sidebar-header.tsx](../resources/js/components/app-sidebar-header.tsx) | ❌ | 3 `className` |
-| [components/app-sidebar.tsx](../resources/js/components/app-sidebar.tsx) | ❌ | 2 `className` |
-| [components/app-content.tsx](../resources/js/components/app-content.tsx) | ❌ | 1 `className` |
-| [components/app-shell.tsx](../resources/js/components/app-shell.tsx) | ❌ | 1 `className` |
-| [components/app-logo.tsx](../resources/js/components/app-logo.tsx) | ❌ | 2 `className` |
-| [components/nav-main.tsx](../resources/js/components/nav-main.tsx) | ❌ | 1 `className` |
-| [components/nav-user.tsx](../resources/js/components/nav-user.tsx) | ❌ | 3 `className` |
-| [components/user-menu-content.tsx](../resources/js/components/user-menu-content.tsx) | ❌ | 6 `className` |
+| [components/app-sidebar-header.tsx](../resources/js/components/app-sidebar-header.tsx) | ✅ | Fase 4b |
+| [components/app-sidebar.tsx](../resources/js/components/app-sidebar.tsx) | ✅ | Fase 4b |
+| [components/app-content.tsx](../resources/js/components/app-content.tsx) | ✅ | Fase 4b |
+| [components/app-shell.tsx](../resources/js/components/app-shell.tsx) | ✅ | Fase 4b |
+| [components/app-logo.tsx](../resources/js/components/app-logo.tsx) | ✅ | Fase 4b |
+| [components/nav-main.tsx](../resources/js/components/nav-main.tsx) | ✅ | Fase 4b |
+| [components/nav-user.tsx](../resources/js/components/nav-user.tsx) | ✅ | Fase 4b |
+| [components/user-menu-content.tsx](../resources/js/components/user-menu-content.tsx) | ✅ | Fase 4b |
 
 ---
 
@@ -204,21 +204,21 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 
 | Categoría | ✅ Migrado | ⚠️ Parcial | ❌ Pendiente | Total |
 |---|---|---|---|---|
-| Layouts | 4 | 0 | 2 | 6 |
+| Layouts | 6 | 0 | 0 | 6 |
 | Pages Auth | 7 | 0 | 0 | 7 |
 | Pages Dashboard/Settings | 8 | 0 | 0 | 8 |
 | Pages Patients | 0 | 0 | 6 | 6 |
 | Pages Appointments | 0 | 0 | 3 | 3 |
 | Pages Admin | 0 | 0 | 4 | 4 |
 | Pages Otras | 0 | 0 | 5 | 5 |
-| Components Shell/Nav | 3 | 0 | 8 | 11 |
+| Components Shell/Nav | 11 | 0 | 0 | 11 |
 | Components Patient | 3 | 0 | 0 | 3 |
 | Components Kosmo | 4 | 0 | 0 | 4 |
 | Components UI | 27 | 0 | 0 | 27 |
 | Components Otros | 12 | 0 | 2 | 14 |
-| **TOTAL** | **68** | **0** | **30** | **98** |
+| **TOTAL** | **78** | **0** | **20** | **98** |
 
-**Progreso global: ~69% migrado** (68 completos de 98 archivos, 0 parciales)
+**Progreso global: ~80% migrado** (78 completos de 98 archivos, 0 parciales)
 
 ---
 

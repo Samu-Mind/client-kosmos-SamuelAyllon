@@ -87,7 +87,7 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild className="h-24!">
+                        <SidebarMenuButton size="lg" asChild h="24 !important">
                             <Link href={isAdmin ? '/admin/users' : '/dashboard'} prefetch>
                                 <AppLogo />
                             </Link>
@@ -104,7 +104,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                {!isAdmin && <NavFooter items={footerNavItems} className="mt-auto" />}
+                {!isAdmin && <NavFooter items={footerNavItems} mt="auto" />}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

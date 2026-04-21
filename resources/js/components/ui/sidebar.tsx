@@ -1,4 +1,4 @@
-import { chakra } from '@chakra-ui/react';
+import { chakra, type HTMLChakraProps } from '@chakra-ui/react';
 import { Slot } from '@radix-ui/react-slot';
 import { PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react';
 import * as React from 'react';
@@ -363,7 +363,7 @@ function SidebarRail({ ...props }: React.ComponentProps<'button'>) {
     );
 }
 
-function SidebarInset({ ...props }: React.ComponentProps<'main'>) {
+function SidebarInset({ ...props }: HTMLChakraProps<'main'>) {
     return (
         <chakra.main
             data-slot="sidebar-inset"
@@ -469,7 +469,7 @@ function SidebarContent({ ...props }: React.ComponentProps<'div'>) {
     );
 }
 
-function SidebarGroup({ ...props }: React.ComponentProps<'div'> & { css?: Record<string, unknown> }) {
+function SidebarGroup({ ...props }: HTMLChakraProps<'div'>) {
     return (
         <chakra.div
             data-slot="sidebar-group"
@@ -606,7 +606,7 @@ function SidebarMenuButton({
     size = 'default',
     tooltip,
     ...props
-}: React.ComponentProps<'button'> & {
+}: HTMLChakraProps<'button'> & {
     asChild?: boolean;
     isActive?: boolean;
     variant?: 'default' | 'outline';
