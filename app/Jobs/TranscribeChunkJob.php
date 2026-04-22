@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Events\TranscriptionSegmentCreated;
+use App\Models\SessionRecording;
 use App\Models\TranscriptionSegment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -65,7 +67,7 @@ class TranscribeChunkJob implements ShouldQueue
             return;
         }
 
-        TranscriptionSegment::updateOrCreate(
+        $segment = TranscriptionSegment::updateOrCreate(
             [
                 'session_recording_id' => $this->sessionRecordingId,
                 'speaker_user_id' => $this->speakerUserId,
@@ -77,5 +79,11 @@ class TranscribeChunkJob implements ShouldQueue
                 'ended_at_ms' => $this->endedAtMs,
             ],
         );
+
+        $appointmentId = SessionRecording::whereKey($this->sessionRecordingId)->value('appointment_id');
+
+        if ($appointmentId !== null) {
+            event(TranscriptionSegmentCreated::fromSegment($segment, (int) $appointmentId));
+        }
     }
 }

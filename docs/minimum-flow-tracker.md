@@ -100,3 +100,4 @@ Resumen: aproximadamente **11/16** pasos completos, **5/16** parciales, **0/16**
 | 2026-04-22 | Claude (Opus 4.7) | P2 completo (book + appointments index + modal slots) y P4 completo (waiting paciente) | — |
 | 2026-04-22 | Claude (Opus 4.7) | Fase A — P6 + F7 + redirects P7/F8: pantallas de cierre con countdown y Pest tests (6/6 passing) | — |
 | 2026-04-22 | Claude (Opus 4.7) | Sprint 1 commit 1 — Backend transcripción chunked: ADR-0008, `transcription_segments`, `TranscribeChunkJob` (Groq Whisper), `RecordingConsentAction`, rutas compartidas y Pest tests (11/11 passing) | — |
+| 2026-04-22 | Claude (Opus 4.7) | Sprint 1 commit 2 — Reverb broadcasting: ADR-0009, `laravel/reverb`, `@laravel/echo-react`+`pusher-js`, evento `TranscriptionSegmentCreated`, canal privado `appointment.{id}` con auth + 3 Pest tests (14/14 passing) | — |

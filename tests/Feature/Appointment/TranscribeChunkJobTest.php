@@ -1,15 +1,18 @@
 <?php
 
+use App\Events\TranscriptionSegmentCreated;
 use App\Jobs\TranscribeChunkJob;
 use App\Models\Appointment;
 use App\Models\SessionRecording;
 use App\Models\TranscriptionSegment;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 it('calls Groq Whisper and persists the transcription segment', function () {
     Storage::fake('local');
+    Event::fake([TranscriptionSegmentCreated::class]);
     Http::fake([
         '*/audio/transcriptions' => Http::response([
             'text' => 'Hola, buenos días, ¿cómo te encuentras?',
@@ -49,6 +52,10 @@ it('calls Groq Whisper and persists the transcription segment', function () {
     expect(Storage::disk('local')->exists($chunkPath))->toBeFalse();
 
     Http::assertSent(fn (Request $request) => str_contains($request->url(), '/audio/transcriptions'));
+
+    Event::assertDispatched(TranscriptionSegmentCreated::class, fn ($event) => $event->appointmentId === $appointment->id
+        && $event->text === 'Hola, buenos días, ¿cómo te encuentras?'
+        && $event->position === 0);
 });
 
 it('does not persist a segment when Whisper returns empty text', function () {
