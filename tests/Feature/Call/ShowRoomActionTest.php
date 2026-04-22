@@ -37,7 +37,22 @@ it('el profesional puede acceder a la sala de su cita', function () {
             ->has('jitsiRoomName')
             ->has('jitsiDomain')
             ->has('exitUrl')
+            ->where('recordingConsentGiven', false)
         );
+});
+
+it('la sala refleja el consentimiento de grabación del paciente', function () {
+    $appointment = makeActiveAppointment();
+    $professional = \App\Models\User::find($appointment->professional_id);
+
+    \App\Models\SessionRecording::factory()->withPatientConsent()->create([
+        'appointment_id' => $appointment->id,
+    ]);
+
+    $this->actingAs($professional)
+        ->get(route('call.room', ['roomId' => $appointment->meeting_room_id]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('recordingConsentGiven', true));
 });
 
 it('el paciente puede acceder a la sala de su cita', function () {

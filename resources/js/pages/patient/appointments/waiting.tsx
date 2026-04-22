@@ -1,7 +1,8 @@
 import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import { Head, router } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { RecordingConsentModal } from '@/components/recording-consent-modal';
 import AppLayout from '@/layouts/app-layout';
 
 interface Appointment {
@@ -15,27 +16,41 @@ interface Appointment {
 
 interface Props {
     appointment: Appointment;
+    recordingConsentGiven: boolean;
 }
 
-export default function PatientAppointmentWaiting({ appointment }: Props) {
+export default function PatientAppointmentWaiting({ appointment, recordingConsentGiven }: Props) {
     const bothPresent = !!appointment.patient_joined_at && !!appointment.professional_joined_at;
+    const [consentModalOpen, setConsentModalOpen] = useState<boolean>(!recordingConsentGiven);
 
     useEffect(() => {
+        if (consentModalOpen) return;
         const id = setInterval(() => {
             router.reload({ only: ['appointment'], preserveUrl: true });
         }, 4000);
         return () => clearInterval(id);
-    }, []);
+    }, [consentModalOpen]);
 
     useEffect(() => {
+        if (consentModalOpen) return;
         if (bothPresent && appointment.meeting_room_id) {
             window.location.href = `/call/${appointment.meeting_room_id}`;
         }
-    }, [bothPresent, appointment.meeting_room_id]);
+    }, [bothPresent, appointment.meeting_room_id, consentModalOpen]);
 
     return (
         <>
             <Head title="Esperando al profesional" />
+
+            <RecordingConsentModal
+                appointmentId={appointment.id}
+                open={consentModalOpen}
+                onAccepted={() => {
+                    router.reload({ only: ['recordingConsentGiven'], preserveUrl: true });
+                    setConsentModalOpen(false);
+                }}
+                onDeclined={() => setConsentModalOpen(false)}
+            />
 
             <Flex flex="1" alignItems="center" justifyContent="center" p="8" minH="70vh">
                 <Stack gap="8" alignItems="center" textAlign="center" maxW="md">

@@ -18,7 +18,7 @@ class ShowRoomAction extends Controller
     public function __invoke(Request $request, string $roomId): Response
     {
         $appointment = Appointment::where('meeting_room_id', $roomId)
-            ->with(['patient', 'professional'])
+            ->with(['patient', 'professional', 'sessionRecording:id,appointment_id,patient_consent_given_at'])
             ->firstOrFail();
 
         $user = $request->user();
@@ -40,6 +40,7 @@ class ShowRoomAction extends Controller
             'appointment' => $appointment,
             'jitsiDomain' => 'meet.jit.si',
             'jitsiRoomName' => $appointment->meeting_room_id,
+            'recordingConsentGiven' => $appointment->sessionRecording?->patient_consent_given_at !== null,
             'exitUrl' => $isPatient
                 ? route('patient.appointments.post-session', $appointment)
                 : route('professional.appointments.closing-success', $appointment),
