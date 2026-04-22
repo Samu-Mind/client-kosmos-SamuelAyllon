@@ -10,7 +10,7 @@ const STATUS_MAP: Record<LegacyVariant, 'info' | 'error'> = {
 
 type AlertProps = Omit<
     React.ComponentProps<typeof ChakraAlert.Root>,
-    'status'
+    'status' | 'variant'
 > & {
     variant?: LegacyVariant;
 };

@@ -1,4 +1,4 @@
-import { Box, Flex, Icon, Text } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
 import { router } from '@inertiajs/react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
@@ -249,10 +249,6 @@ export default function TutorialChatbot({ show, onComplete, isPremium, userName 
                     position="absolute"
                     pointerEvents="none"
                     borderRadius="lg"
-                    ringWidth="4px"
-                    ringColor="brand.solid"
-                    ringOffset="2px"
-                    ringOffsetColor="bg"
                     animation="pulse 2s infinite"
                     style={{
                         top: targetRect.top - 4,

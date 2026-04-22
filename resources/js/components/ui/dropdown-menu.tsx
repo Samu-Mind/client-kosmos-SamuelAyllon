@@ -131,7 +131,7 @@ function DropdownMenuCheckboxItem({
     return (
         <Menu.CheckboxItem
             value={value ?? generatedId}
-            checked={checked}
+            checked={Boolean(checked)}
             data-slot="dropdown-menu-checkbox-item"
             position="relative"
             display="flex"

@@ -516,9 +516,8 @@ function EventDetailDialog({
 
                         <Flex justifyContent="space-between">
                             <Button
-                                variant="outline"
+                                variant="outline-destructive"
                                 size="sm"
-                                colorPalette="red"
                                 onClick={handleDelete}
                             >
                                 <Icon as={Trash2} mr="1.5" boxSize="3.5" />

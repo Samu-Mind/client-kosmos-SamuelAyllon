@@ -2,13 +2,13 @@ import {
     Button as ChakraButton,
     type ButtonProps as ChakraButtonProps,
 } from '@chakra-ui/react';
-import * as React from 'react';
 
 type LegacyVariant =
     | 'default'
     | 'primary'
     | 'destructive'
     | 'outline'
+    | 'outline-destructive'
     | 'secondary'
     | 'ghost'
     | 'link';
@@ -22,6 +22,7 @@ const VARIANT_MAP: Record<LegacyVariant, ChakraStylingProps> = {
     primary: { variant: 'solid', colorPalette: 'brand' },
     destructive: { variant: 'solid', colorPalette: 'red' },
     outline: { variant: 'outline', colorPalette: 'gray' },
+    'outline-destructive': { variant: 'outline', colorPalette: 'red' },
     secondary: { variant: 'subtle', colorPalette: 'gray' },
     ghost: { variant: 'ghost', colorPalette: 'gray' },
     link: { variant: 'plain', colorPalette: 'brand' },

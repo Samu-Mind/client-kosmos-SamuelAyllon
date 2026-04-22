@@ -15,6 +15,7 @@ interface AdminLayoutProps {
 interface SharedProps {
     auth: { user: User };
     isImpersonating: boolean;
+    [key: string]: unknown;
 }
 
 const UserTrigger = chakra('button', {

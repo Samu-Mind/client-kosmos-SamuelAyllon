@@ -1,7 +1,7 @@
 import { Portal, Tooltip as ChakraTooltip } from '@chakra-ui/react';
 import * as React from 'react';
 
-function TooltipProvider({ children }: { children: React.ReactNode }) {
+function TooltipProvider({ children, delayDuration: _ }: { children: React.ReactNode; delayDuration?: number }) {
     return <>{children}</>;
 }
 
@@ -19,9 +19,11 @@ function TooltipTrigger(
 
 type ContentProps = React.ComponentProps<typeof ChakraTooltip.Content> & {
     sideOffset?: number;
+    side?: 'top' | 'right' | 'bottom' | 'left';
+    align?: 'start' | 'center' | 'end';
 };
 
-function TooltipContent({ children, ...props }: ContentProps) {
+function TooltipContent({ children, sideOffset: _, side: __, align: ___, ...props }: ContentProps) {
     return (
         <Portal>
             <ChakraTooltip.Positioner>

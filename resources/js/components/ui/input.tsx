@@ -5,9 +5,10 @@ type Props = InputProps & {
     type?: React.HTMLInputTypeAttribute;
 };
 
-function Input({ type, ...props }: Props) {
+const Input = React.forwardRef<HTMLInputElement, Props>(function Input({ type, ...props }, ref) {
     return (
         <ChakraInput
+            ref={ref}
             type={type}
             data-slot="input"
             size="sm"
@@ -28,6 +29,6 @@ function Input({ type, ...props }: Props) {
             {...props}
         />
     );
-}
+});
 
 export { Input };

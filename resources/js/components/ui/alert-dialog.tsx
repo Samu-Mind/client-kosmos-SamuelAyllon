@@ -177,10 +177,7 @@ function AlertDialogMedia(props: React.ComponentProps<typeof Box>) {
     );
 }
 
-type AlertDialogActionProps = React.ComponentProps<
-    typeof ChakraDialog.ActionTrigger
-> &
-    Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>;
+type AlertDialogActionProps = Omit<React.ComponentProps<typeof Button>, 'asChild'>;
 
 function AlertDialogAction({
     variant = 'default',
@@ -189,17 +186,12 @@ function AlertDialogAction({
 }: AlertDialogActionProps) {
     return (
         <ChakraDialog.ActionTrigger asChild>
-            <Button variant={variant} size={size} asChild>
-                <button data-slot="alert-dialog-action" {...props} />
-            </Button>
+            <Button data-slot="alert-dialog-action" variant={variant} size={size} {...props} />
         </ChakraDialog.ActionTrigger>
     );
 }
 
-type AlertDialogCancelProps = React.ComponentProps<
-    typeof ChakraDialog.CloseTrigger
-> &
-    Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>;
+type AlertDialogCancelProps = Omit<React.ComponentProps<typeof Button>, 'asChild'>;
 
 function AlertDialogCancel({
     variant = 'outline',
@@ -208,9 +200,7 @@ function AlertDialogCancel({
 }: AlertDialogCancelProps) {
     return (
         <ChakraDialog.CloseTrigger asChild>
-            <Button variant={variant} size={size} asChild>
-                <button data-slot="alert-dialog-cancel" {...props} />
-            </Button>
+            <Button data-slot="alert-dialog-cancel" variant={variant} size={size} {...props} />
         </ChakraDialog.CloseTrigger>
     );
 }
