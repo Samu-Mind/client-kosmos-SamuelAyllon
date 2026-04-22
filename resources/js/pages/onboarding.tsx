@@ -96,7 +96,7 @@ export default function Onboarding() {
                                     value={data.practice_name}
                                     onChange={(e) => setData('practice_name', e.target.value)}
                                     placeholder="Ej: Consulta Natalia López"
-                                    className="h-10"
+                                    h="10"
                                 />
                                 {errors.practice_name && (
                                     <Text fontSize="xs" color="error">{errors.practice_name}</Text>
@@ -135,7 +135,7 @@ export default function Onboarding() {
                                     value={data.city}
                                     onChange={(e) => setData('city', e.target.value)}
                                     placeholder="Ej: Madrid"
-                                    className="h-10"
+                                    h="10"
                                 />
                             </Stack>
                         </Stack>
@@ -152,7 +152,7 @@ export default function Onboarding() {
                                     value={data.patient.project_name}
                                     onChange={(e) => setData('patient', { ...data.patient, project_name: e.target.value })}
                                     placeholder="Ej: Ana García"
-                                    className="h-10"
+                                    h="10"
                                 />
                             </Stack>
                             <Stack gap="1.5">
@@ -188,7 +188,7 @@ export default function Onboarding() {
                                     value={data.patient.brand_tone}
                                     onChange={(e) => setData('patient', { ...data.patient, brand_tone: e.target.value })}
                                     placeholder="Ej: TCC, EMDR, Terapia humanista"
-                                    className="h-10"
+                                    h="10"
                                 />
                             </Stack>
                             <Stack gap="1.5">
@@ -198,7 +198,7 @@ export default function Onboarding() {
                                     type="date"
                                     value={data.patient.next_deadline}
                                     onChange={(e) => setData('patient', { ...data.patient, next_deadline: e.target.value })}
-                                    className="h-10"
+                                    h="10"
                                 />
                             </Stack>
                         </Stack>

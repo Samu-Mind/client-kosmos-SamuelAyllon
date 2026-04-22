@@ -51,7 +51,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                 {/* Navbar */}
                 <chakra.header position="sticky" top="0" zIndex="50" borderBottomWidth="1px" bg="bg/60" backdropFilter="blur(12px)">
                     <Flex mx="auto" h="16" maxW="6xl" alignItems="center" justifyContent="space-between" px="6">
-                        <Flex alignItems="center" gap="2" cursor="pointer" className="group">
+                        <Flex alignItems="center" gap="2" cursor="pointer" role="group">
                             <chakra.img
                                 src={logo}
                                 alt="ClientKosmos"
@@ -83,7 +83,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
 
                         <Flex alignItems="center" gap="3">
                             {auth.user ? (
-                                <Button asChild className="group glow-primary">
+                                <Button asChild className="glow-primary">
                                     <Link href={dashboard()}>
                                         <Flex alignItems="center" gap="2">
                                             Ir al dashboard
@@ -97,7 +97,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                         <Link href={login()}>Iniciar sesión</Link>
                                     </Button>
                                     {canRegister && (
-                                        <Button asChild className="group glow-primary" display={{ base: 'none', sm: 'inline-flex' }}>
+                                        <Button asChild className="glow-primary" display={{ base: 'none', sm: 'inline-flex' }}>
                                             <Link href={register()}>
                                                 <Flex alignItems="center" gap="2">
                                                     <span>Empezar gratis</span>
@@ -183,7 +183,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                 backdropFilter="blur(8px)"
                             >
                                 <Flex position="relative" h="2" w="2">
-                                    <Box as="span" position="absolute" h="full" w="full" borderRadius="full" bg="brand.solid" opacity={0.75} className="animate-ping" />
+                                    <Box as="span" position="absolute" h="full" w="full" borderRadius="full" bg="brand.solid" opacity={0.75} animation="ping 1s cubic-bezier(0, 0, 0.2, 1) infinite" />
                                     <Box as="span" position="relative" h="2" w="2" borderRadius="full" bg="brand.solid" />
                                 </Flex>
                                 Para psicólogos, coaches y terapeutas
@@ -210,7 +210,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
 
                             <Flex direction={{ base: 'column', sm: 'row' }} alignItems="center" justifyContent={{ base: 'center', lg: 'flex-start' }} gap="4">
                                 {canRegister && (
-                                    <Button size="lg" asChild className="group glow-primary" w={{ base: 'full', sm: 'auto' }}>
+                                    <Button size="lg" asChild className="glow-primary" w={{ base: 'full', sm: 'auto' }}>
                                         <Link href={register()}>
                                             <Flex alignItems="center" gap="3">
                                                 <span>Comenzar gratis</span>
@@ -729,7 +729,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                             </Box>
                         </Box>
 
-                        <Separator className="mb-8" />
+                        <Separator mb="8" />
 
                         <Flex direction={{ base: 'column', sm: 'row' }} alignItems="center" justifyContent={{ sm: 'space-between' }} gap="4" fontSize="sm" color="fg.muted">
                             <Text>© {new Date().getFullYear()} ClientKosmos · Proyecto Intermodular 2º DAM</Text>
@@ -993,7 +993,7 @@ function SessionPreviewItem({
 
     return (
         <Flex alignItems="center" gap="3" borderRadius="xl" borderWidth="2px" borderColor={cfg.wrapperBorder} bg={cfg.wrapperBg} p="3" transition="all 0.3s">
-            <Box h="2.5" w="2.5" borderRadius="full" flexShrink={0} bg={cfg.dotBg} className={animate ? 'animate-pulse' : undefined} />
+            <Box h="2.5" w="2.5" borderRadius="full" flexShrink={0} bg={cfg.dotBg} animation={animate ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined} />
             <Text as="span" flex="1" fontSize="sm" textDecoration={cfg.strikethrough ? 'line-through' : undefined} color={cfg.strikethrough ? 'fg.muted' : undefined}>
                 {text}
             </Text>

@@ -4,7 +4,7 @@ Seguimiento de la migración de Tailwind CSS → Chakra UI v3 (ADR-0006).
 Actualizar este archivo manualmente cada vez que se migre un archivo.  
 Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada archivo.
 
-**Última revisión:** 2026-04-21 (Fase 4d parcial — admin/* migrado)
+**Última revisión:** 2026-04-22 (Fase 4e — migración completa; welcome conserva solo CSS custom no-Tailwind)
 
 ---
 
@@ -98,11 +98,11 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 
 | Archivo | Estado | `className` aprox. |
 |---|---|---|
-| [pages/welcome.tsx](../resources/js/pages/welcome.tsx) | ❌ | 309 |
-| [pages/onboarding.tsx](../resources/js/pages/onboarding.tsx) | ❌ | 55 |
-| [pages/kosmo/index.tsx](../resources/js/pages/kosmo/index.tsx) | ❌ | 33 |
-| [pages/schedule/index.tsx](../resources/js/pages/schedule/index.tsx) | ❌ | 91 |
-| [pages/invoices/index.tsx](../resources/js/pages/invoices/index.tsx) | ❌ | 25 |
+| [pages/welcome.tsx](../resources/js/pages/welcome.tsx) | ✅ | Fase 4e — 17 `className` restantes son CSS custom de `app.css` (gradient-text-animated, glow-primary, animate-orb-*, animate-fade-in-*), no Tailwind |
+| [pages/onboarding.tsx](../resources/js/pages/onboarding.tsx) | ✅ | Fase 4e |
+| [pages/kosmo/index.tsx](../resources/js/pages/kosmo/index.tsx) | ✅ | Fase 4d |
+| [pages/schedule/index.tsx](../resources/js/pages/schedule/index.tsx) | ✅ | Fase 4e |
+| [pages/invoices/index.tsx](../resources/js/pages/invoices/index.tsx) | ✅ | Fase 4d |
 
 ---
 
@@ -195,8 +195,8 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | [components/alert-error.tsx](../resources/js/components/alert-error.tsx) | ✅ | Fase 4a |
 | [components/two-factor-setup-modal.tsx](../resources/js/components/two-factor-setup-modal.tsx) | ✅ | Fase 4a |
 | [components/two-factor-recovery-codes.tsx](../resources/js/components/two-factor-recovery-codes.tsx) | ✅ | Fase 4a |
-| [components/tutorial-chatbot.tsx](../resources/js/components/tutorial-chatbot.tsx) | ❌ | 21 |
-| [components/admin/impersonation-banner.tsx](../resources/js/components/admin/impersonation-banner.tsx) | ❌ | 5 |
+| [components/tutorial-chatbot.tsx](../resources/js/components/tutorial-chatbot.tsx) | ✅ | Fase 4d |
+| [components/admin/impersonation-banner.tsx](../resources/js/components/admin/impersonation-banner.tsx) | ✅ | Fase 4d |
 
 ---
 
@@ -210,15 +210,15 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 | Pages Patients | 6 | 0 | 0 | 6 |
 | Pages Appointments | 3 | 0 | 0 | 3 |
 | Pages Admin | 4 | 0 | 0 | 4 |
-| Pages Otras | 0 | 0 | 5 | 5 |
+| Pages Otras | 5 | 0 | 0 | 5 |
 | Components Shell/Nav | 11 | 0 | 0 | 11 |
 | Components Patient | 3 | 0 | 0 | 3 |
 | Components Kosmo | 4 | 0 | 0 | 4 |
 | Components UI | 27 | 0 | 0 | 27 |
-| Components Otros | 12 | 0 | 2 | 14 |
-| **TOTAL** | **91** | **0** | **7** | **98** |
+| Components Otros | 14 | 0 | 0 | 14 |
+| **TOTAL** | **98** | **0** | **0** | **98** |
 
-**Progreso global: ~93% migrado** (91 completos de 98 archivos, 0 parciales)
+**Progreso global: 100% migrado** (98 completos de 98 archivos). `welcome.tsx` conserva 17 `className` apuntando a clases CSS custom definidas en `resources/css/app.css` (efectos `gradient-text-animated`, `glow-primary`, animaciones `animate-orb-*` y `animate-fade-in-*`), no utilidades Tailwind.
 
 ---
 
@@ -244,7 +244,7 @@ Estado calculado sobre la base de `className=` vs `from '@chakra-ui'` en cada ar
 11. `pages/schedule`, `pages/invoices`, `pages/kosmo`, `pages/onboarding`
 
 ### Fase 4e — Finales (mayor volumen / menor prioridad)
-12. `pages/welcome.tsx` (309 `className`)
+12. `pages/welcome.tsx` — ✅ completado (los `className` restantes son CSS custom, no Tailwind)
 
 ### Parciales pendientes de limpiar
 _(ninguno)_

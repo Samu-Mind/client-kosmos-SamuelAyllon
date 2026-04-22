@@ -239,7 +239,7 @@ function CreateSlotDialog({
 
     return (
         <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent maxWidth={{ base: 'calc(100% - 2rem)', sm: 'md' }}>
                 <DialogHeader>
                     <DialogTitle>Nuevo hueco de disponibilidad</DialogTitle>
                 </DialogHeader>
@@ -287,7 +287,7 @@ function CreateSlotDialog({
                             checked={data.is_recurring}
                             onCheckedChange={(v) => setData('is_recurring', Boolean(v))}
                         />
-                        <Label htmlFor="slot-recurring" className="cursor-pointer font-normal">
+                        <Label htmlFor="slot-recurring" cursor="pointer" fontWeight="normal">
                             Se repite cada semana
                         </Label>
                     </Flex>
@@ -429,7 +429,7 @@ function EditSlotForm({
                     checked={data.is_recurring}
                     onCheckedChange={(v) => setData('is_recurring', Boolean(v))}
                 />
-                <Label htmlFor="edit-recurring" className="cursor-pointer font-normal">
+                <Label htmlFor="edit-recurring" cursor="pointer" fontWeight="normal">
                     Se repite cada semana
                 </Label>
             </Flex>
@@ -464,7 +464,7 @@ function EventDetailDialog({
 
     return (
         <Dialog open onOpenChange={(v) => { if (!v) { onClose(); setMode('view'); } }}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent maxWidth={{ base: 'calc(100% - 2rem)', sm: 'md' }}>
                 <DialogHeader>
                     <DialogTitle>
                         {event.type === 'appointment' ? 'Cita' : 'Hueco de disponibilidad'}
@@ -521,7 +521,7 @@ function EventDetailDialog({
                                 colorPalette="red"
                                 onClick={handleDelete}
                             >
-                                <Trash2 className="mr-1.5 size-3.5" />
+                                <Icon as={Trash2} mr="1.5" boxSize="3.5" />
                                 Eliminar
                             </Button>
                             <Button variant="default" size="sm" onClick={() => setMode('edit')}>
