@@ -1,6 +1,6 @@
-import { Box, Flex, Grid, Heading, Image, Stack, Text, chakra } from '@chakra-ui/react';
+import { Badge, Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link } from '@inertiajs/react';
-import { Bell, CalendarDays, Receipt, Video } from 'lucide-react';
+import { Bell, CalendarDays, FileText, Video } from 'lucide-react';
 import type { ReactNode } from 'react';
 import AppointmentIndexAction from '@/actions/App/Http/Controllers/Appointment/IndexAction';
 import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 
 const ChakraLink = chakra(Link);
+const ChakraImg = chakra('img');
 
 interface UpcomingAppointment {
     id: number;
@@ -33,6 +34,14 @@ interface RecentInvoice {
     created_at: string | null;
 }
 
+interface Agreement {
+    id: number;
+    title: string;
+    therapist_name: string;
+    status: 'in_progress' | 'completed';
+    progress: number;
+}
+
 interface PatientStats {
     upcoming_appointments: number;
     completed_sessions: number;
@@ -42,230 +51,244 @@ interface PatientStats {
 interface Props {
     upcomingAppointments: UpcomingAppointment[];
     recentInvoices: RecentInvoice[];
+    agreements?: Agreement[];
     stats: PatientStats;
 }
 
-const formatDateTime = (dt: string): string =>
-    new Intl.DateTimeFormat('es-ES', {
-        day: 'numeric',
+const formatDateTime = (dt: string): string => {
+    const date = new Date(dt);
+    const dateStr = new Intl.DateTimeFormat('es-ES', {
         month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-    }).format(new Date(dt));
-
-const getModalityLabel = (modality: string): string => {
-    const map: Record<string, string> = {
-        in_person: 'Presencial',
-        video_call: 'Videollamada',
-        online: 'Online',
-        telefono: 'Teléfono',
-    };
-    return map[modality?.toLowerCase()] ?? modality ?? 'Presencial';
+        day: 'numeric',
+    }).format(date);
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const period = hours < 12 ? 'AM' : 'PM';
+    const displayHour = hours % 12 || 12;
+    return `${dateStr} • ${displayHour}:${minutes} ${period}`;
 };
 
 const isOnlineModality = (modality: string): boolean =>
-    ['video_call', 'online', 'telefono'].includes(modality?.toLowerCase());
+    ['video_call', 'online', 'videollamada', 'telefono'].includes(modality?.toLowerCase());
 
-const getInitials = (name: string): string =>
-    name
-        .split(' ')
-        .slice(0, 2)
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase();
+const getDueDays = (dueAt: string | null): number | null => {
+    if (!dueAt) return null;
+    return Math.ceil((new Date(dueAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+};
 
 const formatInvoiceNumber = (id: number): string =>
     `#INV-${new Date().getFullYear()}-${String(id).padStart(3, '0')}`;
 
-const getDueDays = (dueAt: string | null): number | null => {
-    if (!dueAt) return null;
-    const due = new Date(dueAt);
-    const now = new Date();
-    return Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-};
-
-const appointmentStatusLabel: Record<string, string> = {
-    confirmed: 'Confirmada',
-    pending: 'Pendiente',
-    scheduled: 'Programada',
-    cancelled: 'Cancelada',
-};
-
-export default function PatientDashboard({ upcomingAppointments, recentInvoices }: Props) {
+export default function PatientDashboard({
+    upcomingAppointments,
+    recentInvoices,
+    agreements = [],
+}: Props) {
     const nextAppointment = upcomingAppointments[0] ?? null;
-    const otherAppointments = upcomingAppointments.slice(1);
 
     return (
         <>
             <Head title="Inicio — ClientKosmos" />
 
-            <Stack gap="16" px="8" pt="14" pb="8">
+            <Stack
+                id="main-content"
+                tabIndex={-1}
+                gap="8"
+                pt={{ base: '10', lg: '14' }}
+                px={{ base: '6', lg: '8' }}
+                pb="10"
+                maxW="6xl"
+                mx="auto"
+                w="full"
+            >
+                {/* ── Page header ── */}
+                <Flex justifyContent="space-between" alignItems="center">
+                    <Heading
+                        as="h1"
+                        fontSize="4xl"
+                        fontWeight="bold"
+                        color="fg"
+                        letterSpacing="-0.48px"
+                    >
+                        Tu próxima cita
+                    </Heading>
+                    <Box
+                        as="button"
+                        bg="bg.surface"
+                        borderWidth="1px"
+                        borderColor="border"
+                        p="3"
+                        borderRadius="lg"
+                        cursor="pointer"
+                        color="fg.muted"
+                        _hover={{ bg: 'bg.subtle', color: 'fg' }}
+                        transition="background 0.15s, color 0.15s"
+                        aria-label="Notificaciones"
+                    >
+                        <Box as={Bell} w="5" h="5" aria-hidden={true} />
+                    </Box>
+                </Flex>
 
-                {/* ── Header section ── */}
-                <Stack gap="13">
-
-                    {/* Title row */}
-                    <Flex alignItems="center" justifyContent="space-between">
-                        <Heading
-                            as="h1"
-                            fontSize="4xl"
-                            fontWeight="bold"
-                            color="fg"
-                            letterSpacing="-0.48px"
-                        >
-                            Tu próxima cita
-                        </Heading>
+                {/* ── Hero: Next Session ── */}
+                {nextAppointment ? (
+                    <Box
+                        bg="bg.surface"
+                        borderRadius="2xl"
+                        boxShadow="0px 7px 23.5px -2px rgba(12,29,42,0.19)"
+                        position="relative"
+                        overflow="hidden"
+                        minH="72"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="flex-end"
+                        p="8"
+                    >
+                        {/* Doctor photo — left half */}
                         <Box
-                            as="button"
-                            bg="white"
-                            borderWidth="1px"
-                            borderColor="border"
-                            p="3"
-                            borderRadius="lg"
-                            cursor="pointer"
-                            _hover={{ bg: 'bg.subtle' }}
-                            transition="background 0.2s"
-                        >
-                            <Box as={Bell} w="5" h="5" color="fg.muted" />
-                        </Box>
-                    </Flex>
-
-                    {/* Hero card: next session */}
-                    {nextAppointment ? (
-                        <Box
-                            bg="white"
-                            borderRadius="xl"
-                            boxShadow="0px 2px 23.5px 5px rgba(12,29,42,0.19)"
-                            p="8"
-                            position="relative"
+                            position="absolute"
+                            left={0}
+                            top={0}
+                            bottom={0}
+                            w="55%"
                             overflow="hidden"
-                            minH="297px"
-                            display="flex"
-                            alignItems="center"
-                            maxW="821px"
+                            aria-hidden={true}
                         >
-                            {/* Left content */}
-                            <Stack gap="6" position="relative" zIndex={1} maxW="55%">
-                                {/* Badge */}
-                                <Box
-                                    display="inline-flex"
-                                    bg="#93f0e0"
-                                    px="3"
-                                    py="1"
-                                    borderRadius="full"
-                                    alignSelf="flex-start"
+                            {nextAppointment.professional.avatar_path ? (
+                                <ChakraImg
+                                    src={nextAppointment.professional.avatar_path}
+                                    alt=""
+                                    position="absolute"
+                                    inset={0}
+                                    w="full"
+                                    h="full"
+                                    objectFit="cover"
+                                />
+                            ) : (
+                                <Flex
+                                    w="full"
+                                    h="full"
+                                    bg="brand.subtle"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    fontSize="6xl"
+                                    fontWeight="bold"
+                                    color="brand.solid"
                                 >
-                                    <Text
-                                        fontSize="10px"
-                                        fontWeight="bold"
-                                        color="#006f63"
-                                        textTransform="uppercase"
-                                        letterSpacing="1px"
-                                    >
-                                        Tu próxima sesión
-                                    </Text>
-                                </Box>
-
-                                {/* Doctor info */}
-                                <Stack gap="1">
-                                    <Heading fontSize="3xl" fontWeight="bold" color="fg">
-                                        {nextAppointment.professional.name}
-                                    </Heading>
-                                    <Flex alignItems="center" gap="2">
-                                        <Box as={CalendarDays} w="3.5" h="3.5" color="fg.muted" flexShrink={0} />
-                                        <Text fontSize="md" color="fg.muted">
-                                            {formatDateTime(nextAppointment.scheduled_at)}
-                                        </Text>
-                                    </Flex>
-                                </Stack>
-
-                                {/* CTA button */}
-                                <Button asChild variant="primary" size="lg" alignSelf="flex-start">
-                                    <ChakraLink href={AppointmentShowAction.url(nextAppointment.id)}>
-                                        <Box as={Video} w="4" h="3" mr="1.5" />
-                                        {isOnlineModality(nextAppointment.modality) ? 'Join Session' : 'Ver cita'}
-                                    </ChakraLink>
-                                </Button>
-                            </Stack>
-
-                            {/* Right: doctor avatar / photo */}
+                                    {nextAppointment.professional.name
+                                        .split(' ')
+                                        .slice(0, 2)
+                                        .map((n) => n[0])
+                                        .join('')
+                                        .toUpperCase()}
+                                </Flex>
+                            )}
+                            {/* Gradient fade towards content */}
                             <Box
                                 position="absolute"
-                                top="0"
-                                left="50%"
-                                right="0"
-                                bottom="0"
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="center"
-                                overflow="hidden"
-                            >
-                                {nextAppointment.professional.avatar_path ? (
-                                    <Image
-                                        src={nextAppointment.professional.avatar_path}
-                                        alt={nextAppointment.professional.name}
-                                        fit="cover"
-                                        w="full"
-                                        h="121%"
-                                        mt="-10%"
-                                    />
-                                ) : (
-                                    <Flex
-                                        w="36"
-                                        h="36"
-                                        borderRadius="full"
-                                        bg="brand.subtle"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        fontSize="4xl"
-                                        fontWeight="bold"
-                                        color="brand.solid"
-                                        flexShrink={0}
-                                    >
-                                        {getInitials(nextAppointment.professional.name)}
-                                    </Flex>
-                                )}
-                                {/* Left-to-right gradient overlay */}
-                                <Box
-                                    position="absolute"
-                                    inset="0"
-                                    style={{
-                                        background: 'linear-gradient(to right, white 0%, white 15%, transparent 55%)',
-                                    }}
-                                />
-                            </Box>
+                                inset={0}
+                                pointerEvents="none"
+                                background="linear-gradient(to right, transparent 0%, white 90%)"
+                            />
                         </Box>
-                    ) : (
-                        <Box
-                            bg="white"
-                            borderRadius="xl"
-                            p="10"
-                            textAlign="center"
-                            borderWidth="1px"
-                            borderColor="border"
-                            maxW="821px"
-                        >
-                            <Box as={CalendarDays} w="10" h="10" mx="auto" mb="3" color="fg.subtle" />
-                            <Text color="fg.muted">No tienes citas próximas programadas.</Text>
-                        </Box>
-                    )}
-                </Stack>
 
-                {/* ── Bottom two-column sections ── */}
+                        {/* Session info — right side */}
+                        <Stack
+                            gap="6"
+                            position="relative"
+                            zIndex={1}
+                            w={{ base: 'full', md: '45%' }}
+                            alignItems="flex-start"
+                        >
+                            <Badge
+                                bg="#93f0e0"
+                                color="#006f63"
+                                borderRadius="full"
+                                px="3"
+                                py="1"
+                                fontSize="2xs"
+                                fontWeight="bold"
+                                textTransform="uppercase"
+                                letterSpacing="wider"
+                            >
+                                Tu próxima sesión
+                            </Badge>
+
+                            <Stack gap="1.5">
+                                <Heading as="h2" fontSize="3xl" fontWeight="bold" color="fg">
+                                    {nextAppointment.professional.name}
+                                </Heading>
+                                <Flex alignItems="center" gap="2">
+                                    <Box
+                                        as={CalendarDays}
+                                        w="3.5"
+                                        h="3.5"
+                                        color="fg.muted"
+                                        flexShrink={0}
+                                        aria-hidden={true}
+                                    />
+                                    <Text fontSize="md" color="fg.muted">
+                                        {formatDateTime(nextAppointment.scheduled_at)}
+                                    </Text>
+                                </Flex>
+                            </Stack>
+
+                            <Button asChild variant="primary" size="lg" w="full">
+                                <ChakraLink
+                                    href={AppointmentShowAction.url(nextAppointment.id)}
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    gap="2"
+                                    aria-label={`${isOnlineModality(nextAppointment.modality) ? 'Unirse a la sesión' : 'Ver cita'} con ${nextAppointment.professional.name}`}
+                                >
+                                    <Box as={Video} w="4" h="4" aria-hidden={true} />
+                                    {isOnlineModality(nextAppointment.modality)
+                                        ? 'Join Session'
+                                        : 'Ver cita'}
+                                </ChakraLink>
+                            </Button>
+                        </Stack>
+                    </Box>
+                ) : (
+                    <Box
+                        bg="bg.surface"
+                        borderRadius="2xl"
+                        p="10"
+                        textAlign="center"
+                        borderWidth="1px"
+                        borderColor="border"
+                    >
+                        <Box
+                            as={CalendarDays}
+                            w="10"
+                            h="10"
+                            mx="auto"
+                            mb="3"
+                            color="fg.subtle"
+                            aria-hidden={true}
+                        />
+                        <Text color="fg.muted">No tienes citas próximas programadas.</Text>
+                    </Box>
+                )}
+
+                {/* ── Bottom grid ── */}
                 <Grid
-                    templateColumns={{ base: '1fr', lg: '5fr 6fr' }}
-                    gap={{ base: '10', lg: '12' }}
+                    templateColumns={{ base: '1fr', lg: '5fr 7fr' }}
+                    gap={{ base: '8', lg: '12' }}
+                    alignItems="start"
                 >
-                    {/* Left: Próximas citas */}
-                    <Stack gap="6">
-                        <Flex alignItems="center" justifyContent="space-between">
+                    {/* ── Left: Tus Acuerdos ── */}
+                    <Box as="section" aria-labelledby="heading-agreements">
+                        <Flex justifyContent="space-between" alignItems="center" mb="6">
                             <Heading
+                                id="heading-agreements"
+                                as="h2"
                                 fontSize="2xl"
                                 fontWeight="bold"
                                 color="fg"
                                 letterSpacing="-0.48px"
                             >
-                                Próximas citas
+                                Tus Acuerdos
                             </Heading>
                             <ChakraLink
                                 href={AppointmentIndexAction.url()}
@@ -278,72 +301,98 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices 
                             </ChakraLink>
                         </Flex>
 
-                        <Stack gap="4">
-                            {otherAppointments.length === 0 ? (
+                        <Stack gap="4" role="list" aria-label="Tus acuerdos activos">
+                            {agreements.length === 0 ? (
                                 <Box
                                     bg="bg.surface"
-                                    borderRadius="xl"
-                                    p="6"
+                                    borderRadius="2xl"
+                                    p="8"
                                     textAlign="center"
                                     boxShadow="sm"
                                 >
-                                    <Box as={CalendarDays} w="7" h="7" mx="auto" mb="2" color="fg.subtle" />
                                     <Text fontSize="sm" color="fg.muted">
-                                        Sin más citas próximas.
+                                        No tienes acuerdos activos.
                                     </Text>
                                 </Box>
                             ) : (
-                                otherAppointments.map((apt) => (
-                                    <Box
-                                        key={apt.id}
-                                        bg="bg.surface"
-                                        borderRadius="xl"
-                                        p="6"
-                                        boxShadow="sm"
-                                    >
-                                        <Flex alignItems="flex-start" justifyContent="space-between">
-                                            <Stack gap="1">
-                                                <Heading
-                                                    fontSize="md"
-                                                    fontWeight="bold"
-                                                    color="fg"
-                                                    letterSpacing="-0.36px"
-                                                    lineHeight="short"
-                                                >
-                                                    {apt.professional.name}
-                                                </Heading>
-                                                <Text fontSize="sm" color="fg.muted">
-                                                    {getModalityLabel(apt.modality)}
-                                                </Text>
-                                            </Stack>
-                                            <Box
-                                                bg="brand.subtle"
-                                                color="brand.solid"
-                                                borderRadius="md"
-                                                px="2.5"
-                                                py="1"
-                                                fontSize="2xs"
-                                                fontWeight="bold"
-                                                textTransform="uppercase"
-                                                letterSpacing="wider"
-                                                flexShrink={0}
+                                agreements.map((agreement) => {
+                                    const isCompleted = agreement.status === 'completed';
+                                    return (
+                                        <Box
+                                            key={agreement.id}
+                                            role="listitem"
+                                            bg={isCompleted ? 'rgba(251,242,237,0.47)' : '#fdf9f6'}
+                                            borderRadius="2xl"
+                                            p="6"
+                                            boxShadow="sm"
+                                        >
+                                            <Flex
+                                                justifyContent="space-between"
+                                                alignItems="flex-start"
+                                                mb="4"
+                                                gap="4"
                                             >
-                                                {appointmentStatusLabel[apt.status] ?? apt.status}
+                                                <Stack gap="1" flex={1} minW={0}>
+                                                    <Text
+                                                        fontSize="md"
+                                                        fontWeight="bold"
+                                                        color="fg"
+                                                        lineHeight="short"
+                                                    >
+                                                        {agreement.title}
+                                                    </Text>
+                                                    <Text fontSize="sm" color="fg.muted">
+                                                        Con {agreement.therapist_name}
+                                                    </Text>
+                                                </Stack>
+                                                <Badge
+                                                    bg={isCompleted ? '#93f0e0' : 'rgba(0,97,86,0.1)'}
+                                                    color={isCompleted ? '#006f63' : 'brand.solid'}
+                                                    borderRadius="md"
+                                                    px="2.5"
+                                                    py="1"
+                                                    fontSize="2xs"
+                                                    fontWeight="bold"
+                                                    textTransform="uppercase"
+                                                    letterSpacing="wider"
+                                                    flexShrink={0}
+                                                >
+                                                    {isCompleted ? 'Completado' : 'En progreso'}
+                                                </Badge>
+                                            </Flex>
+
+                                            <Box
+                                                h="2"
+                                                borderRadius="full"
+                                                bg="#d4e4f7"
+                                                overflow="hidden"
+                                                role="progressbar"
+                                                aria-valuenow={agreement.progress}
+                                                aria-valuemin={0}
+                                                aria-valuemax={100}
+                                                aria-label={`Progreso: ${agreement.progress}%`}
+                                            >
+                                                <Box
+                                                    h="full"
+                                                    w={`${agreement.progress}%`}
+                                                    bg="brand.solid"
+                                                    borderRadius="full"
+                                                    transition="width 0.3s ease"
+                                                />
                                             </Box>
-                                        </Flex>
-                                        <Text fontSize="xs" color="fg.muted" mt="3">
-                                            {formatDateTime(apt.scheduled_at)}
-                                        </Text>
-                                    </Box>
-                                ))
+                                        </Box>
+                                    );
+                                })
                             )}
                         </Stack>
-                    </Stack>
+                    </Box>
 
-                    {/* Right: Facturas pendientes */}
-                    <Stack gap="6">
-                        <Flex alignItems="center" justifyContent="space-between">
+                    {/* ── Right: Facturas pendientes ── */}
+                    <Box as="section" aria-labelledby="heading-invoices">
+                        <Flex justifyContent="space-between" alignItems="center" mb="6">
                             <Heading
+                                id="heading-invoices"
+                                as="h2"
                                 fontSize="2xl"
                                 fontWeight="bold"
                                 color="fg"
@@ -362,16 +411,24 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices 
                             </ChakraLink>
                         </Flex>
 
-                        <Stack gap="4">
+                        <Stack gap="4" role="list" aria-label="Facturas pendientes de pago">
                             {recentInvoices.length === 0 ? (
                                 <Box
                                     bg="bg.surface"
-                                    borderRadius="xl"
-                                    p="6"
+                                    borderRadius="2xl"
+                                    p="8"
                                     textAlign="center"
                                     boxShadow="sm"
                                 >
-                                    <Box as={Receipt} w="7" h="7" mx="auto" mb="2" color="fg.subtle" />
+                                    <Box
+                                        as={FileText}
+                                        w="7"
+                                        h="7"
+                                        mx="auto"
+                                        mb="2"
+                                        color="fg.subtle"
+                                        aria-hidden={true}
+                                    />
                                     <Text fontSize="sm" color="fg.muted">
                                         No hay facturas pendientes.
                                     </Text>
@@ -379,34 +436,45 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices 
                             ) : (
                                 recentInvoices.map((invoice) => {
                                     const dueDays = getDueDays(invoice.due_at);
-                                    const isUrgent =
+                                    const isOverdue =
                                         invoice.status === 'overdue' ||
-                                        (dueDays !== null && dueDays <= 3 && dueDays >= 0);
+                                        (dueDays !== null && dueDays <= 0);
+                                    const isUrgent =
+                                        isOverdue ||
+                                        (dueDays !== null && dueDays <= 3 && dueDays > 0);
 
                                     return (
                                         <Flex
                                             key={invoice.id}
-                                            bg={isUrgent ? '#ffecec' : 'bg.surface'}
-                                            borderRadius="xl"
+                                            role="listitem"
+                                            bg={isUrgent ? '#ffecec' : 'bg.subtle'}
+                                            borderRadius="2xl"
                                             p="6"
+                                            boxShadow="sm"
                                             alignItems="center"
                                             justifyContent="space-between"
-                                            boxShadow="sm"
+                                            gap="4"
                                         >
-                                            {/* Left: icon + invoice info */}
-                                            <Flex alignItems="center" gap="5">
+                                            {/* Icon + invoice info */}
+                                            <Flex alignItems="center" gap="5" flex={1} minW={0}>
                                                 <Flex
+                                                    bg="rgba(0,97,86,0.1)"
+                                                    borderRadius="xl"
                                                     w="12"
                                                     h="12"
-                                                    borderRadius="xl"
-                                                    bg="brand.subtle"
                                                     alignItems="center"
                                                     justifyContent="center"
                                                     flexShrink={0}
+                                                    aria-hidden={true}
                                                 >
-                                                    <Box as={Receipt} w="4" h="5" color="brand.solid" />
+                                                    <Box
+                                                        as={FileText}
+                                                        w="5"
+                                                        h="5"
+                                                        color="brand.solid"
+                                                    />
                                                 </Flex>
-                                                <Stack gap="0.5">
+                                                <Stack gap="0.5" minW={0}>
                                                     <Text
                                                         fontSize="xs"
                                                         fontWeight="bold"
@@ -416,7 +484,7 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices 
                                                     >
                                                         {formatInvoiceNumber(invoice.id)}
                                                     </Text>
-                                                    <Text fontSize="xs" color="fg.muted">
+                                                    <Text fontSize="sm" color="fg.muted">
                                                         {invoice.created_at
                                                             ? new Intl.DateTimeFormat('es-ES', {
                                                                   day: 'numeric',
@@ -428,14 +496,22 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices 
                                                 </Stack>
                                             </Flex>
 
-                                            {/* Right: amount + due label + pay button */}
-                                            <Flex alignItems="center" gap="6">
+                                            {/* Amount + due label + pay button */}
+                                            <Flex alignItems="center" gap="5" flexShrink={0}>
                                                 <Stack gap="0.5" alignItems="flex-end">
-                                                    <Text fontSize="xl" fontWeight="bold" color="fg">
-                                                        {Number(invoice.amount).toLocaleString('es-ES', {
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        })}{' '}
+                                                    <Text
+                                                        fontSize="xl"
+                                                        fontWeight="bold"
+                                                        color="fg"
+                                                        lineHeight="none"
+                                                    >
+                                                        {Number(invoice.amount).toLocaleString(
+                                                            'es-ES',
+                                                            {
+                                                                minimumFractionDigits: 0,
+                                                                maximumFractionDigits: 2,
+                                                            },
+                                                        )}{' '}
                                                         €
                                                     </Text>
                                                     {dueDays !== null && (
@@ -445,19 +521,22 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices 
                                                             textTransform="uppercase"
                                                             letterSpacing="wider"
                                                             color={
-                                                                dueDays <= 0 || invoice.status === 'overdue'
+                                                                isOverdue
                                                                     ? 'danger.solid'
                                                                     : 'fg.subtle'
                                                             }
                                                         >
-                                                            {dueDays <= 0 || invoice.status === 'overdue'
+                                                            {isOverdue
                                                                 ? 'VENCIDA'
-                                                                : `VENCE EN ${dueDays} DÍA${dueDays === 1 ? '' : 'S'}`}
+                                                                : `QUEDAN ${dueDays} DÍA${dueDays === 1 ? '' : 'S'}`}
                                                         </Text>
                                                     )}
                                                 </Stack>
                                                 <Button asChild variant="primary" size="sm">
-                                                    <ChakraLink href={InvoiceShowAction.url(invoice.id)}>
+                                                    <ChakraLink
+                                                        href={InvoiceShowAction.url(invoice.id)}
+                                                        aria-label={`Pagar factura ${formatInvoiceNumber(invoice.id)} por ${invoice.amount} €`}
+                                                    >
                                                         Pagar
                                                     </ChakraLink>
                                                 </Button>
@@ -467,7 +546,7 @@ export default function PatientDashboard({ upcomingAppointments, recentInvoices 
                                 })
                             )}
                         </Stack>
-                    </Stack>
+                    </Box>
                 </Grid>
             </Stack>
         </>
