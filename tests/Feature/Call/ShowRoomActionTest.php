@@ -34,25 +34,22 @@ it('el profesional puede acceder a la sala de su cita', function () {
         ->assertInertia(fn ($page) => $page
             ->component('call/room')
             ->has('appointment')
-            ->has('jitsiRoomName')
-            ->has('jitsiDomain')
             ->has('exitUrl')
-            ->where('recordingConsentGiven', false)
         );
 });
 
-it('la sala refleja el consentimiento de grabación del paciente', function () {
+it('la sala no expone props de Jitsi ni recordingConsentGiven', function () {
     $appointment = makeActiveAppointment();
     $professional = \App\Models\User::find($appointment->professional_id);
-
-    \App\Models\SessionRecording::factory()->withPatientConsent()->create([
-        'appointment_id' => $appointment->id,
-    ]);
 
     $this->actingAs($professional)
         ->get(route('call.room', ['roomId' => $appointment->meeting_room_id]))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('recordingConsentGiven', true));
+        ->assertInertia(fn ($page) => $page
+            ->missing('jitsiRoomName')
+            ->missing('jitsiDomain')
+            ->missing('recordingConsentGiven')
+        );
 });
 
 it('el paciente puede acceder a la sala de su cita', function () {
@@ -137,15 +134,16 @@ it('devuelve 403 si la cita terminó hace más de 30 minutos', function () {
 
 // ─── Portal: paciente une llamada ─────────────────────────────────────────────
 
-it('el paciente que une la llamada recibe patient_joined_at y redirige a la sala de espera', function () {
+it('el paciente que une la llamada recibe room_id y su patient_joined_at se registra', function () {
     $appointment = makeActiveAppointment([
         'patient_joined_at' => null,
     ]);
     $patient = \App\Models\User::find($appointment->patient_id);
 
     $this->actingAs($patient)
-        ->get(route('patient.appointments.join', $appointment))
-        ->assertRedirect(route('patient.appointments.waiting', $appointment));
+        ->postJson(route('patient.appointments.join', $appointment))
+        ->assertOk()
+        ->assertJsonStructure(['room_id', 'meeting_url']);
 
     expect($appointment->fresh()->patient_joined_at)->not->toBeNull();
 });
@@ -159,12 +157,12 @@ it('el portal no sobreescribe patient_joined_at si ya existe', function () {
     $patient = \App\Models\User::find($appointment->patient_id);
 
     $this->actingAs($patient)
-        ->get(route('patient.appointments.join', $appointment));
+        ->postJson(route('patient.appointments.join', $appointment));
 
     expect($appointment->fresh()->patient_joined_at->timestamp)->toBe($original->timestamp);
 });
 
-it('el portal redirige a la cita si la sala aún no fue iniciada', function () {
+it('el portal redirige a la sala de espera si la sala aún no fue iniciada', function () {
     $appointment = makeActiveAppointment([
         'meeting_room_id' => null,
         'meeting_url' => null,
@@ -173,8 +171,8 @@ it('el portal redirige a la cita si la sala aún no fue iniciada', function () {
     $patient = \App\Models\User::find($appointment->patient_id);
 
     $this->actingAs($patient)
-        ->get(route('patient.appointments.join', $appointment))
-        ->assertRedirect(route('patient.appointments.show', $appointment));
+        ->postJson(route('patient.appointments.join', $appointment))
+        ->assertRedirect(route('patient.appointments.waiting', $appointment));
 });
 
 it('otro paciente no puede unirse a una cita ajena', function () {
@@ -182,6 +180,6 @@ it('otro paciente no puede unirse a una cita ajena', function () {
     $otherPatient = createPatient();
 
     $this->actingAs($otherPatient)
-        ->get(route('patient.appointments.join', $appointment))
+        ->postJson(route('patient.appointments.join', $appointment))
         ->assertForbidden();
 });

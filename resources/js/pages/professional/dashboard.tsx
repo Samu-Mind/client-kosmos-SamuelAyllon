@@ -2,8 +2,8 @@ import { Badge, Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, CalendarDays, Receipt } from 'lucide-react';
 import type { ReactNode } from 'react';
-import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
 import professionalAppointmentsIndex from '@/actions/App/Http/Controllers/Appointment/IndexAction';
+import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
 import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
 import { KosmoBriefing as KosmoBriefingComponent } from '@/components/kosmo/kosmo-briefing';
 import { Button } from '@/components/ui/button';

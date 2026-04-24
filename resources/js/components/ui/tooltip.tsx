@@ -1,6 +1,7 @@
 import { Portal, Tooltip as ChakraTooltip } from '@chakra-ui/react';
 import * as React from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function TooltipProvider({ children, delayDuration: _ }: { children: React.ReactNode; delayDuration?: number }) {
     return <>{children}</>;
 }
@@ -23,6 +24,7 @@ type ContentProps = React.ComponentProps<typeof ChakraTooltip.Content> & {
     align?: 'start' | 'center' | 'end';
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function TooltipContent({ children, sideOffset: _, side: __, align: ___, ...props }: ContentProps) {
     return (
         <Portal>

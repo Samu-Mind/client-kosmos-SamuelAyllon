@@ -408,3 +408,125 @@ Se adopta **Laravel Reverb 1.x** como broadcaster por defecto (`BROADCAST_CONNEC
 - **Soketi self-host**: descartado — Reverb es la opción canónica del framework, mismo protocolo Pusher, sin necesidad de un proceso separado de comunidad.
 - **Polling HTTP del endpoint `transcription_segments` cada 3 s**: descartado — latencia ≥ 3 s sumada a los 8 s del chunk hace la experiencia perezosa (>11 s p99); además genera carga innecesaria en la base de datos.
 - **Server-Sent Events (SSE)**: descartado — no hay un canal de retorno (necesario en el commit 3 para señalar fin de sesión, etc.) y la reconexión + autenticación requieren plumbing manual que Echo ya resuelve.
+
+---
+
+## ADR-0010 — Migración Jitsi → Google Meet (videollamada)
+
+- **Fecha:** 2026-04-24
+- **Estado:** Aceptado
+
+### Contexto
+
+El SDK `@jitsi/react-sdk` requería un servidor Jitsi self-hosted (o `meet.jit.si` público sin garantías de uptime). El profesional ya dispone de Google Calendar y cuenta Google, y la API de Google Calendar puede crear eventos con `conferenceData.createRequest` que provee un enlace `hangoutsMeet` gratuito y robusto.
+
+### Decisión
+
+- Se desinstala `@jitsi/react-sdk`.
+- La llamada de video se crea como evento de Google Calendar usando `GoogleCalendarService::createMeetEvent()`.
+- El campo `appointments.meeting_url` almacena el `hangoutLink` devuelto por la API.
+- Se añade `appointments.external_calendar_event_id` para poder actualizar/cancelar el evento Meet.
+- `call/room.tsx` abre `meeting_url` en nueva pestaña; el panel lateral en ClientKosmos mantiene transcripción en vivo y botón "Finalizar".
+- OAuth scope requerido: `https://www.googleapis.com/auth/calendar.events`.
+- `users.google_refresh_token` ya existe en el esquema y se almacena cifrado (`encrypted` cast).
+
+### Consecuencias
+
+**Positivas** — Sin infra de video que operar; UX móvil excelente; integración nativa con Calendar del profesional.  
+**Negativas** — Dependencia de disponibilidad de Google Meet; no podemos embeber el video dentro de la app (trade-off aceptado en MVP).  
+**Deuda** — Post-MVP: evaluar embed con `<iframe>` condicional. Si Google retira la API pública de conferencias, migrar a Daily.co o Whereby.
+
+---
+
+## ADR-0011 — Almacenamiento local cifrado (Drive eliminado)
+
+- **Fecha:** 2026-04-24
+- **Estado:** Aceptado
+
+### Contexto
+
+Los archivos de salud (consentimientos, facturas, notas exportadas) son datos de categoría especial RGPD Art. 9. Google Drive no garantiza al responsable del tratamiento control granular sobre accesos, retención y borrado, impidiendo cumplir Art. 32.
+
+### Decisión
+
+- Se usa disco `private` de Laravel (`storage/app/private/`, permisos `0600`) para todos los documentos sensibles.
+- `DocumentCipherService::store()` cifra con `Crypt::encrypt()` (AES-256-CBC, `APP_KEY`) y calcula `sha256` para integridad.
+- Las columnas `gdrive_*` en `documents` se marcan deprecated (nullable, sin nuevos writes).
+- Las URLs temporales firmadas (`URL::temporarySignedRoute`, TTL 5 min) reemplazan los paths directos.
+- Se añade `content_hash` y `encrypted` (bool) a la tabla `documents`.
+
+### Consecuencias
+
+**Positivas** — Cadena de custodia demostrable; cumplimiento Art. 32 RGPD; cero coste de almacenamiento externo en MVP.  
+**Negativas** — Storage en el mismo servidor que la app (en MVP es aceptable; en producción → volumen dedicado o S3 con SSE).  
+**Deuda** — Rotación de `APP_KEY` requiere re-cifrado de todos los documentos (script pendiente, post-MVP).
+
+---
+
+## ADR-0012 — Generación de PDF con barryvdh/laravel-dompdf
+
+- **Fecha:** 2026-04-24
+- **Estado:** Aceptado
+
+### Contexto
+
+Las facturas deben generarse en PDF cumpliendo LIVA art. 20.1.3º (IVA exento para psicólogos) y ser almacenadas en el disco `private`. Se necesita una solución PHP nativa sin dependencias de binarios externos.
+
+### Decisión
+
+- Se instala `barryvdh/laravel-dompdf` (wrapper Laravel de Dompdf).
+- `BillingService::generatePdf(Invoice)` renderiza la vista Blade `invoices.pdf` y guarda el resultado en `storage/app/private/invoices/{id}.pdf`.
+- La numeración de factura pasa de `FAC-{YEAR}-{RANDOM}` a `FAC-{YEAR}-{NNNNN}` secuencial. El número se genera dentro de una transacción con `DB::transaction()` + `lockForUpdate()` para evitar duplicados bajo concurrencia.
+- Font: `dejavu-sans` para soporte correcto de caracteres con tilde.
+
+### Consecuencias
+
+**Positivas** — Solución madura, activamente mantenida, sin proceso externo (wkhtmltopdf, Chromium headless).  
+**Negativas** — CSS soporte limitado (sin Flexbox/Grid completo); el template debe usar tablas HTML. Aceptable para facturas.  
+**Deuda** — Si el profesional necesita facturas con diseño avanzado, migrar a Browsershot (Puppeteer) post-MVP.
+
+---
+
+## ADR-0013 — spatie/laravel-activitylog para audit log RGPD
+
+- **Fecha:** 2026-04-24
+- **Estado:** Aceptado
+
+### Contexto
+
+RGPD Art. 30 (registro de actividades de tratamiento) y las correcciones de auditoría interna exigen registrar quién accedió a qué entidad sensible y cuándo.
+
+### Decisión
+
+- Se instala `spatie/laravel-activitylog v5`.
+- Modelos con log: `PatientProfile`, `Document`, `ConsentForm`, `SessionRecording`, `Invoice`.
+- Eventos mínimos: `created`, `updated`, `deleted`. El evento `viewed` se añade como log manual desde los controladores `Show`.
+- Los logs se guardan en la tabla `activity_log` (ya creada en Sprint 1).
+
+### Consecuencias
+
+**Positivas** — Trazabilidad completa de accesos a datos de salud sin escribir código de logging manual en cada modelo.  
+**Negativas** — Aumenta el volumen de la tabla `activity_log` con el tiempo. Requiere job de purga periódica (post-MVP, retención 5 años).
+
+---
+
+## ADR-0014 — Envío de email transaccional (SMTP / Resend)
+
+- **Fecha:** 2026-04-24
+- **Estado:** Aceptado
+
+### Contexto
+
+El MVP debe enviar facturas y acuerdos al paciente por email después de cada sesión.
+
+### Decisión
+
+- En desarrollo: driver `log` (Mailpit para inspección visual).
+- En producción: Resend (o Postmark como alternativa) configurado vía `MAIL_MAILER=smtp` + credenciales en `.env`.
+- Las clases mailable (`InvoiceIssuedMail`, `AgreementsSentMail`, `PostSessionMail`) extienden `Mailable` de Laravel con `envelope()` + `content()` (API fluida Laravel 10+).
+- Los jobs de envío (`SendInvoiceEmailJob`, `SendAgreementsEmailJob`, `SendPostSessionEmailJob`) usan la cola `default` para no bloquear la petición HTTP.
+
+### Consecuencias
+
+**Positivas** — Desacoplado del proveedor SMTP; cambiar a Postmark es solo cambiar la variable de entorno.  
+**Negativas** — Requiere verificar el dominio del remitente en producción (SPF, DKIM). Documentar en deploy guide.

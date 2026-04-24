@@ -35,8 +35,8 @@ const detectInitialError = (): string | null => {
 };
 
 export function useAudioChunks({ appointmentId, enabled, chunkDurationMs = 8000 }: Options): State {
-    const initialError = useMemo(detectInitialError, []);
-    const mimeType = useMemo(pickMimeType, []);
+    const initialError = useMemo(() => detectInitialError(), []);
+    const mimeType = useMemo(() => pickMimeType(), []);
     const [recording, setRecording] = useState(false);
     const [runtimeError, setRuntimeError] = useState<string | null>(null);
     const [chunksUploaded, setChunksUploaded] = useState(0);

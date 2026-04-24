@@ -2,7 +2,7 @@
 
 use App\Models\Appointment;
 
-it('patient sees waiting page with recordingConsentGiven flag', function () {
+it('patient sees waiting page with their appointment', function () {
     $professional = createProfessional();
     $patient = createPatient();
 
@@ -17,17 +17,8 @@ it('patient sees waiting page with recordingConsentGiven flag', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('patient/appointments/waiting')
-            ->where('recordingConsentGiven', false)
+            ->has('appointment')
         );
-
-    \App\Models\SessionRecording::factory()->withPatientConsent()->create([
-        'appointment_id' => $appointment->id,
-    ]);
-
-    $this->actingAs($patient)
-        ->get(route('patient.appointments.waiting', $appointment))
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('recordingConsentGiven', true));
 });
 
 it('professional can view the waiting room for their appointment', function () {

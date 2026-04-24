@@ -1,13 +1,15 @@
-import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/react';
-import { Head, router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { Alert, Box, Flex, Heading, Stack, Text } from '@chakra-ui/react';
+import { Head } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { RecordingConsentModal } from '@/components/recording-consent-modal';
+import { JoinCallButton } from '@/components/join-call-button';
 import AppLayout from '@/layouts/app-layout';
 
 interface Appointment {
     id: number;
     status: string;
+    starts_at: string;
+    ends_at: string;
+    meeting_url: string | null;
     meeting_room_id: string | null;
     patient_joined_at: string | null;
     professional_joined_at: string | null;
@@ -16,41 +18,12 @@ interface Appointment {
 
 interface Props {
     appointment: Appointment;
-    recordingConsentGiven: boolean;
 }
 
-export default function PatientAppointmentWaiting({ appointment, recordingConsentGiven }: Props) {
-    const bothPresent = !!appointment.patient_joined_at && !!appointment.professional_joined_at;
-    const [consentModalOpen, setConsentModalOpen] = useState<boolean>(!recordingConsentGiven);
-
-    useEffect(() => {
-        if (consentModalOpen) return;
-        const id = setInterval(() => {
-            router.reload({ only: ['appointment'], preserveUrl: true });
-        }, 4000);
-        return () => clearInterval(id);
-    }, [consentModalOpen]);
-
-    useEffect(() => {
-        if (consentModalOpen) return;
-        if (bothPresent && appointment.meeting_room_id) {
-            window.location.href = `/call/${appointment.meeting_room_id}`;
-        }
-    }, [bothPresent, appointment.meeting_room_id, consentModalOpen]);
-
+export default function PatientAppointmentWaiting({ appointment }: Props) {
     return (
         <>
-            <Head title="Esperando al profesional" />
-
-            <RecordingConsentModal
-                appointmentId={appointment.id}
-                open={consentModalOpen}
-                onAccepted={() => {
-                    router.reload({ only: ['recordingConsentGiven'], preserveUrl: true });
-                    setConsentModalOpen(false);
-                }}
-                onDeclined={() => setConsentModalOpen(false)}
-            />
+            <Head title="Sala de espera" />
 
             <Flex flex="1" alignItems="center" justifyContent="center" p="8" minH="70vh">
                 <Stack gap="8" alignItems="center" textAlign="center" maxW="md">
@@ -86,32 +59,22 @@ export default function PatientAppointmentWaiting({ appointment, recordingConsen
 
                     <Stack gap="2">
                         <Heading as="h1" fontSize="2xl" fontWeight="bold" color="fg">
-                            Esperando al profesional
+                            Tu sesión con {appointment.professional?.name ?? 'tu profesional'}
                         </Heading>
                         <Text fontSize="md" color="fg.muted">
-                            Tu sesión comenzará automáticamente en cuanto {appointment.professional?.name ?? 'tu profesional'} se una.
+                            El botón se habilitará 10 minutos antes del inicio.
                         </Text>
                     </Stack>
 
-                    <Flex alignItems="center" gap="1.5" aria-hidden="true">
-                        <Box w="2" h="2" borderRadius="full" bg="brand.solid" animation="pulse 1.4s ease-in-out infinite" />
-                        <Box
-                            w="2"
-                            h="2"
-                            borderRadius="full"
-                            bg="brand.solid"
-                            animation="pulse 1.4s ease-in-out infinite"
-                            style={{ animationDelay: '200ms' }}
-                        />
-                        <Box
-                            w="2"
-                            h="2"
-                            borderRadius="full"
-                            bg="brand.solid"
-                            animation="pulse 1.4s ease-in-out infinite"
-                            style={{ animationDelay: '400ms' }}
-                        />
-                    </Flex>
+                    <JoinCallButton appointment={appointment} role="patient" />
+
+                    <Alert.Root status="info" variant="subtle" borderRadius="md" textAlign="left">
+                        <Alert.Indicator />
+                        <Alert.Description fontSize="xs" color="fg.muted">
+                            Esta sesión será grabada y transcrita automáticamente por la IA de ClientKosmos para apoyar a tu profesional.
+                            Puedes revocar este consentimiento desde tu perfil en cualquier momento.
+                        </Alert.Description>
+                    </Alert.Root>
                 </Stack>
             </Flex>
         </>

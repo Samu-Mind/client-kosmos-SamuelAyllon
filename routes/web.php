@@ -38,6 +38,7 @@ use App\Http\Controllers\Document\StoreAction as DocumentStoreAction;
 use App\Http\Controllers\Invoice\DestroyAction as InvoiceDestroyAction;
 use App\Http\Controllers\Invoice\ExportPdfAction as InvoiceExportPdfAction;
 use App\Http\Controllers\Invoice\IndexAction as InvoiceIndexAction;
+use App\Http\Controllers\Invoice\ReviewAction as InvoiceReviewAction;
 use App\Http\Controllers\Invoice\SendAction as InvoiceSendAction;
 use App\Http\Controllers\Invoice\ShowAction as InvoiceShowAction;
 use App\Http\Controllers\Invoice\StoreAction as InvoiceStoreAction;
@@ -174,6 +175,7 @@ Route::middleware(['auth', 'verified', 'professional'])
         // Invoices
         Route::get('/invoices', InvoiceIndexAction::class)->name('invoices.index');
         Route::get('/invoices/{invoice}', InvoiceShowAction::class)->name('invoices.show');
+        Route::get('/invoices/{invoice}/review', InvoiceReviewAction::class)->name('invoices.review');
         Route::post('/invoices/{invoice}/send', InvoiceSendAction::class)->name('invoices.send');
         Route::get('/invoices/{invoice}/export-pdf', InvoiceExportPdfAction::class)->name('invoices.export-pdf');
 
@@ -272,7 +274,7 @@ Route::middleware(['auth', 'verified'])
         Route::post('/appointments', PortalAppointmentStoreAction::class)->name('appointments.store');
         Route::get('/appointments/{appointment}', PortalAppointmentShowAction::class)->name('appointments.show');
         Route::post('/appointments/{appointment}/cancel', PortalAppointmentCancelAction::class)->name('appointments.cancel');
-        Route::get('/appointments/{appointment}/join', PortalAppointmentJoinCallAction::class)->name('appointments.join');
+        Route::post('/appointments/{appointment}/join', PortalAppointmentJoinCallAction::class)->name('appointments.join');
         Route::get('/appointments/{appointment}/waiting', PortalAppointmentWaitingShowAction::class)->name('appointments.waiting');
         Route::post('/appointments/{appointment}/recording-consent', PortalAppointmentRecordingConsentAction::class)->name('appointments.recording-consent');
         Route::get('/appointments/{appointment}/post-session', PortalAppointmentPostSessionShowAction::class)->name('appointments.post-session');

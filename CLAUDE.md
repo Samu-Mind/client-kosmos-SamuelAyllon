@@ -1,7 +1,6 @@
 # CLAUDE.md — Kosmos Client (Proyecto)
 
 > Constitución operativa del repositorio. La IA la carga automáticamente en cada sesión.
-> Complementa — no sustituye — el `CLAUDE.md` global de Kosmos (`Desktop/CLAUDE.md`).
 
 ## Rol y Contexto
 

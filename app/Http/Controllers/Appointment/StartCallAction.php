@@ -18,18 +18,23 @@ class StartCallAction extends Controller
             'Solo se puede iniciar una llamada en citas confirmadas.'
         );
 
-        $roomId = 'kosmos-'.Str::uuid();
-        $meetUrl = route('call.room', ['roomId' => $roomId]);
+        abort_unless(
+            $appointment->canBeJoinedNow(),
+            403,
+            'Fuera de la ventana de acceso (10 min antes — 15 min después).'
+        );
+
+        $roomId = $appointment->meeting_room_id ?? 'kosmos-'.Str::uuid();
 
         $appointment->update([
             'status' => 'in_progress',
+            'professional_joined_at' => now(),
             'meeting_room_id' => $roomId,
-            'meeting_url' => $meetUrl,
         ]);
 
         return response()->json([
-            'meeting_url' => $meetUrl,
             'room_id' => $roomId,
+            'meeting_url' => $appointment->meeting_url,
         ]);
     }
 }

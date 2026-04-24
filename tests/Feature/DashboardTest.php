@@ -82,7 +82,7 @@ it('authenticated patient can visit dashboard and sees patient view', function (
         ->assertInertia(fn ($page) => $page
             ->component('patient/dashboard')
             ->has('upcomingAppointments')
-            ->has('pendingInvoices')
+            ->has('recentInvoices')
             ->has('unreadMessages')
         );
 });

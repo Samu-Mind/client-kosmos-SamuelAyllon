@@ -1,13 +1,8 @@
-import { Box, Flex, Heading, Stack, Text, chakra } from '@chakra-ui/react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/react';
+import { Head } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import AppointmentShowAction from '@/actions/App/Http/Controllers/Appointment/ShowAction';
-import { Button } from '@/components/ui/button';
+import { JoinCallButton } from '@/components/join-call-button';
 import AppLayout from '@/layouts/app-layout';
-import type { Auth } from '@/types';
-
-const ChakraLink = chakra(Link);
 
 interface User {
     id: number;
@@ -19,11 +14,14 @@ interface User {
 interface Appointment {
     id: number;
     status: string;
+    starts_at: string;
+    ends_at: string;
     patient_id: number;
     professional_id: number;
     patient_joined_at: string | null;
     professional_joined_at: string | null;
     meeting_room_id: string | null;
+    meeting_url: string | null;
     patient: User | null;
     professional: User | null;
 }
@@ -41,25 +39,6 @@ const initials = (name: string | undefined) =>
         .toUpperCase();
 
 export default function AppointmentWaiting({ appointment }: Props) {
-    const { auth } = usePage<{ auth: Auth }>().props;
-    const viewerIsProfessional = auth.user.id === appointment.professional_id;
-    const other = viewerIsProfessional ? appointment.patient : appointment.professional;
-    const message = viewerIsProfessional ? 'Esperando al paciente' : 'Esperando al profesional';
-    const bothPresent = !!appointment.patient_joined_at && !!appointment.professional_joined_at;
-
-    useEffect(() => {
-        const id = setInterval(() => {
-            router.reload({ only: ['appointment'], preserveUrl: true });
-        }, 4000);
-        return () => clearInterval(id);
-    }, []);
-
-    useEffect(() => {
-        if (bothPresent && appointment.meeting_room_id) {
-            window.location.href = `/call/${appointment.meeting_room_id}`;
-        }
-    }, [bothPresent, appointment.meeting_room_id]);
-
     return (
         <>
             <Head title="Sala de espera" />
@@ -87,31 +66,21 @@ export default function AppointmentWaiting({ appointment }: Props) {
                             justifyContent="center"
                         >
                             <Text fontSize="2xl" fontWeight="semibold" color="brand.contrast">
-                                {initials(other?.name)}
+                                {initials(appointment.patient?.name)}
                             </Text>
                         </Flex>
                     </Flex>
 
                     <Box>
                         <Heading as="h1" fontSize="2xl" fontWeight="bold" color="fg">
-                            {message}
+                            Sesión con {appointment.patient?.name ?? 'tu paciente'}
                         </Heading>
                         <Text mt="2" fontSize="md" color="fg.muted">
-                            La sesión comenzará automáticamente cuando ambos estéis presentes.
+                            El botón se habilitará 10 minutos antes del inicio.
                         </Text>
                     </Box>
 
-                    <Flex alignItems="center" gap="1.5" aria-hidden="true">
-                        <Box w="2" h="2" borderRadius="full" bg="brand.solid" animation="pulse 1.5s ease-in-out infinite" />
-                        <Box w="2" h="2" borderRadius="full" bg="brand.solid" animation="pulse 1.5s ease-in-out infinite" style={{ animationDelay: '200ms' }} />
-                        <Box w="2" h="2" borderRadius="full" bg="brand.solid" animation="pulse 1.5s ease-in-out infinite" style={{ animationDelay: '400ms' }} />
-                    </Flex>
-
-                    <ChakraLink href={AppointmentShowAction.url(appointment.id)}>
-                        <Button variant="secondary" size="sm">
-                            Cancelar
-                        </Button>
-                    </ChakraLink>
+                    <JoinCallButton appointment={appointment} role="professional" />
                 </Stack>
             </Flex>
         </>

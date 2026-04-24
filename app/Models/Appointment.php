@@ -38,7 +38,7 @@ class Appointment extends Model
     protected $fillable = [
         'workspace_id', 'patient_id', 'professional_id', 'service_id',
         'starts_at', 'ends_at', 'status', 'modality',
-        'meeting_room_id', 'meeting_url',
+        'meeting_room_id', 'meeting_url', 'external_calendar_event_id',
         'patient_joined_at', 'professional_joined_at',
         'cancellation_reason', 'cancelled_by', 'notes',
     ];
@@ -101,6 +101,16 @@ class Appointment extends Model
     public function kosmoBriefings(): HasMany
     {
         return $this->hasMany(KosmoBriefing::class);
+    }
+
+    /**
+     * Window: starts_at - 10min ≤ now ≤ ends_at + 15min, status pending or confirmed or in_progress.
+     */
+    public function canBeJoinedNow(): bool
+    {
+        return now()->greaterThanOrEqualTo($this->starts_at->subMinutes(10))
+            && now()->lessThanOrEqualTo($this->ends_at->addMinutes(15))
+            && in_array($this->status, ['pending', 'confirmed', 'in_progress'], strict: true);
     }
 
     public function isPending(): bool

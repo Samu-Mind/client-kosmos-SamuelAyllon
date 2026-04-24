@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Appointment;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\GeneratePreSessionBriefing;
+use App\Jobs\SummarizeSessionJob;
 use App\Models\Appointment;
 use Illuminate\Http\JsonResponse;
 
@@ -19,8 +19,11 @@ class EndCallAction extends Controller
 
         $appointment->update(['status' => 'completed']);
 
-        // @todo Dispatch post-session briefing job once implemented
-        // GeneratePreSessionBriefing::dispatch($appointment);
+        $recording = $appointment->sessionRecording;
+
+        if ($recording !== null && trim((string) $recording->transcription) !== '') {
+            SummarizeSessionJob::dispatch($recording->id);
+        }
 
         return response()->json(['status' => 'completed']);
     }

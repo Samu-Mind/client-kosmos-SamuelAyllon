@@ -161,6 +161,7 @@ export default function TutorialChatbot({ show, onComplete, isPremium, userName 
     useEffect(() => {
         if (!isActive) return;
 
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         measureTarget();
 
         window.addEventListener('resize', measureTarget);
@@ -170,7 +171,9 @@ export default function TutorialChatbot({ show, onComplete, isPremium, userName 
     useEffect(() => {
         if (!isActive) return;
 
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsTyping(true);
+         
         setDisplayedMessage('');
 
         const message = currentStep === 0

@@ -1,10 +1,8 @@
-import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Stack, Text } from '@chakra-ui/react';
 import { Head, router, usePage } from '@inertiajs/react';
-import { JitsiMeeting } from '@jitsi/react-sdk';
-import type { IJitsiMeetExternalApi } from '@jitsi/react-sdk/lib/types';
 import type { ReactNode } from 'react';
 import { LiveTranscriptPanel } from '@/components/live-transcript-panel';
-import { useAudioChunks } from '@/hooks/use-audio-chunks';
+import { useProfessionalTabRecorder } from '@/hooks/use-professional-tab-recorder';
 import type { Auth } from '@/types';
 
 interface AppointmentUser {
@@ -22,106 +20,135 @@ interface Appointment {
     starts_at: string;
     ends_at: string;
     meeting_room_id: string;
+    meeting_url: string | null;
     patient: AppointmentUser;
     professional: AppointmentUser;
 }
 
 interface Props {
     appointment: Appointment;
-    jitsiDomain: string;
-    jitsiRoomName: string;
-    recordingConsentGiven: boolean;
     exitUrl: string;
 }
 
-function LoadingScreen() {
+function RecordingIndicator() {
     return (
-        <Flex h="100vh" w="100%" alignItems="center" justifyContent="center" bg="black" direction="column" gap="4">
-            <Spinner size="xl" color="white" />
-            <Text color="whiteAlpha.700" fontSize="sm">
-                Conectando a la videoconsulta...
+        <HStack gap="1.5" alignItems="center">
+            <Box w="2.5" h="2.5" borderRadius="full" bg="red.500" animation="pulse 1s ease-in-out infinite" />
+            <Text fontSize="xs" fontWeight="semibold" color="red.400" letterSpacing="wider" textTransform="uppercase">
+                Grabando
             </Text>
-        </Flex>
+        </HStack>
     );
 }
 
-export default function CallRoom({ appointment, jitsiDomain, jitsiRoomName, recordingConsentGiven, exitUrl }: Props) {
+export default function CallRoom({ appointment, exitUrl }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
-
     const isProfessional = auth.user.id === appointment.professional_id;
-    const isPatient = auth.user.id === appointment.patient_id;
 
-    const audioCaptureEnabled = isProfessional || (isPatient && recordingConsentGiven);
+    const recorder = useProfessionalTabRecorder({ appointmentId: appointment.id });
 
-    useAudioChunks({
-        appointmentId: appointment.id,
-        enabled: audioCaptureEnabled,
-    });
+    const handleOpenMeet = () => {
+        if (appointment.meeting_url) {
+            window.open(appointment.meeting_url, '_blank', 'noopener,noreferrer');
+        }
+    };
 
-    const handleApiReady = (api: IJitsiMeetExternalApi) => {
-        api.addEventListener('readyToClose', () => {
-            if (isProfessional) {
-                router.post(
-                    `/appointments/${appointment.id}/end-call`,
-                    {},
-                    {
-                        onFinish: () => {
-                            window.location.href = exitUrl;
-                        },
-                    },
-                );
-            } else {
-                window.location.href = exitUrl;
-            }
-        });
+    const handleEndSession = () => {
+        if (recorder.status === 'recording') recorder.stopRecording();
+        router.post(
+            `/appointments/${appointment.id}/end-call`,
+            {},
+            { onFinish: () => { window.location.href = exitUrl; } },
+        );
     };
 
     return (
         <>
             <Head title="Videoconsulta" />
 
-            <Flex h="100vh" w="100vw" overflow="hidden" bg="black" direction={{ base: 'column', lg: 'row' }}>
-                <Box flex="1" minH="0">
-                    <JitsiMeeting
-                        domain={jitsiDomain}
-                        roomName={jitsiRoomName}
-                        configOverwrite={{
-                            startWithAudioMuted: false,
-                            startWithVideoMuted: false,
-                            disableModeratorIndicator: true,
-                            enableWelcomePage: false,
-                            prejoinPageEnabled: false,
-                            enableEmailInRegistration: false,
-                            disableDeepLinking: true,
-                            toolbarButtons: [
-                                'microphone',
-                                'camera',
-                                'desktop',
-                                'chat',
-                                'hangup',
-                                'tileview',
-                            ],
-                        }}
-                        interfaceConfigOverwrite={{
-                            DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-                            SHOW_JITSI_WATERMARK: false,
-                            SHOW_WATERMARK_FOR_GUESTS: false,
-                            MOBILE_APP_PROMO: false,
-                        }}
-                        userInfo={{
-                            displayName: auth.user.name,
-                            email: auth.user.email,
-                        }}
-                        spinner={LoadingScreen}
-                        onApiReady={handleApiReady}
-                        getIFrameRef={(node) => {
-                            node.style.height = '100%';
-                            node.style.width = '100%';
-                            node.style.border = 'none';
-                        }}
-                    />
-                </Box>
+            <Flex h="100vh" w="100vw" overflow="hidden" bg="gray.950" direction={{ base: 'column', lg: 'row' }}>
+                {/* Left panel: controls */}
+                <Flex
+                    direction="column"
+                    flex="1"
+                    alignItems="center"
+                    justifyContent="center"
+                    gap="6"
+                    p="8"
+                    bg="gray.900"
+                >
+                    <Stack alignItems="center" gap="2" textAlign="center">
+                        <Text fontSize="xl" fontWeight="bold" color="white">
+                            Sesión en curso
+                        </Text>
+                        <Text fontSize="sm" color="whiteAlpha.600">
+                            {isProfessional
+                                ? `Con ${appointment.patient?.name}`
+                                : `Con ${appointment.professional?.name}`}
+                        </Text>
+                    </Stack>
 
+                    {appointment.meeting_url && (
+                        <Button
+                            colorPalette="blue"
+                            variant="solid"
+                            size="lg"
+                            onClick={handleOpenMeet}
+                        >
+                            Abrir Google Meet
+                        </Button>
+                    )}
+
+                    {isProfessional && (
+                        <Stack alignItems="center" gap="3">
+                            {recorder.status === 'idle' || recorder.status === 'error' ? (
+                                <Button
+                                    colorPalette="green"
+                                    variant="solid"
+                                    onClick={() => void recorder.startRecording()}
+                                >
+                                    Comenzar grabación
+                                </Button>
+                            ) : recorder.status === 'permission_pending' ? (
+                                <Button colorPalette="gray" variant="subtle" loading disabled>
+                                    Esperando permiso...
+                                </Button>
+                            ) : (
+                                <Stack alignItems="center" gap="2">
+                                    <RecordingIndicator />
+                                    <Text fontSize="xs" color="whiteAlpha.500">
+                                        {recorder.chunksUploaded} segmentos transcritos
+                                    </Text>
+                                    <Button
+                                        colorPalette="red"
+                                        variant="subtle"
+                                        size="sm"
+                                        onClick={recorder.stopRecording}
+                                    >
+                                        Pausar grabación
+                                    </Button>
+                                </Stack>
+                            )}
+
+                            {recorder.error && (
+                                <Text fontSize="xs" color="red.300">
+                                    {recorder.error}
+                                </Text>
+                            )}
+                        </Stack>
+                    )}
+
+                    <Button
+                        colorPalette="red"
+                        variant="solid"
+                        mt="4"
+                        onClick={handleEndSession}
+                    >
+                        {isProfessional ? 'Finalizar sesión' : 'Salir de la sesión'}
+                    </Button>
+                </Flex>
+
+                {/* Right panel: live transcript (professional only) */}
                 {isProfessional && (
                     <LiveTranscriptPanel
                         appointmentId={appointment.id}

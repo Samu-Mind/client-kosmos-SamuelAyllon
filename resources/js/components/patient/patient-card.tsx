@@ -1,9 +1,9 @@
 import { Box, Flex, Image, Text } from '@chakra-ui/react';
 import { Link } from '@inertiajs/react';
 import React from 'react';
+import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
 import { StatusBadge } from '@/components/ui/status-badge';
 import type { Patient, PatientStatus } from '@/types';
-import PatientShowAction from '@/actions/App/Http/Controllers/Patient/ShowAction';
 
 interface PatientCardProps {
     patient: Patient;

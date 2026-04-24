@@ -4,32 +4,57 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\User;
-use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class BillingService
 {
     /**
-     * Generates a unique invoice number in the format FAC-{YEAR}-{RANDOM}.
-     * Retries on collision to guarantee uniqueness against the invoices table.
+     * Sequential invoice number: FAC-{YEAR}-{NNNNN}.
+     * Uses a transaction with lockForUpdate to prevent duplicates under concurrency.
      */
-    public function generateInvoiceNumber(User $user): string
+    public function generateSequentialInvoiceNumber(int $year): string
     {
-        $year = now()->year;
+        return DB::transaction(function () use ($year) {
+            $prefix = "FAC-{$year}-";
 
-        do {
-            $number = 'FAC-'.$year.'-'.strtoupper(Str::random(6));
-        } while (Invoice::where('invoice_number', $number)->exists());
+            $last = Invoice::where('invoice_number', 'like', $prefix.'%')
+                ->lockForUpdate()
+                ->orderByDesc('invoice_number')
+                ->value('invoice_number');
 
-        return $number;
+            $next = $last === null ? 1 : ((int) substr($last, strlen($prefix)) + 1);
+
+            return $prefix.str_pad((string) $next, 5, '0', STR_PAD_LEFT);
+        });
     }
 
     /**
-     * @todo Generate a PDF invoice and store it in the invoice's pdf_path.
-     *       Requires a PDF library (e.g. barryvdh/laravel-dompdf).
+     * @deprecated Use generateSequentialInvoiceNumber() — AEAT requires sequential numbering.
+     */
+    public function generateInvoiceNumber(User $user): string
+    {
+        return $this->generateSequentialInvoiceNumber(now()->year);
+    }
+
+    /**
+     * Generate a PDF for the invoice and store it in the private disk.
+     * Sets invoice->pdf_path after storing.
      */
     public function generatePdf(Invoice $invoice): void
     {
-        // @todo
+        $invoice->loadMissing(['professional', 'patient', 'items', 'workspace']);
+
+        $pdf = Pdf::loadView('invoices.pdf', ['invoice' => $invoice])
+            ->setPaper('a4', 'portrait')
+            ->setOption('defaultFont', 'dejavu sans');
+
+        $path = "invoices/{$invoice->id}.pdf";
+
+        Storage::disk('private')->put($path, $pdf->output());
+
+        $invoice->update(['pdf_path' => $path]);
     }
 
     /**

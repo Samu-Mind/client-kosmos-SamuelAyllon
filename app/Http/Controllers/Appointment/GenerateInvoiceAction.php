@@ -19,28 +19,28 @@ class GenerateInvoiceAction extends Controller
         }
 
         $service = $appointment->service;
-        $amount  = $service?->price ?? 0;
+        $amount = $service?->price ?? 0;
 
         $invoice = Invoice::create([
-            'workspace_id'       => $appointment->workspace_id,
-            'patient_id'      => $appointment->patient_id,
+            'workspace_id' => $appointment->workspace_id,
+            'patient_id' => $appointment->patient_id,
             'professional_id' => $appointment->professional_id,
-            'invoice_number'  => $billing->generateInvoiceNumber($request->user()),
-            'status'          => 'draft',
-            'issued_at'       => now(),
-            'due_at'          => now()->addDays(30),
-            'subtotal'        => $amount,
-            'tax_rate'        => 0,
-            'tax_amount'      => 0,
-            'total'           => $amount,
+            'invoice_number' => $billing->generateSequentialInvoiceNumber(now()->year),
+            'status' => 'draft',
+            'issued_at' => now(),
+            'due_at' => now()->addDays(30),
+            'subtotal' => $amount,
+            'tax_rate' => 0,
+            'tax_amount' => 0,
+            'total' => $amount,
         ]);
 
         InvoiceItem::create([
-            'invoice_id'     => $invoice->id,
-            'description'    => $service?->name ?? 'Sesión',
-            'quantity'       => 1,
-            'unit_price'     => $amount,
-            'total'          => $amount,
+            'invoice_id' => $invoice->id,
+            'description' => $service?->name ?? 'Sesión',
+            'quantity' => 1,
+            'unit_price' => $amount,
+            'total' => $amount,
             'appointment_id' => $appointment->id,
         ]);
 

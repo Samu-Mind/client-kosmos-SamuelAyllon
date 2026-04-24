@@ -14,11 +14,10 @@ class WaitingShowAction extends Controller
     {
         abort_if($appointment->patient_id !== $request->user()->id, 403);
 
-        $appointment->load(['professional:id,name,avatar_path', 'sessionRecording:id,appointment_id,patient_consent_given_at']);
+        $appointment->load(['professional:id,name,avatar_path']);
 
         return Inertia::render('patient/appointments/waiting', [
             'appointment' => $appointment,
-            'recordingConsentGiven' => $appointment->sessionRecording?->patient_consent_given_at !== null,
         ]);
     }
 }
