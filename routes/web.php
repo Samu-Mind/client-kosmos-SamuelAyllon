@@ -14,6 +14,7 @@ use App\Http\Controllers\Agreement\UpdateAction as AgreementUpdateAction;
 use App\Http\Controllers\Appointment\ClosingSuccessAction;
 use App\Http\Controllers\Appointment\DestroyAction as AppointmentDestroyAction;
 use App\Http\Controllers\Appointment\EndCallAction;
+use App\Http\Controllers\Appointment\FinalizeAndNotifyAction;
 use App\Http\Controllers\Appointment\GenerateInvoiceAction;
 use App\Http\Controllers\Appointment\IndexAction as AppointmentIndexAction;
 use App\Http\Controllers\Appointment\JoinWaitingRoomAction;
@@ -190,6 +191,7 @@ Route::middleware(['auth', 'verified', 'professional'])
         Route::patch('/appointments/{appointment}/status', UpdateStatusAction::class)->name('appointments.status');
         Route::post('/appointments/{appointment}/start-call', StartCallAction::class)->name('appointments.start-call');
         Route::post('/appointments/{appointment}/end-call', EndCallAction::class)->name('appointments.end-call');
+        Route::post('/appointments/{appointment}/finalize-and-notify', FinalizeAndNotifyAction::class)->name('appointments.finalize-and-notify');
         Route::post('/appointments/{appointment}/summarize', SummarizeAction::class)->name('appointments.summarize');
         Route::post('/appointments/{appointment}/generate-invoice', GenerateInvoiceAction::class)->name('appointments.generate-invoice');
         Route::delete('/appointments/{appointment}', AppointmentDestroyAction::class)->name('appointments.destroy');

@@ -14,13 +14,14 @@ class PostSessionAction extends Controller
         $this->authorize('view', $patient);
 
         $lastAppointment = $patient->appointments()
+            ->with('sessionRecording')
             ->orderByDesc('starts_at')
             ->first();
 
         return Inertia::render('professional/patients/post-session', [
             'patient' => $patient,
             'lastAppointment' => $lastAppointment,
-            'lastInvoice' => $patient->invoices()->orderByDesc('due_at')->first(),
+            'lastInvoice' => $patient->invoices()->latest()->first(),
         ]);
     }
 }
