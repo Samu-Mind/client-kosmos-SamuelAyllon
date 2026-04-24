@@ -4,6 +4,7 @@ import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { CheckCircle2, Mail, User } from 'lucide-react';
 import type { ReactNode } from 'react';
 import ProfileActions from '@/actions/App/Http/Controllers/Settings/Profile';
+import { ActiveConsentsList, type ConsentFormSummary } from '@/components/active-consents-list';
 import DeleteUser from '@/components/delete-user';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -25,9 +26,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Profile({
     mustVerifyEmail,
     status,
+    consentForms = [],
 }: {
     mustVerifyEmail: boolean;
     status?: string;
+    consentForms?: ConsentFormSummary[];
 }) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
@@ -162,6 +165,8 @@ export default function Profile({
                         </Form>
                     </CardContent>
                 </Card>
+
+                <ActiveConsentsList consentForms={consentForms} />
 
                 <DeleteUser />
             </SettingsLayout>

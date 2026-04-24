@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\Consent\RevokeAction as ConsentRevokeAction;
 use App\Http\Controllers\Settings\Google\CallbackAction as GoogleCallbackAction;
 use App\Http\Controllers\Settings\Google\ConnectAction as GoogleConnectAction;
 use App\Http\Controllers\Settings\Password\EditAction as PasswordEditAction;
@@ -34,4 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('settings/google/connect', GoogleConnectAction::class)->name('settings.google.connect');
     Route::get('settings/google/callback', GoogleCallbackAction::class)->name('settings.google.callback');
+
+    Route::post('settings/consents/{consentForm}/revoke', ConsentRevokeAction::class)
+        ->name('settings.consents.revoke');
 });
