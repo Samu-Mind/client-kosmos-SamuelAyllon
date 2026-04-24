@@ -58,8 +58,8 @@ class BookAction extends Controller
             'professional' => [
                 'id' => $profile->id,
                 'user_id' => $profile->user_id,
-                'name' => $profile->user?->name ?? '',
-                'avatar_path' => $profile->user?->avatar_path,
+                'name' => $profile->user->name,
+                'avatar_path' => $profile->user->avatar_path,
                 'specialties' => $profile->specialties ?? [],
                 'collegiate_number' => $profile->collegiate_number,
             ],

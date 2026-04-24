@@ -98,7 +98,7 @@ class IndexAction extends Controller
                 ->get(['id', 'user_id'])
                 ->map(fn (PatientProfile $p) => [
                     'id' => $p->id,
-                    'project_name' => $p->user?->name ?? 'Paciente',
+                    'project_name' => $p->user->name,
                     'payment_status' => 'pending',
                 ]),
             'consent' => PatientProfile::withoutGlobalScopes()
@@ -111,7 +111,7 @@ class IndexAction extends Controller
                 ->get(['id', 'user_id'])
                 ->map(fn (PatientProfile $p) => [
                     'id' => $p->id,
-                    'project_name' => $p->user?->name ?? 'Paciente',
+                    'project_name' => $p->user->name,
                 ]),
         ];
 

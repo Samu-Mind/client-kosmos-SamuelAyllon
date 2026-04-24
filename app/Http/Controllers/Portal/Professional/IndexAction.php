@@ -24,8 +24,8 @@ class IndexAction extends Controller
             ->map(fn (ProfessionalProfile $profile) => [
                 'id' => $profile->id,
                 'user_id' => $profile->user_id,
-                'name' => $profile->user?->name ?? '',
-                'avatar_path' => $profile->user?->avatar_path,
+                'name' => $profile->user->name,
+                'avatar_path' => $profile->user->avatar_path,
                 'specialties' => $profile->specialties ?? [],
                 'bio' => $profile->bio,
                 'collegiate_number' => $profile->collegiate_number,
