@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Users\DestroyAction as AdminUserDestroyAction;
 use App\Http\Controllers\Admin\Users\IndexAction as AdminUserIndexAction;
 use App\Http\Controllers\Admin\Users\ShowAction as AdminUserShowAction;
 use App\Http\Controllers\Admin\Users\StoreAction as AdminUserStoreAction;
+use App\Http\Controllers\Admin\Users\VerifyProfessionalAction as AdminVerifyProfessionalAction;
 use App\Http\Controllers\Admin\Workspaces\IndexAction as AdminWorkspaceIndexAction;
 use App\Http\Controllers\Admin\Workspaces\ShowAction as AdminWorkspaceShowAction;
 use App\Http\Controllers\Agreement\DestroyAction as AgreementDestroyAction;
@@ -258,6 +259,7 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::post('/users', AdminUserStoreAction::class)->name('users.store');
         Route::get('/users/{user}', AdminUserShowAction::class)->name('users.show');
         Route::delete('/users/{user}', AdminUserDestroyAction::class)->name('users.destroy');
+        Route::patch('/users/{user}/verify', AdminVerifyProfessionalAction::class)->name('users.verify');
 
         Route::get('/workspaces', AdminWorkspaceIndexAction::class)->name('workspaces.index');
         Route::get('/workspaces/{workspace}', AdminWorkspaceShowAction::class)->name('workspaces.show');

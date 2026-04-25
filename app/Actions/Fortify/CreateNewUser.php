@@ -68,6 +68,7 @@ class CreateNewUser implements CreatesNewUsers
                 'collegiate_number' => $input['collegiate_number'] ?? null,
                 'specialties' => $input['specialties'] ?? null,
                 'bio' => $input['bio'] ?? null,
+                'verification_status' => 'pending',
             ]);
         } else {
             $user->assignRole('patient');
