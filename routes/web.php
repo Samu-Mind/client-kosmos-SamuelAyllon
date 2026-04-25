@@ -78,6 +78,7 @@ use App\Http\Controllers\Portal\ConsentForm\IndexAction as PortalConsentFormInde
 use App\Http\Controllers\Portal\ConsentForm\SignAction as PortalConsentFormSignAction;
 use App\Http\Controllers\Portal\Dashboard\IndexAction as PortalDashboardIndexAction;
 use App\Http\Controllers\Portal\Document\IndexAction as PortalDocumentIndexAction;
+use App\Http\Controllers\Portal\Document\ShowAction as PortalDocumentShowAction;
 use App\Http\Controllers\Portal\Invoice\DownloadPdfAction as PortalInvoiceDownloadPdfAction;
 use App\Http\Controllers\Portal\Invoice\IndexAction as PortalInvoiceIndexAction;
 use App\Http\Controllers\Portal\Invoice\ShowAction as PortalInvoiceShowAction;
@@ -286,6 +287,9 @@ Route::middleware(['auth', 'verified'])
         Route::get('/invoices/{invoice}/download', PortalInvoiceDownloadPdfAction::class)->name('invoices.download');
 
         Route::get('/documents', PortalDocumentIndexAction::class)->name('documents.index');
+        Route::get('/documents/{document}', PortalDocumentShowAction::class)
+            ->middleware('signed')
+            ->name('documents.show');
 
         Route::get('/consent-forms', PortalConsentFormIndexAction::class)->name('consent-forms.index');
         Route::post('/consent-forms/{consentForm}/sign', PortalConsentFormSignAction::class)->name('consent-forms.sign');
@@ -305,6 +309,7 @@ Route::middleware(['auth', 'verified'])
             ->where('roomId', '[a-z0-9-]+');
 
         Route::post('/appointments/{appointment}/transcribe', TranscribeAction::class)
+            ->middleware('throttle:30,1')
             ->name('appointments.transcribe');
     });
 
