@@ -17,7 +17,7 @@ class ProfessionalProfile extends Model
 
     protected $fillable = [
         'user_id', 'license_number', 'collegiate_number',
-        'specialties', 'verification_status', 'bio', 'verified_at',
+        'specialties', 'verification_status', 'bio', 'city', 'verified_at',
     ];
 
     protected function casts(): array

@@ -16,11 +16,13 @@ class IndexAction extends Controller
     {
         $workspaceId = $request->user()->patientProfile?->workspace_id;
 
-        $professionals = ProfessionalProfile::query()
+        $profiles = ProfessionalProfile::query()
             ->where('verification_status', 'verified')
             ->with('user:id,name,avatar_path')
             ->orderBy('id')
-            ->get()
+            ->get();
+
+        $professionals = $profiles
             ->map(fn (ProfessionalProfile $profile) => [
                 'id' => $profile->id,
                 'user_id' => $profile->user_id,
@@ -29,11 +31,19 @@ class IndexAction extends Controller
                 'specialties' => $profile->specialties ?? [],
                 'bio' => $profile->bio,
                 'collegiate_number' => $profile->collegiate_number,
+                'city' => $profile->city,
                 'is_verified' => $profile->isVerified(),
                 'slots' => $profile->user_id
                     ? $availability->slotsForProfessional($profile->user_id)
                     : [],
             ])
+            ->values();
+
+        $cities = $profiles
+            ->pluck('city')
+            ->filter()
+            ->unique()
+            ->sort()
             ->values();
 
         $services = $workspaceId
@@ -47,6 +57,7 @@ class IndexAction extends Controller
         return Inertia::render('patient/professionals/index', [
             'professionals' => $professionals,
             'services' => $services,
+            'cities' => $cities,
         ]);
     }
 }
