@@ -67,6 +67,7 @@ use App\Http\Controllers\Patient\ShowAction as PatientShowAction;
 use App\Http\Controllers\Patient\StoreAction as PatientStoreAction;
 use App\Http\Controllers\Patient\UpdateAction as PatientUpdateAction;
 use App\Http\Controllers\Portal\Appointment\BookAction as PortalAppointmentBookAction;
+use App\Http\Controllers\Portal\Appointment\BookSuccessAction as PortalAppointmentBookSuccessAction;
 use App\Http\Controllers\Portal\Appointment\CancelAction as PortalAppointmentCancelAction;
 use App\Http\Controllers\Portal\Appointment\IndexAction as PortalAppointmentIndexAction;
 use App\Http\Controllers\Portal\Appointment\JoinCallAction as PortalAppointmentJoinCallAction;
@@ -86,6 +87,7 @@ use App\Http\Controllers\Portal\Invoice\ShowAction as PortalInvoiceShowAction;
 use App\Http\Controllers\Portal\Message\IndexAction as PortalMessageIndexAction;
 use App\Http\Controllers\Portal\Message\StoreAction as PortalMessageStoreAction;
 use App\Http\Controllers\Portal\Professional\IndexAction as PortalProfessionalIndexAction;
+use App\Http\Controllers\Portal\Professional\ShowAction as PortalProfessionalShowAction;
 use App\Http\Controllers\Portal\Profile\ShowAction as PortalProfileShowAction;
 use App\Http\Controllers\Portal\Profile\UpdateAction as PortalProfileUpdateAction;
 use App\Http\Controllers\Referral\DestroyAction as ReferralDestroyAction;
@@ -273,9 +275,11 @@ Route::middleware(['auth', 'verified'])
         Route::get('/', PortalDashboardIndexAction::class)->name('dashboard');
 
         Route::get('/professionals', PortalProfessionalIndexAction::class)->name('professionals.index');
+        Route::get('/professionals/{professional}', PortalProfessionalShowAction::class)->name('professionals.show');
 
         Route::get('/appointments', PortalAppointmentIndexAction::class)->name('appointments.index');
         Route::get('/appointments/book', PortalAppointmentBookAction::class)->name('appointments.book');
+        Route::get('/appointments/book-success', PortalAppointmentBookSuccessAction::class)->name('appointments.book-success');
         Route::post('/appointments', PortalAppointmentStoreAction::class)->name('appointments.store');
         Route::get('/appointments/{appointment}', PortalAppointmentShowAction::class)->name('appointments.show');
         Route::post('/appointments/{appointment}/cancel', PortalAppointmentCancelAction::class)->name('appointments.cancel');
