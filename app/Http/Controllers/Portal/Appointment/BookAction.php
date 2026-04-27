@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Portal\Appointment;
 
+use App\Actions\Patient\LinkPatientToProfessional;
 use App\Http\Controllers\Controller;
 use App\Models\ProfessionalProfile;
 use App\Models\Service;
@@ -13,19 +14,13 @@ use Inertia\Response;
 
 class BookAction extends Controller
 {
-    public function __invoke(Request $request): Response|RedirectResponse
+    public function __invoke(Request $request, LinkPatientToProfessional $linkPatient): Response|RedirectResponse
     {
         $validated = $request->validate([
             'professional_id' => ['required', 'integer'],
             'starts_at' => ['required', 'date', 'after:now'],
             'service_id' => ['nullable', 'integer'],
         ]);
-
-        $workspaceId = $request->user()->patientProfile?->workspace_id;
-
-        if (! $workspaceId) {
-            return redirect()->route('patient.dashboard');
-        }
 
         $profile = ProfessionalProfile::with('user:id,name,avatar_path')
             ->find($validated['professional_id']);
@@ -36,7 +31,21 @@ class BookAction extends Controller
                 ->withErrors(['professional_id' => 'Profesional no disponible.']);
         }
 
-        $services = Service::where('workspace_id', $workspaceId)
+        $workspace = $profile->user->workspaces()->first();
+
+        if (! $workspace) {
+            return redirect()
+                ->route('patient.professionals.index')
+                ->withErrors(['professional_id' => 'Profesional no disponible.']);
+        }
+
+        $authUser = $request->user();
+
+        if ($authUser && $authUser->isPatient()) {
+            $linkPatient($authUser, $profile->user, $workspace);
+        }
+
+        $services = Service::where('workspace_id', $workspace->id)
             ->where('is_active', true)
             ->orderBy('name')
             ->get(['id', 'name', 'description', 'duration_minutes', 'price']);

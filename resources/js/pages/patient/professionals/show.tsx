@@ -3,9 +3,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, BadgeCheck, CalendarClock, ChevronLeft, ChevronRight, MessageSquare, Star } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import ShowAction from '@/actions/App/Http/Controllers/Portal/Professional/ShowAction';
-import IndexAction from '@/actions/App/Http/Controllers/Portal/Professional/IndexAction';
 import BookAction from '@/actions/App/Http/Controllers/Portal/Appointment/BookAction';
+import IndexAction from '@/actions/App/Http/Controllers/Portal/Professional/IndexAction';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 

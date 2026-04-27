@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { UserPlus, Search } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import CreateAction from '@/actions/App/Http/Controllers/Patient/CreateAction';
 import { EmptyState } from '@/components/empty-state';
 import { PatientCard } from '@/components/patient/patient-card';
 import { Button } from '@/components/ui/button';
@@ -48,7 +49,7 @@ export default function PatientsIndex({ patients }: Props) {
                     <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
                         Pacientes
                     </Heading>
-                    <Button variant="primary" onClick={() => router.visit('/patients/create')}>
+                    <Button variant="primary" onClick={() => router.visit(CreateAction.url())}>
                         <Box as={UserPlus} w="4" h="4" mr="2" />
                         Añadir paciente
                     </Button>
@@ -111,7 +112,7 @@ export default function PatientsIndex({ patients }: Props) {
                         }
                         action={patients.length === 0 ? {
                             label: 'Añadir paciente',
-                            onClick: () => router.visit('/patients/create'),
+                            onClick: () => router.visit(CreateAction.url()),
                         } : undefined}
                     />
                 ) : (
