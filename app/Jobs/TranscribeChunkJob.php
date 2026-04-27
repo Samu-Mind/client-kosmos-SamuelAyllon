@@ -103,10 +103,6 @@ class TranscribeChunkJob implements ShouldQueue
             ],
         );
 
-        $appointmentId = $recording->appointment_id;
-
-        if ($appointmentId !== null) {
-            event(TranscriptionSegmentCreated::fromSegment($segment, (int) $appointmentId));
-        }
+        event(TranscriptionSegmentCreated::fromSegment($segment, $recording->appointment_id));
     }
 }

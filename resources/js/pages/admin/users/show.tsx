@@ -1,4 +1,4 @@
-import { Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
+import { Badge, Box, Button as ChakraButton, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -9,6 +9,17 @@ import AdminLayout from '@/layouts/admin-layout';
 import type { Auth } from '@/types';
 
 const ChakraLink = chakra(Link);
+
+type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
+
+interface ProfessionalProfile {
+    license_number: string | null;
+    collegiate_number: string | null;
+    specialties: string[];
+    bio: string | null;
+    verification_status: VerificationStatus;
+    verified_at: string | null;
+}
 
 interface UserDetail {
     id: number;
@@ -21,6 +32,7 @@ interface UserDetail {
     sessions_count: number;
     paid_amount: number;
     created_at: string;
+    professional_profile: ProfessionalProfile | null;
 }
 
 interface Props {
@@ -37,8 +49,19 @@ export default function AdminUserShow({ user }: Props) {
         router.delete(`/admin/users/${user.id}`);
     };
 
+    const handleVerify = (status: 'verified' | 'rejected') => {
+        router.patch(`/admin/users/${user.id}/verify`, { status });
+    };
+
     const formatDate = (d: string) =>
         new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d));
+
+    const statusBadge: Record<VerificationStatus, { label: string; colorPalette: string }> = {
+        verified: { label: 'Verificado', colorPalette: 'green' },
+        pending: { label: 'Pendiente', colorPalette: 'yellow' },
+        rejected: { label: 'Rechazado', colorPalette: 'red' },
+        unverified: { label: 'Sin verificar', colorPalette: 'gray' },
+    };
 
     return (
         <>
@@ -82,6 +105,109 @@ export default function AdminUserShow({ user }: Props) {
                     <KPICard label="Facturado" value={`€${Number(user.paid_amount ?? 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`} />
                     <KPICard label="Alta" value={formatDate(user.created_at)} />
                 </Grid>
+
+                {user.professional_profile && (
+                    <Stack
+                        gap="4"
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        borderColor="border"
+                        bg="bg.surface"
+                        p="6"
+                        boxShadow="sm"
+                    >
+                        <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap" gap="3">
+                            <Heading as="h2" fontSize="xl" color="fg">
+                                Verificación profesional
+                            </Heading>
+                            <Badge
+                                variant="subtle"
+                                colorPalette={statusBadge[user.professional_profile.verification_status].colorPalette}
+                                px="3"
+                                py="1"
+                                fontSize="sm"
+                                fontWeight="medium"
+                                borderRadius="md"
+                            >
+                                {statusBadge[user.professional_profile.verification_status].label}
+                            </Badge>
+                        </Flex>
+
+                        <Grid gridTemplateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)' }} gap="3">
+                            {user.professional_profile.collegiate_number && (
+                                <Box>
+                                    <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                        Nº Colegiado
+                                    </Text>
+                                    <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                        {user.professional_profile.collegiate_number}
+                                    </Text>
+                                </Box>
+                            )}
+                            {user.professional_profile.license_number && (
+                                <Box>
+                                    <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                        Nº Licencia
+                                    </Text>
+                                    <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                        {user.professional_profile.license_number}
+                                    </Text>
+                                </Box>
+                            )}
+                            {user.professional_profile.specialties.length > 0 && (
+                                <Box>
+                                    <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                        Especialidades
+                                    </Text>
+                                    <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                        {user.professional_profile.specialties.join(', ')}
+                                    </Text>
+                                </Box>
+                            )}
+                            {user.professional_profile.bio && (
+                                <Box gridColumn={{ sm: '1 / -1' }}>
+                                    <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                        Bio
+                                    </Text>
+                                    <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                        {user.professional_profile.bio}
+                                    </Text>
+                                </Box>
+                            )}
+                            {user.professional_profile.verified_at && (
+                                <Box>
+                                    <Text as="dt" fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+                                        Verificado el
+                                    </Text>
+                                    <Text as="dd" fontSize="sm" color="fg" mt="0.5">
+                                        {formatDate(user.professional_profile.verified_at)}
+                                    </Text>
+                                </Box>
+                            )}
+                        </Grid>
+
+                        <Flex gap="3">
+                            <ChakraButton
+                                variant="outline"
+                                size="sm"
+                                colorPalette="green"
+                                onClick={() => handleVerify('verified')}
+                                disabled={user.professional_profile.verification_status === 'verified'}
+                            >
+                                Verificar
+                            </ChakraButton>
+                            <ChakraButton
+                                variant="outline"
+                                size="sm"
+                                colorPalette="red"
+                                onClick={() => handleVerify('rejected')}
+                                disabled={user.professional_profile.verification_status === 'rejected'}
+                            >
+                                Rechazar
+                            </ChakraButton>
+                        </Flex>
+                    </Stack>
+                )}
 
                 <Stack
                     gap="4"

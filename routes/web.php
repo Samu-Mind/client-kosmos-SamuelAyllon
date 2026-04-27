@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Users\DestroyAction as AdminUserDestroyAction;
 use App\Http\Controllers\Admin\Users\IndexAction as AdminUserIndexAction;
 use App\Http\Controllers\Admin\Users\ShowAction as AdminUserShowAction;
 use App\Http\Controllers\Admin\Users\StoreAction as AdminUserStoreAction;
+use App\Http\Controllers\Admin\Users\VerifyProfessionalAction as AdminVerifyProfessionalAction;
 use App\Http\Controllers\Admin\Workspaces\IndexAction as AdminWorkspaceIndexAction;
 use App\Http\Controllers\Admin\Workspaces\ShowAction as AdminWorkspaceShowAction;
 use App\Http\Controllers\Agreement\DestroyAction as AgreementDestroyAction;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Agreement\UpdateAction as AgreementUpdateAction;
 use App\Http\Controllers\Appointment\ClosingSuccessAction;
 use App\Http\Controllers\Appointment\DestroyAction as AppointmentDestroyAction;
 use App\Http\Controllers\Appointment\EndCallAction;
+use App\Http\Controllers\Appointment\FinalizeAndNotifyAction;
 use App\Http\Controllers\Appointment\GenerateInvoiceAction;
 use App\Http\Controllers\Appointment\IndexAction as AppointmentIndexAction;
 use App\Http\Controllers\Appointment\JoinWaitingRoomAction;
@@ -77,6 +79,7 @@ use App\Http\Controllers\Portal\ConsentForm\IndexAction as PortalConsentFormInde
 use App\Http\Controllers\Portal\ConsentForm\SignAction as PortalConsentFormSignAction;
 use App\Http\Controllers\Portal\Dashboard\IndexAction as PortalDashboardIndexAction;
 use App\Http\Controllers\Portal\Document\IndexAction as PortalDocumentIndexAction;
+use App\Http\Controllers\Portal\Document\ShowAction as PortalDocumentShowAction;
 use App\Http\Controllers\Portal\Invoice\DownloadPdfAction as PortalInvoiceDownloadPdfAction;
 use App\Http\Controllers\Portal\Invoice\IndexAction as PortalInvoiceIndexAction;
 use App\Http\Controllers\Portal\Invoice\ShowAction as PortalInvoiceShowAction;
@@ -190,6 +193,7 @@ Route::middleware(['auth', 'verified', 'professional'])
         Route::patch('/appointments/{appointment}/status', UpdateStatusAction::class)->name('appointments.status');
         Route::post('/appointments/{appointment}/start-call', StartCallAction::class)->name('appointments.start-call');
         Route::post('/appointments/{appointment}/end-call', EndCallAction::class)->name('appointments.end-call');
+        Route::post('/appointments/{appointment}/finalize-and-notify', FinalizeAndNotifyAction::class)->name('appointments.finalize-and-notify');
         Route::post('/appointments/{appointment}/summarize', SummarizeAction::class)->name('appointments.summarize');
         Route::post('/appointments/{appointment}/generate-invoice', GenerateInvoiceAction::class)->name('appointments.generate-invoice');
         Route::delete('/appointments/{appointment}', AppointmentDestroyAction::class)->name('appointments.destroy');
@@ -255,6 +259,7 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::post('/users', AdminUserStoreAction::class)->name('users.store');
         Route::get('/users/{user}', AdminUserShowAction::class)->name('users.show');
         Route::delete('/users/{user}', AdminUserDestroyAction::class)->name('users.destroy');
+        Route::patch('/users/{user}/verify', AdminVerifyProfessionalAction::class)->name('users.verify');
 
         Route::get('/workspaces', AdminWorkspaceIndexAction::class)->name('workspaces.index');
         Route::get('/workspaces/{workspace}', AdminWorkspaceShowAction::class)->name('workspaces.show');
@@ -284,6 +289,9 @@ Route::middleware(['auth', 'verified'])
         Route::get('/invoices/{invoice}/download', PortalInvoiceDownloadPdfAction::class)->name('invoices.download');
 
         Route::get('/documents', PortalDocumentIndexAction::class)->name('documents.index');
+        Route::get('/documents/{document}', PortalDocumentShowAction::class)
+            ->middleware('signed')
+            ->name('documents.show');
 
         Route::get('/consent-forms', PortalConsentFormIndexAction::class)->name('consent-forms.index');
         Route::post('/consent-forms/{consentForm}/sign', PortalConsentFormSignAction::class)->name('consent-forms.sign');
@@ -303,6 +311,7 @@ Route::middleware(['auth', 'verified'])
             ->where('roomId', '[a-z0-9-]+');
 
         Route::post('/appointments/{appointment}/transcribe', TranscribeAction::class)
+            ->middleware('throttle:30,1')
             ->name('appointments.transcribe');
     });
 

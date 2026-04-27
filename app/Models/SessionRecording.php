@@ -4,9 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
+/**
+ * @property int $appointment_id
+ * @property \Illuminate\Support\Carbon|null $patient_consent_given_at
+ * @property \Illuminate\Support\Carbon|null $summarized_at
+ * @property-read \App\Models\Appointment|null $appointment
+ */
 class SessionRecording extends Model
 {
     use HasFactory, LogsActivity;
@@ -36,7 +43,7 @@ class SessionRecording extends Model
         ];
     }
 
-    public function appointment()
+    public function appointment(): BelongsTo
     {
         return $this->belongsTo(Appointment::class);
     }

@@ -1,7 +1,7 @@
 # ClientKosmos MVP — Roadmap funcional
 
 > **Deadline:** 2026-05-14
-> **Última actualización:** 2026-04-24
+> **Última actualización:** 2026-04-25
 > **Objetivo:** cerrar el flujo mínimo end-to-end (paciente + profesional) con videollamada real, transcripción, resumen IA, factura y cierre de sesión, cumpliendo el mínimo legal RGPD para una consulta psicológica autónoma.
 >
 > Este documento complementa [minimum-flow-tracker.md](minimum-flow-tracker.md) incorporando dos decisiones de producto posteriores:
@@ -13,6 +13,8 @@
 ## 1. Resumen ejecutivo
 
 ### 1.1 Estado actual (según tracker + auditoría)
+
+> **Nota (2026-04-25):** las cifras siguientes son la línea base del 2026-04-24, antes de ejecutar Sprints 1-3. Tras el cierre del Sprint 3 + auditoría posterior + cierre de deudas RGPD/seguridad, el estado real es **16/16 pasos del flujo + 7/7 capacidades transversales** y todos los puntos de §6 Definition of Done están cubiertos salvo el despliegue (S3.5 pospuesto a AWS post-defensa por decisión del usuario). Ver §10.
 
 - **Flujo paciente:** 6/7 ✅ · 1/7 🟡 (videollamada + transcripción).
 - **Flujo profesional:** 5/9 ✅ · 4/9 🟡 (video, resumen IA, factura legal, cierre).
@@ -547,3 +549,4 @@ Calendario: 3 semanas desde 2026-04-24 (hoy). Cada sprint cierra viernes con gat
 |-------|--------|
 | 2026-04-24 | Creación inicial. Definición de MVP con Google Meet + storage local cifrado. |
 | 2026-04-24 | Añadidas decisiones de producto: ventana de unión de 10 min, grabación única desde el profesional (`getDisplayMedia` de pestaña Meet), consentimiento global de grabación en registro. |
+| 2026-04-25 | Cierre Sprints 1-3 + auditoría: 16/16 pasos + 7/7 capacidades transversales. Cerradas deudas RGPD/seguridad: signed URLs en documentos del paciente (`Portal/Document/ShowAction` con TTL 5 min), comando `audio:cleanup` con scheduler diario 03:00, middleware `SecurityHeaders` (CSP + X-Frame-Options + Referrer-Policy + Permissions-Policy), rate limit `throttle:30,1` en `/appointments/{id}/transcribe`, fixtures de tests de password reparados, ADR-0015 redactado. Despliegue (S3.5) pospuesto a AWS. |

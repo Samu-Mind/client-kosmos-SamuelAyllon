@@ -1,7 +1,8 @@
-import { Box, Button, Flex, HStack, Stack, Text } from '@chakra-ui/react';
+import { Button, Flex, Stack, Text } from '@chakra-ui/react';
 import { Head, router, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { LiveTranscriptPanel } from '@/components/live-transcript-panel';
+import { RecordingIndicator } from '@/components/recording-indicator';
 import { useProfessionalTabRecorder } from '@/hooks/use-professional-tab-recorder';
 import type { Auth } from '@/types';
 
@@ -28,17 +29,6 @@ interface Appointment {
 interface Props {
     appointment: Appointment;
     exitUrl: string;
-}
-
-function RecordingIndicator() {
-    return (
-        <HStack gap="1.5" alignItems="center">
-            <Box w="2.5" h="2.5" borderRadius="full" bg="red.500" animation="pulse 1s ease-in-out infinite" />
-            <Text fontSize="xs" fontWeight="semibold" color="red.400" letterSpacing="wider" textTransform="uppercase">
-                Grabando
-            </Text>
-        </HStack>
-    );
 }
 
 export default function CallRoom({ appointment, exitUrl }: Props) {

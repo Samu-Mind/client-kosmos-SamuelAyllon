@@ -26,12 +26,10 @@ class ShowAction extends Controller
             'id' => $a->id,
             'patient_id' => $a->patient_id,
             'user_id' => $a->professional_id,
-            'scheduled_at' => $a->starts_at?->toIso8601String(),
-            'started_at' => $a->starts_at?->toIso8601String(),
-            'ended_at' => $a->ends_at?->toIso8601String(),
-            'duration_minutes' => ($a->starts_at && $a->ends_at)
-                ? (int) $a->starts_at->diffInMinutes($a->ends_at)
-                : null,
+            'scheduled_at' => $a->starts_at->toIso8601String(),
+            'started_at' => $a->starts_at->toIso8601String(),
+            'ended_at' => $a->ends_at->toIso8601String(),
+            'duration_minutes' => (int) $a->starts_at->diffInMinutes($a->ends_at),
             'status' => $a->status,
             'ai_summary' => null,
             'ai_summary_generated' => false,

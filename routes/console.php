@@ -12,3 +12,4 @@ Schedule::job(new GeneratePreSessionBriefing)->everyFiveMinutes();
 Schedule::job(new SendPaymentReminder)->dailyAt('09:00');
 Schedule::job(new CheckConsentExpiry)->weeklyOn(1, '08:00');
 Schedule::job(new MarkNoShowAppointments)->everyFiveMinutes();
+Schedule::command('audio:cleanup')->dailyAt('03:00');
