@@ -2,7 +2,8 @@
 
 namespace App\Actions\Appointment;
 
-use App\Actions\Patient\LinkPatientToProfessional;
+use App\Actions\Patient\CreateOrUpdateProfessionalPatient;
+use App\DTOs\PatientUpsertData;
 use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\User;
@@ -13,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 class CreateAppointment
 {
     public function __construct(
-        private LinkPatientToProfessional $linkPatient,
+        private CreateOrUpdateProfessionalPatient $upsertPatient,
     ) {}
 
     /**
@@ -49,7 +50,17 @@ class CreateAppointment
         }
 
         return DB::transaction(function () use ($patient, $professional, $workspace, $service, $data): Appointment {
-            ($this->linkPatient)($patient, $professional, $workspace);
+            ($this->upsertPatient)(
+                $professional,
+                $workspace,
+                new PatientUpsertData(
+                    name: $patient->name,
+                    email: $patient->email,
+                    phone: $patient->phone,
+                    consultationReason: $data['notes'] ?? null,
+                ),
+                $patient,
+            );
 
             $startsAt = CarbonImmutable::parse($data['starts_at']);
 

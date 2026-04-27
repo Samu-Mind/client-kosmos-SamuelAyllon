@@ -42,6 +42,7 @@ class PatientProfile extends Model
         'user_id', 'workspace_id', 'professional_id',
         'is_active', 'clinical_notes', 'diagnosis', 'treatment_plan',
         'referral_source', 'status', 'first_session_at', 'last_session_at',
+        'consultation_reason', 'therapeutic_approach',
     ];
 
     protected function casts(): array
@@ -117,6 +118,17 @@ class PatientProfile extends Model
     public function referrals(): HasMany
     {
         return $this->hasMany(Referral::class, 'patient_id');
+    }
+
+    public function delegations(): HasMany
+    {
+        return $this->hasMany(PatientDelegation::class);
+    }
+
+    /** Recursos asociados al paciente (documents reused as resources). */
+    public function resources(): HasMany
+    {
+        return $this->hasMany(Document::class, 'patient_id');
     }
 
     public function scopeActive($query)

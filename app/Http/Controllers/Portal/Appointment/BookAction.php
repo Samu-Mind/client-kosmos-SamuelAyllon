@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Portal\Appointment;
 
-use App\Actions\Patient\LinkPatientToProfessional;
+use App\Actions\Patient\CreateOrUpdateProfessionalPatient;
+use App\DTOs\PatientUpsertData;
 use App\Http\Controllers\Controller;
 use App\Models\ProfessionalProfile;
 use App\Models\Service;
@@ -14,7 +15,7 @@ use Inertia\Response;
 
 class BookAction extends Controller
 {
-    public function __invoke(Request $request, LinkPatientToProfessional $linkPatient): Response|RedirectResponse
+    public function __invoke(Request $request, CreateOrUpdateProfessionalPatient $upsertPatient): Response|RedirectResponse
     {
         $validated = $request->validate([
             'professional_id' => ['required', 'integer'],
@@ -42,7 +43,16 @@ class BookAction extends Controller
         $authUser = $request->user();
 
         if ($authUser && $authUser->isPatient()) {
-            $linkPatient($authUser, $profile->user, $workspace);
+            $upsertPatient(
+                $profile->user,
+                $workspace,
+                new PatientUpsertData(
+                    name: $authUser->name,
+                    email: $authUser->email,
+                    phone: $authUser->phone,
+                ),
+                $authUser,
+            );
         }
 
         $services = Service::where('workspace_id', $workspace->id)
