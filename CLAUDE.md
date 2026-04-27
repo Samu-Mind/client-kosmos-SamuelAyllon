@@ -158,6 +158,16 @@ npm run build
 
 ## 8. Estilo de Commits y PRs
 
+### Commit Automation
+
+**Regla:** cuando el usuario dice "commit", Claude:
+1. **Debe** cambiar el modelo a **Haiku** (`/model haiku`).
+2. **Debe** desactivar thinking (`/thinking off`).
+3. Ejecuta `git add` para archivos modificados/sin seguimiento.
+4. Crea commit con mensaje **Conventional Commits** (en formato imperativo).
+5. Ejecuta **`git push origin main`** inmediatamente después.
+6. No hace preguntas de confirmación—sigue las instrucciones del usuario literalmente.
+
 ### Conventional Commits
 
 ```
