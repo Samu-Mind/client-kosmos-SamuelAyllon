@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\CaseAssignment;
+use App\Models\OfferedConsultation;
 use App\Models\PatientProfile;
 use App\Models\ProfessionalProfile;
-use App\Models\Service;
 use App\Models\User;
 use App\Models\Workspace;
 
@@ -25,8 +25,7 @@ function makeVerifiedProfessionalWithWorkspace(): array
         'joined_at' => now(),
     ]);
 
-    Service::create([
-        'workspace_id' => $workspace->id,
+    OfferedConsultation::factory()->for($profile, 'professionalProfile')->create([
         'name' => 'Sesión inicial',
         'duration_minutes' => 50,
         'price' => 60,
@@ -128,8 +127,8 @@ it('creates a separate PatientProfile per workspace when the patient books with 
 });
 
 it('links the patient and creates the appointment on POST without duplicating profiles', function () {
-    [$professional, , $workspace] = makeVerifiedProfessionalWithWorkspace();
-    $service = Service::where('workspace_id', $workspace->id)->first();
+    [$professional, $profile, $workspace] = makeVerifiedProfessionalWithWorkspace();
+    $service = OfferedConsultation::where('professional_profile_id', $profile->id)->first();
     $patient = makeFreshlyRegisteredPatient();
 
     $startsAt = now()->addDays(2)->setTime(10, 0);

@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Appointment;
+use App\Models\OfferedConsultation;
 use App\Models\PatientProfile;
 use App\Models\ProfessionalProfile;
-use App\Models\Service;
 use App\Models\User;
 use App\Models\Workspace;
 
@@ -14,7 +14,7 @@ function bookingProfessionalWithWorkspace(): array
     $professional = User::factory()->create(['tutorial_completed_at' => now()]);
     $professional->assignRole('professional');
 
-    ProfessionalProfile::factory()->verified()->create(['user_id' => $professional->id]);
+    $profile = ProfessionalProfile::factory()->verified()->create(['user_id' => $professional->id]);
 
     $workspace = Workspace::factory()->create(['creator_id' => $professional->id]);
     $workspace->members()->attach($professional->id, [
@@ -23,15 +23,14 @@ function bookingProfessionalWithWorkspace(): array
         'joined_at' => now(),
     ]);
 
-    $service = Service::create([
-        'workspace_id' => $workspace->id,
+    $service = OfferedConsultation::factory()->for($profile, 'professionalProfile')->create([
         'name' => 'Sesión inicial',
         'duration_minutes' => 50,
         'price' => 60,
         'is_active' => true,
     ]);
 
-    return [$professional, $workspace, $service];
+    return [$professional, $workspace, $service, $profile];
 }
 
 function bookingPatient(): User
@@ -126,12 +125,10 @@ it('rejects booking with an invalid modality', function () {
         ->assertSessionHasErrors(['modality']);
 });
 
-it('rejects booking when the service belongs to another workspace', function () {
+it('rejects booking when the service belongs to another professional', function () {
     [$professionalA] = bookingProfessionalWithWorkspace();
-    [, $workspaceB, $serviceB] = bookingProfessionalWithWorkspace();
+    [, , $serviceB] = bookingProfessionalWithWorkspace();
     $patient = bookingPatient();
-
-    expect($serviceB->workspace_id)->toBe($workspaceB->id);
 
     $this->actingAs($patient)
         ->post(route('patient.appointments.store'), [
