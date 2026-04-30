@@ -5,7 +5,8 @@ namespace App\Actions\Appointment;
 use App\Actions\Patient\CreateOrUpdateProfessionalPatient;
 use App\DTOs\PatientUpsertData;
 use App\Models\Appointment;
-use App\Models\Service;
+use App\Models\OfferedConsultation;
+use App\Models\ProfessionalProfile;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -38,10 +39,15 @@ class CreateAppointment
             ]);
         }
 
-        $service = Service::where('id', $data['service_id'])
-            ->where('workspace_id', $workspace->id)
-            ->where('is_active', true)
-            ->first();
+        $profile = ProfessionalProfile::where('user_id', $professional->id)->first();
+
+        $service = $profile
+            ? OfferedConsultation::query()
+                ->where('id', $data['service_id'])
+                ->where('professional_profile_id', $profile->id)
+                ->where('is_active', true)
+                ->first()
+            : null;
 
         if (! $service) {
             throw ValidationException::withMessages([

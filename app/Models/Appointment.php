@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $workspace_id
  * @property int $patient_id
  * @property int $professional_id
- * @property int|null $service_id
+ * @property int|null $service_id Foreign key to offered_consultations.id (legacy column name kept to avoid breaking 25+ files; ADR-0007).
  * @property \Illuminate\Support\Carbon $starts_at
  * @property \Illuminate\Support\Carbon $ends_at
  * @property \Illuminate\Support\Carbon|null $patient_joined_at
@@ -28,7 +28,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $notes
  * @property-read \App\Models\User|null $patient
  * @property-read \App\Models\User|null $professional
- * @property-read \App\Models\Service|null $service
+ * @property-read \App\Models\OfferedConsultation|null $service
+ * @property-read \App\Models\OfferedConsultation|null $offeredConsultation
  * @property-read \App\Models\SessionRecording|null $sessionRecording
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Agreement> $agreements
  */
@@ -71,7 +72,12 @@ class Appointment extends Model
 
     public function service(): BelongsTo
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(OfferedConsultation::class, 'service_id');
+    }
+
+    public function offeredConsultation(): BelongsTo
+    {
+        return $this->belongsTo(OfferedConsultation::class, 'service_id');
     }
 
     public function sessionRecording(): HasOne

@@ -16,7 +16,7 @@ class StoreAppointmentRequest extends FormRequest
     {
         return [
             'professional_id' => ['required', 'integer', Rule::exists('users', 'id')],
-            'service_id' => ['required', 'integer'],
+            'service_id' => ['required', 'integer', Rule::exists('offered_consultations', 'id')],
             'starts_at' => ['required', 'date', 'after:now'],
             'modality' => ['required', 'in:in_person,video_call'],
             'notes' => ['nullable', 'string', 'max:1000'],
