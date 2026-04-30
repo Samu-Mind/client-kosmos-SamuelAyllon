@@ -16,11 +16,12 @@ class StoreAction extends Controller
 
         $user->completeTutorial();
 
-        if ($user->currentWorkspace() === null) {
+        if ($user->createdWorkspaces()->doesntExist()) {
             $workspace = Workspace::create([
                 'creator_id' => $user->id,
+                'type' => Workspace::TYPE_PERSONAL,
                 'name' => $user->name,
-                'slug' => Str::slug($user->name) . '-' . Str::lower(Str::random(6)),
+                'slug' => Str::slug($user->name).'-'.Str::lower(Str::random(6)),
             ]);
 
             $workspace->members()->attach($user->id, [

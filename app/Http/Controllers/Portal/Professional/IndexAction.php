@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Portal\Professional;
 
 use App\Http\Controllers\Controller;
+use App\Models\OfferedConsultation;
 use App\Models\ProfessionalProfile;
-use App\Models\Service;
 use App\Services\AvailabilityService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,6 +14,7 @@ class IndexAction extends Controller
 {
     public function __invoke(Request $request, AvailabilityService $availability): Response
     {
+        // Patient may not have profile yet — services rendered are global preview, not workspace-bound.
         $workspaceId = $request->user()->patientProfile?->workspace_id;
 
         $profiles = ProfessionalProfile::query()
@@ -46,13 +47,12 @@ class IndexAction extends Controller
             ->sort()
             ->values();
 
-        $services = $workspaceId
-            ? Service::where('workspace_id', $workspaceId)
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(['id', 'name', 'duration_minutes', 'price'])
-                ->values()
-            : collect();
+        $services = OfferedConsultation::query()
+            ->whereIn('professional_profile_id', $profiles->pluck('id'))
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'duration_minutes', 'price', 'professional_profile_id', 'modality'])
+            ->values();
 
         return Inertia::render('patient/professionals/index', [
             'professionals' => $professionals,

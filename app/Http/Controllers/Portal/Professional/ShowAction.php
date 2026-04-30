@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal\Professional;
 
 use App\Http\Controllers\Controller;
+use App\Models\OfferedConsultation;
 use App\Models\ProfessionalProfile;
 use App\Services\AvailabilityService;
 use Illuminate\Http\Request;
@@ -16,6 +17,12 @@ class ShowAction extends Controller
         abort_unless($professional->isVerified(), 404);
 
         $professional->load('user:id,name,avatar_path');
+
+        $services = OfferedConsultation::query()
+            ->where('professional_profile_id', $professional->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'description', 'duration_minutes', 'price', 'color', 'modality', 'is_active']);
 
         return Inertia::render('patient/professionals/show', [
             'professional' => [
@@ -31,6 +38,7 @@ class ShowAction extends Controller
                     ? $availability->slotsForProfessional($professional->user_id)
                     : [],
             ],
+            'services' => $services,
         ]);
     }
 }

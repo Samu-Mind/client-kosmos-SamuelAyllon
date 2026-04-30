@@ -6,7 +6,7 @@ use App\Actions\Patient\CreateOrUpdateProfessionalPatient;
 use App\DTOs\PatientUpsertData;
 use App\Http\Controllers\Controller;
 use App\Models\ProfessionalProfile;
-use App\Models\Service;
+use App\Models\OfferedConsultation;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,10 +55,11 @@ class BookAction extends Controller
             );
         }
 
-        $services = Service::where('workspace_id', $workspace->id)
+        $services = OfferedConsultation::query()
+            ->where('professional_profile_id', $profile->id)
             ->where('is_active', true)
             ->orderBy('name')
-            ->get(['id', 'name', 'description', 'duration_minutes', 'price']);
+            ->get(['id', 'name', 'description', 'duration_minutes', 'price', 'modality']);
 
         $service = isset($validated['service_id'])
             ? $services->firstWhere('id', $validated['service_id'])

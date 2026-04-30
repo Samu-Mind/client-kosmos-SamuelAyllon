@@ -10,8 +10,9 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Note;
 use App\Models\CaseAssignment;
+use App\Models\OfferedConsultation;
 use App\Models\PatientProfile;
-use App\Models\Service;
+use App\Models\ProfessionalProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -69,24 +70,37 @@ class UserSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        $serviceSession = Service::create([
-            'workspace_id' => $workspace->id,
+        $nataliaProfile = ProfessionalProfile::create([
+            'user_id' => $owner->id,
+            'license_number' => 'PSI-08-12345',
+            'collegiate_number' => 'B-01234',
+            'specialties' => ['clinical', 'cognitive_behavioral'],
+            'verification_status' => 'verified',
+            'bio' => 'Psicóloga clínica con 12 años de experiencia en TCC, EMDR y trauma.',
+            'city' => 'Barcelona',
+            'verified_at' => now(),
+        ]);
+
+        $serviceSession = OfferedConsultation::create([
+            'professional_profile_id' => $nataliaProfile->id,
             'name' => 'Sesión de psicología',
             'description' => 'Sesión individual de psicoterapia (50 min)',
             'duration_minutes' => 50,
             'price' => 70.00,
             'color' => '#6366f1',
             'is_active' => true,
+            'modality' => 'both',
         ]);
 
-        Service::create([
-            'workspace_id' => $workspace->id,
+        OfferedConsultation::create([
+            'professional_profile_id' => $nataliaProfile->id,
             'name' => 'Sesión EMDR',
             'description' => 'Sesión especializada EMDR (60 min)',
             'duration_minutes' => 60,
             'price' => 80.00,
             'color' => '#8b5cf6',
             'is_active' => true,
+            'modality' => 'in_person',
         ]);
 
         // ══════════════════════════════════════════════════
@@ -520,14 +534,26 @@ class UserSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        $elenaService = Service::create([
-            'workspace_id' => $elenaClinic->id,
+        $elenaProfile = ProfessionalProfile::create([
+            'user_id' => $elenaOwner->id,
+            'license_number' => 'PSI-28-54321',
+            'collegiate_number' => 'M-07890',
+            'specialties' => ['clinical', 'cognitive_behavioral'],
+            'verification_status' => 'verified',
+            'bio' => 'Psicóloga online especializada en autoestima y gestión emocional.',
+            'city' => 'Madrid',
+            'verified_at' => now(),
+        ]);
+
+        $elenaService = OfferedConsultation::create([
+            'professional_profile_id' => $elenaProfile->id,
             'name' => 'Sesión online',
             'description' => 'Sesión individual por videollamada (50 min)',
             'duration_minutes' => 50,
             'price' => 65.00,
             'color' => '#10b981',
             'is_active' => true,
+            'modality' => 'video_call',
         ]);
 
         $patientUserElena = User::create([

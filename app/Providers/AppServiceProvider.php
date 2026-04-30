@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\Responses\LoginResponse;
 use App\Models\Document;
 use App\Models\Invoice;
+use App\Models\OfferedConsultation;
 use App\Models\PatientProfile;
 use App\Models\SessionRecording;
 use App\Models\User;
@@ -12,6 +13,7 @@ use App\Observers\PatientObserver;
 use App\Observers\PaymentObserver;
 use App\Policies\AdminPolicy;
 use App\Policies\DocumentPolicy;
+use App\Policies\OfferedConsultationPolicy;
 use App\Policies\PatientPolicy;
 use App\Policies\PaymentPolicy;
 use App\Policies\SessionRecordingPolicy;
@@ -69,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Invoice::class, PaymentPolicy::class);
         Gate::policy(Document::class, DocumentPolicy::class);
         Gate::policy(SessionRecording::class, SessionRecordingPolicy::class);
+        Gate::policy(OfferedConsultation::class, OfferedConsultationPolicy::class);
     }
 
     /**
