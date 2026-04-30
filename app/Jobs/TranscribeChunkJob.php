@@ -8,6 +8,7 @@ use App\Models\TranscriptionSegment;
 use App\Services\RgpdService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -50,6 +51,17 @@ class TranscribeChunkJob implements ShouldQueue
             ]);
             $recording->update(['transcription_status' => 'rejected_no_consent']);
 
+            activity('rgpd_access')
+                ->performedOn($recording)
+                ->causedBy($patient)
+                ->withProperties([
+                    'recording_id' => $recording->id,
+                    'patient_id' => $patient->id,
+                    'position' => $this->position,
+                ])
+                ->event('chunk_rejected_no_consent')
+                ->log('chunk_rejected_no_consent');
+
             return;
         }
 
@@ -61,8 +73,19 @@ class TranscribeChunkJob implements ShouldQueue
             return;
         }
 
-        $contents = $disk->get($this->chunkPath);
-        $filename = basename($this->chunkPath);
+        try {
+            $contents = Crypt::decryptString((string) $disk->get($this->chunkPath));
+        } catch (\Throwable $e) {
+            Log::error('TranscribeChunkJob: failed to decrypt chunk', [
+                'path' => $this->chunkPath,
+                'error' => $e->getMessage(),
+            ]);
+            $disk->delete($this->chunkPath);
+
+            return;
+        }
+
+        $filename = preg_replace('/\.enc$/', '', basename($this->chunkPath)) ?? basename($this->chunkPath);
 
         $response = Http::withToken(config('services.groq.api_key'))
             ->attach('file', $contents, $filename)

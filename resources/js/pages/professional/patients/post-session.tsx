@@ -1,4 +1,4 @@
-import { Badge, Box, Flex, Grid, Heading, Stack, Text, chakra } from '@chakra-ui/react';
+import { Badge, Box, Flex, Grid, Heading, Skeleton, SkeletonText, Stack, Text, chakra } from '@chakra-ui/react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft, Check, FileText, Mail, Sparkles } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
@@ -212,6 +212,11 @@ export default function PostSession({ patient, lastAppointment, lastInvoice }: P
 
     const aiSummary = lastAppointment?.session_recording?.ai_summary ?? null;
     const transcriptionStatus = lastAppointment?.session_recording?.transcription_status ?? null;
+    const summaryStatus: 'ready' | 'pending' | 'failed' = aiSummary
+        ? 'ready'
+        : transcriptionStatus === 'rejected_no_consent'
+            ? 'failed'
+            : 'pending';
 
     return (
         <>
@@ -256,17 +261,28 @@ export default function PostSession({ patient, lastAppointment, lastInvoice }: P
                                     </Badge>
                                 )}
                             </Flex>
-                            {aiSummary ? (
+                            {summaryStatus === 'ready' && (
                                 <Text fontSize="sm" color="fg" whiteSpace="pre-wrap" lineHeight="1.7">
                                     {aiSummary}
                                 </Text>
-                            ) : (
-                                <Text fontSize="sm" color="fg.muted">
-                                    {transcriptionStatus === 'rejected_no_consent'
-                                        ? 'No se generó resumen: el paciente no otorgó consentimiento de grabación.'
-                                        : lastAppointment?.session_recording
-                                            ? 'Generando resumen automático… Esta operación puede tardar hasta 30 segundos. Refresca la página si no aparece.'
+                            )}
+                            {summaryStatus === 'pending' && (
+                                <Stack gap="3">
+                                    <Text fontSize="sm" color="fg.muted">
+                                        {lastAppointment?.session_recording
+                                            ? 'Generando resumen automático… Esta operación puede tardar hasta 30 segundos.'
                                             : 'No hay transcripción disponible para esta sesión.'}
+                                    </Text>
+                                    {lastAppointment?.session_recording && (
+                                        <Skeleton height="6" loading>
+                                            <SkeletonText noOfLines={4} gap="2" />
+                                        </Skeleton>
+                                    )}
+                                </Stack>
+                            )}
+                            {summaryStatus === 'failed' && (
+                                <Text fontSize="sm" color="fg.muted">
+                                    No se generó resumen: el paciente no otorgó consentimiento de grabación.
                                 </Text>
                             )}
                         </Card>

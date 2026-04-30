@@ -74,3 +74,20 @@ Registro transparente del uso de herramientas de IA en el desarrollo de ClientKo
 - **Revisión humana:** pendiente — validar dashboard profesional (agenda del día, KPI cards, cobros pendientes) y dashboard paciente (KPI stats row, próximas citas, facturas recientes). Light + dark.
 - **Prompt(s) relevantes:** "continua Batch C — Migrate dashboard pages"
 - **Relación con ADR:** ADR-0007
+
+### Cierre del flujo Post-Sesión + RGPD art. 9 hardening
+
+- **Fecha:** 2026-04-30
+- **Herramientas:** Claude Code (Opus 4.7), Explore subagent (auditoría inicial), Plan mode (plan en `docs/post-session-plan.md`).
+- **Alcance IA:** auditoría arquitectónica del flujo post-sesión (grabación → Whisper → resumen → hub → factura) e implementación de los 4 cierres detectados:
+    1. **Cifrado at-rest de chunks** — `Crypt::encryptString()` en [`TranscribeAction`](../app/Http/Controllers/Appointment/TranscribeAction.php) y `Crypt::decryptString()` simétrico en [`TranscribeChunkJob`](../app/Jobs/TranscribeChunkJob.php). Extensión `.enc`.
+    2. **Listener `AggregateTranscription`** ([nuevo](../app/Listeners/AggregateTranscription.php)) — engancha al evento existente `TranscriptionSegmentCreated` y reescribe `session_recordings.transcription` concatenando segmentos ordenados. Registrado en [`AppServiceProvider`](../app/Providers/AppServiceProvider.php).
+    3. **Cierre del stub `SummarizeAction`** — despacha `SummarizeSessionJob` cuando hay transcripción agregada; devuelve `409 transcription_pending` en otro caso.
+    4. **Middleware `LogTranscriptionAccess`** ([nuevo](../app/Http/Middleware/LogTranscriptionAccess.php)) — registra accesos a invoices y documents en `activity_log` (RGPD art. 30). Aliasado como `rgpd.access_log` en [`bootstrap/app.php`](../bootstrap/app.php).
+    5. **Command `purge:expired-session-data`** ([nuevo](../app/Console/Commands/PurgeExpiredSessionData.php)) — purga PDFs caducados, transcripciones revocadas y audit logs antiguos. Programado en [`routes/console.php`](../routes/console.php) a las 03:15 diario.
+    6. **Log de chunks rechazados** — `TranscribeChunkJob` registra `chunk_rejected_no_consent` en `activity_log` cuando se descarta un chunk por revocación de consentimiento.
+- **Tests añadidos:** `AggregateTranscriptionTest`, `SummarizeActionTest`, y nuevo caso "stores chunk encrypted on disk" en `TranscribeActionTest`. Tests existentes (`TranscribeChunkJobTest`, `TranscribeChunkConsentTest`) actualizados para cifrar chunks en setup. Suite completa: 243 passed.
+- **Gate ejecutado:** ✅ Pint, ✅ Pest (243 passed), ✅ ESLint, ✅ tsc --noEmit, ✅ Vite build.
+- **Revisión humana:** pendiente — validar (a) UAT con sesión real: chunk encriptado en disco; (b) UI post-session muestra Skeleton mientras `summary_status='pending'`; (c) `purge:expired-session-data --dry-run` reporta correctamente; (d) entrada en `activity_log` al descargar una factura.
+- **Prompt(s) relevantes:** "Comprueba si el requisito está implementado de verdad: …grabación, transcripción, resumen, factura, RGPD…", "diseña un plan separando las tareas en pasos pequeños…", "ejecuta el plan".
+- **Relación con ADR:** ADR-0018 (relacionado con ADR-0008, ADR-0013, ADR-0015).

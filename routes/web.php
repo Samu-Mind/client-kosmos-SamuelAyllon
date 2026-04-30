@@ -314,12 +314,16 @@ Route::middleware(['auth', 'verified'])
         Route::get('/appointments/{appointment}/post-session', PortalAppointmentPostSessionShowAction::class)->name('appointments.post-session');
 
         Route::get('/invoices', PortalInvoiceIndexAction::class)->name('invoices.index');
-        Route::get('/invoices/{invoice}', PortalInvoiceShowAction::class)->name('invoices.show');
-        Route::get('/invoices/{invoice}/download', PortalInvoiceDownloadPdfAction::class)->name('invoices.download');
+        Route::get('/invoices/{invoice}', PortalInvoiceShowAction::class)
+            ->middleware('rgpd.access_log:invoice.show')
+            ->name('invoices.show');
+        Route::get('/invoices/{invoice}/download', PortalInvoiceDownloadPdfAction::class)
+            ->middleware('rgpd.access_log:invoice.download')
+            ->name('invoices.download');
 
         Route::get('/documents', PortalDocumentIndexAction::class)->name('documents.index');
         Route::get('/documents/{document}', PortalDocumentShowAction::class)
-            ->middleware('signed')
+            ->middleware(['signed', 'rgpd.access_log:document.show'])
             ->name('documents.show');
 
         Route::get('/consent-forms', PortalConsentFormIndexAction::class)->name('consent-forms.index');

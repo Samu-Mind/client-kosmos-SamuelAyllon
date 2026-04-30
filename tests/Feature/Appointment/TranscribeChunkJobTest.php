@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\SessionRecording;
 use App\Models\TranscriptionSegment;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -30,8 +31,8 @@ it('calls Groq Whisper and persists the transcription segment', function () {
 
     $recording = SessionRecording::factory()->create(['appointment_id' => $appointment->id]);
 
-    $chunkPath = "transcription-chunks/{$recording->id}/chunk-0.webm";
-    Storage::disk('local')->put($chunkPath, 'fake-audio-bytes');
+    $chunkPath = "transcription-chunks/{$recording->id}/chunk-0.webm.enc";
+    Storage::disk('local')->put($chunkPath, Crypt::encryptString('fake-audio-bytes'));
 
     (new TranscribeChunkJob(
         sessionRecordingId: $recording->id,
@@ -75,8 +76,8 @@ it('does not persist a segment when Whisper returns empty text', function () {
 
     $recording = SessionRecording::factory()->create(['appointment_id' => $appointment->id]);
 
-    $chunkPath = "transcription-chunks/{$recording->id}/chunk-silence.webm";
-    Storage::disk('local')->put($chunkPath, 'silent-bytes');
+    $chunkPath = "transcription-chunks/{$recording->id}/chunk-silence.webm.enc";
+    Storage::disk('local')->put($chunkPath, Crypt::encryptString('silent-bytes'));
 
     (new TranscribeChunkJob(
         sessionRecordingId: $recording->id,
@@ -108,8 +109,8 @@ it('throws when Groq Whisper returns a failure', function () {
 
     $recording = SessionRecording::factory()->create(['appointment_id' => $appointment->id]);
 
-    $chunkPath = "transcription-chunks/{$recording->id}/chunk-fail.webm";
-    Storage::disk('local')->put($chunkPath, 'bytes');
+    $chunkPath = "transcription-chunks/{$recording->id}/chunk-fail.webm.enc";
+    Storage::disk('local')->put($chunkPath, Crypt::encryptString('bytes'));
 
     expect(fn () => (new TranscribeChunkJob(
         sessionRecordingId: $recording->id,

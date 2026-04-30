@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\TranscriptionSegmentCreated;
 use App\Http\Responses\LoginResponse;
+use App\Listeners\AggregateTranscription;
 use App\Models\Document;
 use App\Models\Invoice;
 use App\Models\OfferedConsultation;
@@ -21,6 +23,7 @@ use Carbon\CarbonImmutable;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -72,6 +75,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Document::class, DocumentPolicy::class);
         Gate::policy(SessionRecording::class, SessionRecordingPolicy::class);
         Gate::policy(OfferedConsultation::class, OfferedConsultationPolicy::class);
+
+        Event::listen(TranscriptionSegmentCreated::class, AggregateTranscription::class);
     }
 
     /**

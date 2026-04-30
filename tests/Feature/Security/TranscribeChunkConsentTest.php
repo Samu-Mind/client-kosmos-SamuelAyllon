@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\RgpdService;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -73,7 +74,7 @@ class TranscribeChunkConsentTest extends TestCase
         [$recording] = $this->makePatientWithConsent('revoked');
 
         $chunkPath = 'chunks/test-chunk.webm';
-        Storage::disk('local')->put($chunkPath, 'fake-audio-data');
+        Storage::disk('local')->put($chunkPath, Crypt::encryptString('fake-audio-data'));
 
         Http::fake();
 
@@ -98,7 +99,7 @@ class TranscribeChunkConsentTest extends TestCase
         [$recording] = $this->makePatientWithConsent('none');
 
         $chunkPath = 'chunks/test-chunk.webm';
-        Storage::disk('local')->put($chunkPath, 'fake-audio-data');
+        Storage::disk('local')->put($chunkPath, Crypt::encryptString('fake-audio-data'));
 
         Http::fake();
 
@@ -123,7 +124,7 @@ class TranscribeChunkConsentTest extends TestCase
         [$recording] = $this->makePatientWithConsent('signed');
 
         $chunkPath = 'chunks/test-chunk.webm';
-        Storage::disk('local')->put($chunkPath, 'fake-audio-data');
+        Storage::disk('local')->put($chunkPath, Crypt::encryptString('fake-audio-data'));
 
         Http::fake([
             '*/audio/transcriptions' => Http::response(['text' => 'texto transcrito'], 200),
