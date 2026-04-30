@@ -1,12 +1,13 @@
 import { Badge, Box, Flex, Heading, Stack, Text, chakra } from '@chakra-ui/react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { ArrowLeft, BadgeCheck, CalendarClock, ChevronLeft, ChevronRight, MessageSquare, Star } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import BookAction from '@/actions/App/Http/Controllers/Portal/Appointment/BookAction';
 import IndexAction from '@/actions/App/Http/Controllers/Portal/Professional/IndexAction';
+import { BookingDialog } from '@/components/patient/booking-dialog';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import type { OfferedConsultation } from '@/types/offered-consultation';
 
 const ChakraImg = chakra('img');
 
@@ -29,6 +30,7 @@ interface Professional {
 
 interface Props {
     professional: Professional;
+    services: OfferedConsultation[];
 }
 
 const SPECIALTY_LABELS: Record<string, string> = {
@@ -64,10 +66,17 @@ function formatDayColumn(isoDate: string): { dayName: string; dayNum: number } {
 
 const DAYS_PER_PAGE = 3;
 
-export default function ProfessionalShow({ professional }: Props) {
+export default function ProfessionalShow({ professional, services }: Props) {
     const [activeTab, setActiveTab] = useState<Tab>('Experiencia');
     const [slotPage, setSlotPage] = useState(0);
     const [bioExpanded, setBioExpanded] = useState(false);
+    const [bookingOpen, setBookingOpen] = useState(false);
+    const [preselectedServiceId, setPreselectedServiceId] = useState<number | null>(null);
+
+    const openBooking = (serviceId: number | null = null) => {
+        setPreselectedServiceId(serviceId);
+        setBookingOpen(true);
+    };
 
     const totalPages = Math.ceil(professional.slots.length / DAYS_PER_PAGE);
     const visibleSlots = professional.slots.slice(slotPage * DAYS_PER_PAGE, (slotPage + 1) * DAYS_PER_PAGE);
@@ -83,20 +92,11 @@ export default function ProfessionalShow({ professional }: Props) {
         return first === last ? fmt(first) : `${fmt(first)} – ${fmt(last)}`;
     })();
 
-    const selectSlot = (date: string, time: string) => {
-        const [y, mo, d] = date.split('-').map(Number);
-        const [h, mi] = time.split(':').map(Number);
-        const startsAt = new Date(y, mo - 1, d, h, mi, 0).toISOString();
-
-        router.visit(
-            BookAction.url({
-                query: {
-                    professional_id: professional.id,
-                    starts_at: startsAt,
-                },
-            }),
-        );
+    const selectSlot = () => {
+        const firstActive = services.find((s) => s.is_active);
+        openBooking(firstActive?.id ?? null);
     };
+    void router;
 
     const bioText = professional.bio ?? '';
     const BIO_LIMIT = 220;
@@ -216,13 +216,8 @@ export default function ProfessionalShow({ professional }: Props) {
                                         <Button
                                             variant="primary"
                                             size="md"
-                                            disabled={professional.slots.length === 0}
-                                            onClick={() => {
-                                                const firstSlot = professional.slots[0];
-                                                if (firstSlot) {
-                                                    selectSlot(firstSlot.date, firstSlot.times[0]);
-                                                }
-                                            }}
+                                            disabled={services.length === 0}
+                                            onClick={() => openBooking(null)}
                                         >
                                             <Box as={CalendarClock} w="4" h="4" aria-hidden />
                                             Reservar cita
@@ -417,7 +412,7 @@ export default function ProfessionalShow({ professional }: Props) {
                                                             variant="secondary"
                                                             size="sm"
                                                             w="full"
-                                                            onClick={() => selectSlot(day.date, time)}
+                                                            onClick={selectSlot}
                                                         >
                                                             {time}
                                                         </Button>
@@ -451,6 +446,15 @@ export default function ProfessionalShow({ professional }: Props) {
                     </Box>
                 </Flex>
             </Stack>
+
+            <BookingDialog
+                open={bookingOpen}
+                onOpenChange={setBookingOpen}
+                professional={{ id: professional.id, user_id: professional.user_id, name: professional.name }}
+                services={services}
+                slots={professional.slots}
+                preselectedServiceId={preselectedServiceId}
+            />
         </>
     );
 }

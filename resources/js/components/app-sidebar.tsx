@@ -34,6 +34,7 @@ import { index as portalProfessionalsIndex } from '@/routes/patient/professional
 import { dashboard, kosmo, settings } from '@/routes/professional';
 import { index as invoicesIndex } from '@/routes/professional/invoices';
 import { index as messagesIndex } from '@/routes/professional/messages';
+import { index as services } from '@/routes/professional/offered-consultations';
 import { index as patientsIndex } from '@/routes/professional/patients';
 import { index as scheduleIndex } from '@/routes/professional/schedule';
 import { index as teamIndex } from '@/routes/professional/workspace/team';
@@ -73,6 +74,11 @@ const professionalNavItems: NavItem[] = [
         title: 'Calendario',
         href: scheduleIndex.url(),
         icon: CalendarRange,
+    },
+    {
+        title: 'Servicios',
+        href: services.url(),
+        icon: FileText,
     },
     {
         title: 'Kosmo',

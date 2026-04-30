@@ -1,138 +1,119 @@
-import { Avatar, Badge, Box, Flex, Heading, Stack, Table, Text } from '@chakra-ui/react';
-import { Head } from '@inertiajs/react';
-import { useForm } from '@inertiajs/react';
-import { UserPlus } from 'lucide-react';
+import { Badge, Box, Button, Card, Flex, Heading, SimpleGrid, Stack, Text } from '@chakra-ui/react';
+import { Head, Link } from '@inertiajs/react';
+import { ArrowRight, Users } from 'lucide-react';
 import type { ReactNode } from 'react';
-import InviteAction from '@/actions/App/Http/Controllers/Workspace/Team/InviteAction';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import ShowAction from '@/actions/App/Http/Controllers/Workspace/Team/ShowAction';
+import CreateCollaborativeWorkspaceDialog from '@/components/create-collaborative-workspace-dialog';
 import AppLayout from '@/layouts/app-layout';
 
-interface Member {
+interface WorkspaceCard {
     id: number;
     name: string;
-    email: string;
-    avatar_path: string | null;
-    pivot: {
-        role: string;
-        joined_at: string | null;
-        is_active: boolean;
-    };
-}
-
-interface Workspace {
-    id: number;
-    name: string;
+    description: string | null;
+    members_count: number;
+    is_owner: boolean;
+    created_at: string | null;
 }
 
 interface Props {
-    workspace: Workspace;
-    members: Member[];
+    workspaces: WorkspaceCard[];
 }
 
-const roleLabel: Record<string, string> = {
-    owner: 'Propietario',
-    admin: 'Administrador',
-    member: 'Miembro',
-};
-
-export default function TeamIndex({ workspace, members }: Props) {
-    const { data, setData, post, processing, reset, errors } = useForm({ email: '' });
-
-    function handleInvite(e: React.FormEvent) {
-        e.preventDefault();
-        post(InviteAction.url(), { onSuccess: () => reset() });
-    }
-
+export default function TeamIndex({ workspaces }: Props) {
     return (
         <>
-            <Head title={`Equipo — ${workspace.name}`} />
+            <Head title="Mis workspaces" />
 
             <Stack gap="8" p={{ base: '6', lg: '8' }}>
-                <Flex alignItems="center" justifyContent="space-between">
-                    <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
-                        Equipo
-                    </Heading>
+                <Flex alignItems="center" justifyContent="space-between" wrap="wrap" gap="3">
+                    <Stack gap="1">
+                        <Heading as="h1" fontSize="3xl" fontWeight="bold" color="fg">
+                            Workspaces colaborativos
+                        </Heading>
+                        <Text color="fg.muted" fontSize="sm">
+                            Gestiona tus equipos y comparte pacientes con otros profesionales.
+                        </Text>
+                    </Stack>
+                    <CreateCollaborativeWorkspaceDialog />
                 </Flex>
 
-                <Box as="form" onSubmit={handleInvite}>
-                    <Stack gap="3">
-                        <Text fontWeight="medium" color="fg">
-                            Invitar miembro
-                        </Text>
-                        <Flex gap="3" alignItems="flex-start">
-                            <Stack gap="1" flex="1">
-                                <Input
-                                    type="email"
-                                    placeholder="correo@ejemplo.com"
-                                    value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                    required
-                                />
-                                {errors.email && (
-                                    <Text fontSize="sm" color="red.500">
-                                        {errors.email}
-                                    </Text>
-                                )}
-                            </Stack>
-                            <Button type="submit" variant="primary" loading={processing}>
-                                <Box as={UserPlus} w="4" h="4" mr="2" />
-                                Invitar
-                            </Button>
-                        </Flex>
-                    </Stack>
-                </Box>
-
-                <Table.Root variant="outline" size="md">
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.ColumnHeader>Miembro</Table.ColumnHeader>
-                            <Table.ColumnHeader>Rol</Table.ColumnHeader>
-                            <Table.ColumnHeader>Estado</Table.ColumnHeader>
-                            <Table.ColumnHeader>Se unió</Table.ColumnHeader>
-                        </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                        {members.map((member) => (
-                            <Table.Row key={member.id}>
-                                <Table.Cell>
-                                    <Flex alignItems="center" gap="3">
-                                        <Avatar.Root size="sm">
-                                            {member.avatar_path ? (
-                                                <Avatar.Image src={member.avatar_path} alt={member.name} />
-                                            ) : (
-                                                <Avatar.Fallback>{member.name.charAt(0)}</Avatar.Fallback>
+                {workspaces.length === 0 ? (
+                    <Flex
+                        direction="column"
+                        align="center"
+                        justify="center"
+                        gap="4"
+                        py="16"
+                        px="6"
+                        rounded="xl"
+                        borderWidth="1px"
+                        borderStyle="dashed"
+                        borderColor="border.muted"
+                        bg="bg.subtle"
+                    >
+                        <Box color="fg.muted">
+                            <Users size={40} />
+                        </Box>
+                        <Stack gap="1" textAlign="center" maxW="md">
+                            <Text fontWeight="semibold" color="fg" fontSize="lg">
+                                Aún no tienes workspaces colaborativos
+                            </Text>
+                            <Text fontSize="sm" color="fg.muted">
+                                Crea un workspace para invitar a otros profesionales y compartir pacientes en equipo.
+                            </Text>
+                        </Stack>
+                        <CreateCollaborativeWorkspaceDialog />
+                    </Flex>
+                ) : (
+                    <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap="5">
+                        {workspaces.map((workspace) => (
+                            <Card.Root key={workspace.id} variant="outline">
+                                <Card.Body>
+                                    <Stack gap="4">
+                                        <Flex justify="space-between" align="flex-start" gap="3">
+                                            <Stack gap="1" flex="1">
+                                                <Heading as="h3" fontSize="lg" color="fg">
+                                                    {workspace.name}
+                                                </Heading>
+                                                {workspace.description && (
+                                                    <Text fontSize="sm" color="fg.muted" lineClamp={2}>
+                                                        {workspace.description}
+                                                    </Text>
+                                                )}
+                                            </Stack>
+                                            {workspace.is_owner && (
+                                                <Badge colorPalette="brand" variant="subtle">
+                                                    Propietario
+                                                </Badge>
                                             )}
-                                        </Avatar.Root>
-                                        <Stack gap="0">
-                                            <Text fontWeight="medium" color="fg">
-                                                {member.name}
+                                        </Flex>
+
+                                        <Flex align="center" gap="2" color="fg.muted" fontSize="sm">
+                                            <Users size={16} />
+                                            <Text>
+                                                {workspace.members_count}{' '}
+                                                {workspace.members_count === 1 ? 'miembro' : 'miembros'}
                                             </Text>
-                                            <Text fontSize="sm" color="fg.muted">
-                                                {member.email}
-                                            </Text>
-                                        </Stack>
-                                    </Flex>
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <Text color="fg">{roleLabel[member.pivot.role] ?? member.pivot.role}</Text>
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <Badge colorPalette={member.pivot.is_active ? 'green' : 'gray'}>
-                                        {member.pivot.is_active ? 'Activo' : 'Inactivo'}
-                                    </Badge>
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <Text color="fg.muted" fontSize="sm">
-                                        {member.pivot.joined_at
-                                            ? new Date(member.pivot.joined_at).toLocaleDateString('es-ES')
-                                            : '—'}
-                                    </Text>
-                                </Table.Cell>
-                            </Table.Row>
+                                        </Flex>
+                                    </Stack>
+                                </Card.Body>
+                                <Card.Footer>
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        size="sm"
+                                        width="full"
+                                    >
+                                        <Link href={ShowAction.url({ workspace: workspace.id })}>
+                                            Gestionar
+                                            <ArrowRight size={16} />
+                                        </Link>
+                                    </Button>
+                                </Card.Footer>
+                            </Card.Root>
                         ))}
-                    </Table.Body>
-                </Table.Root>
+                    </SimpleGrid>
+                )}
             </Stack>
         </>
     );

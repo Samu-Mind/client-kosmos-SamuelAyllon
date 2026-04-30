@@ -2,6 +2,8 @@ import { Box, Flex, Heading, Image } from '@chakra-ui/react';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, Edit } from 'lucide-react';
 import React from 'react';
+import PatientEditAction from '@/actions/App/Http/Controllers/Patient/EditAction';
+import PatientIndexAction from '@/actions/App/Http/Controllers/Patient/IndexAction';
 import { StatusBadge } from '@/components/ui/status-badge';
 import type { Patient, PatientStatus } from '@/types';
 
@@ -33,7 +35,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({ patient }) => {
                     <Box
                         as={Link}
                         // @ts-expect-error — Inertia Link props forwarded via `as`
-                        href="/patients"
+                        href={PatientIndexAction.url()}
                         p="1.5"
                         borderRadius="sm"
                         transition="background-color 200ms"
@@ -67,7 +69,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({ patient }) => {
                             fontSize="sm"
                             fontWeight="semibold"
                         >
-                            {patient.project_name.substring(0, 2).toUpperCase()}
+                            {(patient.project_name ?? '').substring(0, 2).toUpperCase()}
                         </Flex>
                     )}
 
@@ -89,7 +91,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({ patient }) => {
                     <Box
                         as={Link}
                         // @ts-expect-error — Inertia Link props forwarded via `as`
-                        href={`/patients/${patient.id}/edit`}
+                        href={PatientEditAction.url(patient.id)}
                         p="1.5"
                         borderRadius="sm"
                         transition="background-color 200ms"

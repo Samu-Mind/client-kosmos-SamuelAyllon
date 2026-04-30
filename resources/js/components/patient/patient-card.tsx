@@ -16,7 +16,7 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient }) => {
         <Box
             as={Link}
             // @ts-expect-error — Inertia Link props are forwarded via `as`
-            href={PatientShowAction.url(patient.patient_profile.id)}
+            href={PatientShowAction.url(patient.id)}
             display="block"
             borderRadius="lg"
             borderWidth="1px"
