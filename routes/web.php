@@ -54,6 +54,13 @@ use App\Http\Controllers\Message\StoreAction as MessageStoreAction;
 use App\Http\Controllers\Note\DestroyAction as NoteDestroyAction;
 use App\Http\Controllers\Note\StoreAction as NoteStoreAction;
 use App\Http\Controllers\Note\UpdateAction as NoteUpdateAction;
+use App\Http\Controllers\OfferedConsultations\CreateAction as OfferedConsultationsCreateAction;
+use App\Http\Controllers\OfferedConsultations\DestroyAction as OfferedConsultationsDestroyAction;
+use App\Http\Controllers\OfferedConsultations\EditAction as OfferedConsultationsEditAction;
+use App\Http\Controllers\OfferedConsultations\IndexAction as OfferedConsultationsIndexAction;
+use App\Http\Controllers\OfferedConsultations\ShowAction as OfferedConsultationsShowAction;
+use App\Http\Controllers\OfferedConsultations\StoreAction as OfferedConsultationsStoreAction;
+use App\Http\Controllers\OfferedConsultations\UpdateAction as OfferedConsultationsUpdateAction;
 use App\Http\Controllers\Onboarding\IndexAction as OnboardingIndexAction;
 use App\Http\Controllers\Onboarding\StoreAction as OnboardingStoreAction;
 use App\Http\Controllers\Patient\CreateAction as PatientCreateAction;
@@ -102,15 +109,19 @@ use App\Http\Controllers\Schedule\IndexAction as ScheduleIndexAction;
 use App\Http\Controllers\Settings\IndexAction as SettingsIndexAction;
 use App\Http\Controllers\Settings\UpdateAction as SettingsUpdateAction;
 use App\Http\Controllers\Workspace\Analytics\IndexAction as WorkspaceAnalyticsIndexAction;
+use App\Http\Controllers\Workspace\Patient\ShareAction as WorkspacePatientShareAction;
+use App\Http\Controllers\Workspace\Patient\UnshareAction as WorkspacePatientUnshareAction;
 use App\Http\Controllers\Workspace\Services\DestroyAction as WorkspaceServiceDestroyAction;
 use App\Http\Controllers\Workspace\Services\IndexAction as WorkspaceServiceIndexAction;
 use App\Http\Controllers\Workspace\Services\StoreAction as WorkspaceServiceStoreAction;
 use App\Http\Controllers\Workspace\Services\UpdateAction as WorkspaceServiceUpdateAction;
 use App\Http\Controllers\Workspace\Settings\IndexAction as WorkspaceSettingsIndexAction;
 use App\Http\Controllers\Workspace\Settings\UpdateAction as WorkspaceSettingsUpdateAction;
+use App\Http\Controllers\Workspace\StoreAction as WorkspaceStoreAction;
 use App\Http\Controllers\Workspace\Team\DestroyAction as WorkspaceTeamDestroyAction;
 use App\Http\Controllers\Workspace\Team\IndexAction as WorkspaceTeamIndexAction;
 use App\Http\Controllers\Workspace\Team\InviteAction as WorkspaceTeamInviteAction;
+use App\Http\Controllers\Workspace\Team\ShowAction as WorkspaceTeamShowAction;
 use App\Http\Controllers\Workspace\Team\UpdatePermissionsAction as WorkspaceTeamUpdatePermissionsAction;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -207,16 +218,30 @@ Route::middleware(['auth', 'verified', 'professional'])
         Route::match(['put', 'patch'], '/schedule/availability/{availability}', AvailabilityUpdateAction::class)->name('schedule.availability.update');
         Route::delete('/schedule/availability/{availability}', AvailabilityDestroyAction::class)->name('schedule.availability.destroy');
 
+        // OfferedConsultations (services del profesional)
+        Route::get('/offered-consultations', OfferedConsultationsIndexAction::class)->name('offered-consultations.index');
+        Route::get('/offered-consultations/create', OfferedConsultationsCreateAction::class)->name('offered-consultations.create');
+        Route::post('/offered-consultations', OfferedConsultationsStoreAction::class)->name('offered-consultations.store');
+        Route::get('/offered-consultations/{offered_consultation}', OfferedConsultationsShowAction::class)->name('offered-consultations.show');
+        Route::get('/offered-consultations/{offered_consultation}/edit', OfferedConsultationsEditAction::class)->name('offered-consultations.edit');
+        Route::match(['put', 'patch'], '/offered-consultations/{offered_consultation}', OfferedConsultationsUpdateAction::class)->name('offered-consultations.update');
+        Route::delete('/offered-consultations/{offered_consultation}', OfferedConsultationsDestroyAction::class)->name('offered-consultations.destroy');
+
         // Workspace management
         Route::prefix('workspace')->name('workspace.')->group(function () {
+            Route::post('/collaborative', WorkspaceStoreAction::class)->name('collaborative.store');
             Route::get('/settings', WorkspaceSettingsIndexAction::class)->name('settings.index');
             Route::put('/settings', WorkspaceSettingsUpdateAction::class)->name('settings.update');
             Route::get('/analytics', WorkspaceAnalyticsIndexAction::class)->name('analytics.index');
 
             Route::get('/team', WorkspaceTeamIndexAction::class)->name('team.index');
-            Route::post('/team/invite', WorkspaceTeamInviteAction::class)->name('team.invite');
-            Route::put('/team/{user}/permissions', WorkspaceTeamUpdatePermissionsAction::class)->name('team.permissions');
-            Route::delete('/team/{user}', WorkspaceTeamDestroyAction::class)->name('team.destroy');
+            Route::get('/{workspace}/team', WorkspaceTeamShowAction::class)->name('team.show');
+            Route::post('/{workspace}/team/invite', WorkspaceTeamInviteAction::class)->name('team.invite');
+            Route::put('/{workspace}/team/{user}/permissions', WorkspaceTeamUpdatePermissionsAction::class)->name('team.permissions');
+            Route::delete('/{workspace}/team/{user}', WorkspaceTeamDestroyAction::class)->name('team.destroy');
+
+            Route::post('/{workspace}/patients/{patient}', WorkspacePatientShareAction::class)->name('patients.share');
+            Route::delete('/{workspace}/patients/{patient}', WorkspacePatientUnshareAction::class)->name('patients.unshare');
 
             Route::get('/services', WorkspaceServiceIndexAction::class)->name('services.index');
             Route::post('/services', WorkspaceServiceStoreAction::class)->name('services.store');
