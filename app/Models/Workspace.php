@@ -16,8 +16,12 @@ class Workspace extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const TYPE_PERSONAL = 'personal';
+
+    public const TYPE_COLLABORATIVE = 'collaborative';
+
     protected $fillable = [
-        'creator_id', 'name', 'slug', 'tax_name', 'tax_id', 'tax_address',
+        'creator_id', 'type', 'name', 'slug', 'tax_name', 'tax_id', 'tax_address',
         'phone', 'email', 'logo_path', 'location_address', 'settings',
     ];
 
@@ -26,6 +30,16 @@ class Workspace extends Model
         return [
             'settings' => 'array',
         ];
+    }
+
+    public function isPersonal(): bool
+    {
+        return $this->type === self::TYPE_PERSONAL;
+    }
+
+    public function isCollaborative(): bool
+    {
+        return $this->type === self::TYPE_COLLABORATIVE;
     }
 
     public function isOnlineOnly(): bool
@@ -48,11 +62,6 @@ class Workspace extends Model
         return $this->belongsToMany(User::class, 'workspace_members')
             ->withPivot(['role', 'joined_at', 'is_active'])
             ->withTimestamps();
-    }
-
-    public function services(): HasMany
-    {
-        return $this->hasMany(Service::class);
     }
 
     public function appointments(): HasMany
