@@ -15,6 +15,7 @@ class PostSessionAction extends Controller
 
         $lastAppointment = $patient->appointments()
             ->with('sessionRecording')
+            ->where('starts_at', '<=', now())
             ->orderByDesc('starts_at')
             ->first();
 

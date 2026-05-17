@@ -14,10 +14,10 @@ import {
 import { Head, usePage } from '@inertiajs/react';
 import { Circle, ExternalLink, PhoneOff, Square } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
+import EndCallAction from '@/actions/App/Http/Controllers/Appointment/EndCallAction';
 import { LiveTranscriptPanel } from '@/components/live-transcript-panel';
 import { RecordingIndicator } from '@/components/recording-indicator';
 import { useProfessionalTabRecorder } from '@/hooks/use-professional-tab-recorder';
-import EndCallAction from '@/actions/App/Http/Controllers/Appointment/EndCallAction';
 import axios from '@/lib/axios';
 import type { Auth } from '@/types';
 
