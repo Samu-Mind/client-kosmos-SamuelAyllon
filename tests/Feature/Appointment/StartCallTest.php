@@ -104,3 +104,16 @@ it('rejects starting outside the join window', function () {
         ->postJson(route('professional.appointments.start-call', $appointment))
         ->assertForbidden();
 });
+
+it('rejects another professional starting a colleague\'s appointment (IDOR guard)', function () {
+    $appointment = startableAppointment();
+    $intruder = createProfessional();
+
+    $this->actingAs($intruder)
+        ->postJson(route('professional.appointments.start-call', $appointment))
+        ->assertForbidden();
+
+    expect($appointment->fresh())
+        ->status->toBe('confirmed')
+        ->professional_joined_at->toBeNull();
+});

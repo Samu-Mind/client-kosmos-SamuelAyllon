@@ -12,7 +12,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('patient_id')->constrained('patient_profiles')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('appointment_id')->nullable()->constrained()->nullOnDelete();
+            // FK a appointments se añade en 2026_05_21_000001_add_appointment_fks_to_april_tables.php
+            // (esta migración corre antes de create_appointments_table; declarar la FK aquí
+            //  rompe el bootstrap sobre BD vacía sin DB_DISABLE_FK_CHECKS).
+            $table->unsignedBigInteger('appointment_id')->nullable();
             $table->text('content');
             $table->enum('type', ['quick_note', 'session_note', 'observation', 'followup'])->default('quick_note');
             $table->boolean('is_ai_generated')->default(false);

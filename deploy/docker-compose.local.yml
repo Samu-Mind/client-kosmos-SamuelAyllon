@@ -117,6 +117,39 @@ services:
                       # Accede en: http://localhost:8025
 
   # ──────────────────────────────────────────────────────────────────────────
+  # SERVICIO: init — Bootstrap de BD (migraciones + seeders)
+  # ──────────────────────────────────────────────────────────────────────────
+  # Servicio one-shot: arranca, aplica migraciones y seeders, y sale exit 0.
+  # Reusa la misma imagen que `app`. CONTAINER_ROLE=init le dice al entrypoint
+  # que solo haga el bootstrap y termine — no levanta FrankenPHP.
+  #
+  # Aislar el bootstrap del proceso HTTP evita que un fallo parcial de migración
+  # deje al servicio `app` en bucle de restart sirviendo 500s: si `init` falla,
+  # `app` y `worker` no llegan a arrancar y el error se ve claro en los logs.
+  init:
+    image: samue45/client-kosmos:latest
+    container_name: clientkosmos_init
+    restart: "no"                       # one-shot: si falla, no se reintenta
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      CONTAINER_ROLE: init              # ← entrypoint hace migrate + seed y exit 0
+      APP_NAME: ClientKosmos
+      APP_ENV: local                    # `local` activa los seeders demo si users=0
+      APP_DEBUG: "true"
+      APP_KEY: "base64:8APoq2IK+zUDKGmFvHJnO3XHUMYXi6Wh8sSAAfSlbCk="
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: clientkosmos
+      DB_USERNAME: clientkosmos
+      DB_PASSWORD: clientkosmos_secret
+      DB_DISABLE_FK_CHECKS: "1"         # red de seguridad para FK out-of-order (solo init)
+      LOG_CHANNEL: stderr
+
+  # ──────────────────────────────────────────────────────────────────────────
   # SERVICIO: app — Aplicación ClientKosmos
   # ──────────────────────────────────────────────────────────────────────────
   # Descarga la imagen publicada en Docker Hub. No construye nada localmente.
@@ -154,10 +187,12 @@ services:
     # el entrypoint necesita conectarse a la BD para migrar.
     # Usamos service_started para mailpit: responde desde el primer instante.
     depends_on:
+      init:
+        condition: service_completed_successfully  # bootstrap de BD listo
       db:
-        condition: service_healthy  # Espera a que MySQL esté realmente listo
+        condition: service_healthy
       mailpit:
-        condition: service_started  # Solo espera a que el contenedor esté en pie
+        condition: service_started
 
     volumes:
       # Archivos subidos por usuarios (imágenes, documentos...).
@@ -167,14 +202,21 @@ services:
     environment:
       # ── Configuración general de Laravel ──────────────────────────────────
       APP_NAME: ClientKosmos
-      APP_ENV: production
-      APP_DEBUG: "false"
+      # APP_ENV=local activa los seeders de demo (admin + natalia) y permite ver
+      # stack traces si algo falla. Para un despliegue real, cámbialo a "production".
+      APP_ENV: local
+      APP_DEBUG: "true"
+
+      # El servicio `init` ya aplicó migraciones y seeders. Este contenedor solo
+      # arranca FrankenPHP, sin volver a tocar la BD — el bootstrap está
+      # desacoplado del lifecycle del proceso HTTP.
+      SKIP_DB_BOOTSTRAP: "1"
 
       # Clave de cifrado de Laravel (sessions, cookies, tokens).
-      # Deja vacío en el primer arranque: el entrypoint la genera automáticamente.
-      # Una vez generada, pégala aquí para que sea estable entre reinicios:
-      #   docker compose exec app php artisan key:generate --show
-      APP_KEY: ""
+      # Esta clave está pregenerada y es estable entre reinicios. Si la cambias,
+      # todas las sesiones y cookies firmadas existentes quedan invalidadas.
+      # Para regenerarla: docker compose exec app php artisan key:generate --show
+      APP_KEY: "base64:8APoq2IK+zUDKGmFvHJnO3XHUMYXi6Wh8sSAAfSlbCk="
 
       APP_URL: http://localhost:8000
 
@@ -187,6 +229,12 @@ services:
       DB_DATABASE: clientkosmos         # Debe coincidir con MYSQL_DATABASE de db
       DB_USERNAME: clientkosmos         # Debe coincidir con MYSQL_USER de db
       DB_PASSWORD: clientkosmos_secret  # Debe coincidir con MYSQL_PASSWORD de db
+
+      # Necesario para el bootstrap sobre BD vacía: hay FKs cíclicas / out-of-order
+      # entre migraciones de abril y mayo (notes→appointments, etc.). Sin este flag,
+      # `create_notes_table` falla al crear la FK porque `appointments` aún no existe,
+      # el container entra en bucle de restart y nunca arranca. Ver
+      # config/database.php (PDO::MYSQL_ATTR_INIT_COMMAND) y docs/deploy/railway-bootstrap.md.
 
       # ── Drivers de Laravel ────────────────────────────────────────────────
       # Usamos la base de datos para sesiones, caché y cola de trabajos.
@@ -212,6 +260,70 @@ services:
       # Sin esta clave la app funciona completamente, pero las funciones de
       # IA (Kosmo: planDay, clientSummary, clientUpdate) no estarán disponibles.
       # Consigue una clave gratis en: https://console.groq.com/keys
+      GROQ_API_KEY: ""
+      GROQ_BASE_URL: "https://api.groq.com/openai/v1"
+      GROQ_MODEL: "llama-3.3-70b-versatile"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # SERVICIO: worker — Procesador de la cola de trabajos
+  # ──────────────────────────────────────────────────────────────────────────
+  # Reusa la MISMA imagen que el servicio `app`. La diferencia es la variable
+  # CONTAINER_ROLE=queue: el entrypoint detecta ese rol y arranca
+  # "php artisan queue:work" en vez del servidor HTTP.
+  #
+  # Sin este servicio, jobs encolados (transcripción Whisper, recordatorios de
+  # pago, notificaciones por email, generación de PDFs, briefings de IA…) se
+  # quedan acumulados en la tabla `jobs` sin procesarse y la app parece "rota"
+  # (los emails de verificación no llegan, la transcripción nunca termina, etc.).
+  #
+  # En producción (Railway) este rol se ejecuta como un servicio separado
+  # con la misma imagen y la variable CONTAINER_ROLE=queue.
+  worker:
+    image: samue45/client-kosmos:latest
+    container_name: clientkosmos_worker
+    restart: on-failure
+    depends_on:
+      init:
+        condition: service_completed_successfully  # bootstrap de BD listo
+      db:
+        condition: service_healthy
+    volumes:
+      - clientkosmos_storage:/app/storage/app/public
+    environment:
+      # Cambia el rol del entrypoint a "queue" → arranca `queue:work` en vez de FrankenPHP.
+      CONTAINER_ROLE: queue
+      SKIP_DB_BOOTSTRAP: "1"     # explícito por consistencia (el rol queue tampoco migra)
+
+      # ── Bloque de variables idéntico al del servicio `app` ──
+      # Si cambias algo en `app`, replícalo aquí. Mantener sincronizadas las
+      # credenciales y configuración es la única forma de que el worker
+      # acceda a la misma BD y procese los mismos jobs.
+      APP_NAME: ClientKosmos
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: "base64:8APoq2IK+zUDKGmFvHJnO3XHUMYXi6Wh8sSAAfSlbCk="
+      APP_URL: http://localhost:8000
+
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: clientkosmos
+      DB_USERNAME: clientkosmos
+      DB_PASSWORD: clientkosmos_secret
+
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      LOG_CHANNEL: stderr
+
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      MAIL_USERNAME: "null"
+      MAIL_PASSWORD: "null"
+      MAIL_FROM_ADDRESS: "noreply@clientkosmos.test"
+      MAIL_FROM_NAME: ClientKosmos
+
       GROQ_API_KEY: ""
       GROQ_BASE_URL: "https://api.groq.com/openai/v1"
       GROQ_MODEL: "llama-3.3-70b-versatile"

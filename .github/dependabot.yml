@@ -82,3 +82,42 @@ updates:
     commit-message:
       prefix: "chore(ci)"
       include: scope
+
+  # Imágenes Docker: bases del Dockerfile pineadas a digest sha256 (deps,
+  # frontend, composer, dunglas/frankenphp) y referencias en docker-compose
+  # (mysql, mailpit). Dependabot abre PRs semanales cuando hay digest nuevo
+  # disponible — la PR pasa por CI antes de mergear, así el bump es revisable.
+  # Ignoramos samue45/* (nuestra propia imagen publicada).
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Madrid
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - docker
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    ignore:
+      - dependency-name: "samue45/*"
+
+  - package-ecosystem: docker
+    directory: "/deploy"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Madrid
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - docker
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    ignore:
+      - dependency-name: "samue45/*"

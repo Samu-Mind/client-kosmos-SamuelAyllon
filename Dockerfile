@@ -26,10 +26,15 @@
 # ==============================================================================
 # ETAPA 1: Composer
 # ==============================================================================
-FROM php:8.4-cli-alpine AS deps
+# Pineamos Alpine al minor explícitamente (alpine3.21 = Alpine 3.21 LTS).
+# Sin pinear, las capas de paquetes apk varían entre builds según el estado
+# del mirror oficial. Combinado con composer.lock y package-lock.json (PHP/JS)
+# esto deja la imagen funcionalmente reproducible — los únicos floats que
+# quedan son patches dentro del minor (CVE fixes), aceptables por diseño.
+FROM php:8.4-cli-alpine3.21@sha256:9c1dd92c492546d1de23decef0d67280f3f9413942ff44ec119af6db642cd9f0 AS deps
 
 RUN apk add --no-cache unzip
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2@sha256:b09bccd91a78fe8a9ab4b33d707b862e8fe54fec17782e32683ad2a69c46867d /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
@@ -55,7 +60,7 @@ RUN cd vendor/google/apiclient-services/src && \
 # ==============================================================================
 # ETAPA 2: Frontend (Vite + React)
 # ==============================================================================
-FROM node:20-alpine AS frontend
+FROM node:20-alpine3.21@sha256:eb0b81f6eb35ec5ecd1cab181801f93a6314127580b416e6e290363b724e1686 AS frontend
 
 # Variables VITE_* que Vite hornea en el bundle JS en tiempo de build. Si no
 # se pasan vía --build-arg (o via Railway que las inyecta automáticamente
@@ -140,7 +145,11 @@ RUN npm run build
 # ==============================================================================
 # dunglas/frankenphp ya trae Caddy embebido + PHP 8.4 + install-php-extensions.
 # La imagen base alpine pesa ~70 MB; con extensiones + app debería quedar < 200 MB.
-FROM dunglas/frankenphp:1-php8.4-alpine
+#
+# Las cuatro imágenes base están pineadas a digest sha256 para que `docker build`
+# del mismo SHA de git produzca capas idénticas hoy y dentro de tres años.
+# Los bumps los gestiona Dependabot vía .github/dependabot.yml (revisión semanal).
+FROM dunglas/frankenphp:1-php8.4-alpine@sha256:70d3fd963ab380a186e272db2d52e5c52f1767a4a3b7f65530b1a7c384a22b6f
 
 # Instalamos extensiones PHP de runtime usando install-php-extensions (helper
 # que ya viene en la imagen FrankenPHP). Usa apk virtual deps internamente y

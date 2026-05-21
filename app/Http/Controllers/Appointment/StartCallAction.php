@@ -14,6 +14,8 @@ class StartCallAction extends Controller
 {
     public function __invoke(Request $request, Appointment $appointment, GoogleCalendarService $google): JsonResponse
     {
+        $this->authorize('start', $appointment);
+
         abort_if(
             ! in_array($appointment->status, ['confirmed', 'in_progress'], strict: true),
             422,

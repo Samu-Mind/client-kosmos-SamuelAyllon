@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('patient_id')->nullable()->constrained('patient_profiles')->nullOnDelete();
-            $table->foreignId('appointment_id')->nullable()->constrained()->nullOnDelete();
+            // FK a appointments se añade en 2026_05_21_000001_add_appointment_fks_to_april_tables.php
+            $table->unsignedBigInteger('appointment_id')->nullable();
             $table->enum('type', ['daily', 'pre_session', 'post_session', 'weekly', 'nudge']);
             $table->json('content');
             $table->boolean('is_read')->default(false);

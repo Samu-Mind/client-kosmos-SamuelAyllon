@@ -31,4 +31,9 @@ class AppointmentPolicy
     {
         return $user->isAdmin() || $user->id === $appointment->professional_id;
     }
+
+    public function start(User $user, Appointment $appointment): bool
+    {
+        return $user->id === $appointment->professional_id;
+    }
 }

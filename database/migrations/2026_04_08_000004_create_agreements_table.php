@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('patient_id')->constrained('patient_profiles')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('appointment_id')->nullable()->constrained()->nullOnDelete();
+            // FK a appointments se añade en 2026_05_21_000001_add_appointment_fks_to_april_tables.php
+            $table->unsignedBigInteger('appointment_id')->nullable();
             $table->text('content');
             $table->boolean('is_completed')->default(false);
             $table->dateTime('completed_at')->nullable();
